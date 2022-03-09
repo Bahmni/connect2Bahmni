@@ -1,25 +1,33 @@
+import 'dart:async';
 import 'dart:convert';
 
-import '../../domain/models/user.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:async';
+import '../../domain/models/user.dart';
+import '../domain/models/session.dart';
 
 class UserPreferences {
-  Future<bool> saveUser(User user) async {
+  Future<bool> saveSession(Session session) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setString("user", jsonEncode(user.toJson()));
+    prefs.setString("session", jsonEncode(session.toJson()));
+    prefs.setString("sessionId", session.sessionId);
     return Future.value(true);
   }
 
-  Future<User?> getUser() async {
+  Future<Session?> getSession() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? userInfo = prefs.getString("user");
-    return userInfo != null ? Future.value(User.fromJson(jsonDecode(userInfo))) : Future.value(null);
+    String? sessionInfo = prefs.getString("session");
+    Session? userSession = sessionInfo != null ? Session.fromJson(jsonDecode(sessionInfo)) : null;
+    return Future.value(userSession);
   }
 
-  void removeUser() async {
+  Future<String?> getSessionId() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.remove("user");
+    return Future.value(prefs.getString("sessionId"));
+  }
+
+  void removeUserSession() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.remove("session");
     prefs.remove("sessionId");
   }
 

@@ -1,8 +1,11 @@
-import '../providers/user_provider.dart';
-import '../domain/models/user.dart';
+import 'dart:async';
 
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
+
+import '../domain/models/user.dart';
+import '../providers/user_provider.dart';
+import '../utils/app_routes.dart';
 
 class DashboardWidget extends StatefulWidget {
   const DashboardWidget({Key? key}) : super(key: key);
@@ -167,131 +170,9 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                           mainAxisSize: MainAxisSize.max,
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Container(
-                              width: 100,
-                              height: 100,
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                boxShadow: const [
-                                  BoxShadow(
-                                    blurRadius: 5,
-                                    color: Color(0x3B000000),
-                                    offset: Offset(0, 2),
-                                  )
-                                ],
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsetsDirectional.fromSTEB(4, 4, 4, 4),
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.max,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    const Icon(
-                                      Icons.person,
-                                      color: Color(0xFF1E2429),
-                                      size: 40,
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsetsDirectional.fromSTEB(0, 8, 0, 0),
-                                      child: Text(
-                                        'Patients',
-                                        style: Theme.of(context).textTheme.bodyText2?.merge(const TextStyle(
-                                          fontFamily: 'Lexend Deca',
-                                          color: Color(0xFF090F13),
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.normal,
-                                        )),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            Container(
-                              width: 110,
-                              height: 100,
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                boxShadow: const [
-                                  BoxShadow(
-                                    blurRadius: 5,
-                                    color: Color(0x3A000000),
-                                    offset: Offset(0, 2),
-                                  )
-                                ],
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsetsDirectional.fromSTEB(4, 4, 4, 4),
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.max,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    const Icon(
-                                      Icons.access_alarm,
-                                      color: Color(0xFF1E2429),
-                                      size: 40,
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsetsDirectional.fromSTEB(
-                                          0, 8, 0, 0),
-                                      child: Text(
-                                        'Appointments',
-                                        style: Theme.of(context).textTheme.bodyText1?.merge(const TextStyle(
-                                          fontFamily: 'Lexend Deca',
-                                          color: Color(0xFF090F13),
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.normal,
-                                        )),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            Container(
-                              width: 110,
-                              height: 100,
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                boxShadow: const [
-                                  BoxShadow(
-                                    blurRadius: 5,
-                                    color: Color(0x39000000),
-                                    offset: Offset(0, 2),
-                                  )
-                                ],
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsetsDirectional.fromSTEB(4, 4, 4, 4),
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.max,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    const Icon(
-                                      Icons.event_note,
-                                      color: Color(0xFF1E2429),
-                                      size: 40,
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsetsDirectional.fromSTEB(
-                                          0, 8, 0, 0),
-                                      child: Text(
-                                        'Notifications',
-                                        style: Theme.of(context).textTheme.bodyText1?.merge(const TextStyle(
-                                          fontFamily: 'Lexend Deca',
-                                          color: Color(0xFF090F13),
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.normal,
-                                        )),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
+                            _patiientSearch(),
+                            _myAppointments(),
+                            _myNotifications(),
                           ],
                         ),
                       ),
@@ -611,6 +492,173 @@ class _DashboardWidgetState extends State<DashboardWidget> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _patiientSearch() {
+    return Container(
+      width: 100,
+      height: 100,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: const [
+          BoxShadow(
+            blurRadius: 5,
+            color: Color(0x3B000000),
+            offset: Offset(0, 2),
+          )
+        ],
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Padding(
+        padding: const EdgeInsetsDirectional.fromSTEB(4, 4, 4, 4),
+        child: InkWell(
+          onTap: () => Navigator.pushNamed(context, AppRoutes.searchPatients),
+//          onTap: () async {
+//            await Navigator.push(
+//              context,
+//              MaterialPageRoute(
+//                builder: (context) => const PatientSearch(),
+//              ),
+//            );
+//          },
+          child: Column(
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(
+                Icons.person,
+                color: Color(0xFF1E2429),
+                size: 40,
+              ),
+              Padding(
+                padding: const EdgeInsetsDirectional.fromSTEB(0, 8, 0, 0),
+                child: Text(
+                  'Patients',
+                  style: Theme.of(context).textTheme.bodyText2?.merge(const TextStyle(
+                    fontFamily: 'Lexend Deca',
+                    color: Color(0xFF090F13),
+                    fontSize: 14,
+                    fontWeight: FontWeight.normal,
+                  )),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _myAppointments() {
+    return Container(
+      width: 110,
+      height: 100,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: const [
+          BoxShadow(
+            blurRadius: 5,
+            color: Color(0x3A000000),
+            offset: Offset(0, 2),
+          )
+        ],
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Padding(
+        padding: const EdgeInsetsDirectional.fromSTEB(4, 4, 4, 4),
+        child: InkWell(
+          onTap: () => Navigator.pushNamed(context, AppRoutes.appointments),
+          child: Column(
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(
+                Icons.access_alarm,
+                color: Color(0xFF1E2429),
+                size: 40,
+              ),
+              Padding(
+                padding: const EdgeInsetsDirectional.fromSTEB(
+                    0, 8, 0, 0),
+                child: Text(
+                  'Appointments',
+                  style: Theme.of(context).textTheme.bodyText1?.merge(const TextStyle(
+                    fontFamily: 'Lexend Deca',
+                    color: Color(0xFF090F13),
+                    fontSize: 14,
+                    fontWeight: FontWeight.normal,
+                  )),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _myNotifications() {
+    return Container(
+      width: 110,
+      height: 100,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: const [
+          BoxShadow(
+            blurRadius: 5,
+            color: Color(0x39000000),
+            offset: Offset(0, 2),
+          )
+        ],
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Padding(
+        padding: const EdgeInsetsDirectional.fromSTEB(4, 4, 4, 4),
+        child: InkWell(
+          onTap: () => Navigator.pushNamed(context, AppRoutes.taskNotification),
+          child: Column(
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(
+                Icons.event_note,
+                color: Color(0xFF1E2429),
+                size: 40,
+              ),
+              Padding(
+                padding: const EdgeInsetsDirectional.fromSTEB(
+                    0, 8, 0, 0),
+                child: Text(
+                  'Notifications',
+                  style: Theme.of(context).textTheme.bodyText1?.merge(const TextStyle(
+                    fontFamily: 'Lexend Deca',
+                    color: Color(0xFF090F13),
+                    fontSize: 14,
+                    fontWeight: FontWeight.normal,
+                  )),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class Debouncer {
+  int? milliseconds;
+  VoidCallback? action;
+  Timer? timer;
+
+  run(VoidCallback action) {
+    if (null != timer) {
+      timer!.cancel();
+    }
+    timer = Timer(
+      const Duration(milliseconds: Duration.millisecondsPerSecond),
+      action,
     );
   }
 }

@@ -1,8 +1,12 @@
-import '../domain/models/session.dart';
-import 'package:flutter/material.dart';
 import 'dart:convert';
-
+import 'package:flutter/material.dart';
 import 'package:http/http.dart';
+
+import '../domain/models/session.dart';
+import '../domain/models/omrs_provider.dart';
+import '../utils/app_urls.dart';
+import '../utils/shared_preference.dart';
+import '../services/providers.dart';
 
 enum Status {
   notLoggedIn,
@@ -26,30 +30,32 @@ class AuthProvider with ChangeNotifier {
     String basicAuth = 'Basic ' + base64Encode(utf8.encode('$username:$password'));
     _loggedInStatus = Status.authenticating;
     notifyListeners();
-
-//    Response response = await post(
-//      Uri.parse('https://demo.mybahmni.org/openmrs/ws/rest/v1/session'),
-//      body: json.encode({}),
-//      headers: {'Content-Type': 'application/json'}
-//    );
-
-    Response response = await get(Uri.parse('https://qa-02.hip.bahmni-covid19.in/openmrs/ws/rest/v1/session'),
+    Response response = await get(Uri.parse(AppUrls.omrs.sessionUrl),
           headers: <String, String>{'authorization': basicAuth, 'Content-Type': 'application/json'});
     if (response.statusCode == 200) {
       final Map<String, dynamic> responseData = json.decode(response.body);
       Session session = Session.fromJson(responseData);
-      //UserPreferences().saveUser(authUser);
+      var providerResponse = await Providers().omrsProviderbyUserId(session.user.uuid, () => Future.value(session.sessionId));
+      if (providerResponse['status']) {
+        session.user.provider = providerResponse['result'] as OmrsProvider;
+      }
+      //UserPreferences().saveSession(session);
       _loggedInStatus = Status.loggedIn;
+      print('Login successful. user.name = ${session.user.username}, user.uuid = ${session.user.uuid}, user.provider.identifier = ${session.user.provider!.identifier}');
       notifyListeners();
       return {'status': true, 'message': 'Successful', 'session': session};
     } else {
       _loggedInStatus = Status.notLoggedIn;
-      //notifyListeners();
+      notifyListeners();
       return {
         'status': false,
         'message': json.decode(response.body)['error']
       };
     }
+  }
+
+  Future<String?> get sessionId {
+    return UserPreferences().getSessionId();
   }
 
 }

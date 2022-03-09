@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../utils/shared_preference.dart';
 import '../providers/auth.dart';
 import '../utils/validators.dart';
 import '../domain/models/user.dart';
@@ -98,21 +99,17 @@ class _LoginState extends State<Login> {
         final Future<Map<String, dynamic>> successfulMessage = auth.login(_username as String, _password as String);
         successfulMessage.then((response) {
           if (response['status']) {
-            User user = response['session'].user;
-            print(user);
-            Provider.of<UserProvider>(context, listen: false).setUser(user);
+            var session = response['session'];
+            UserPreferences().saveSession(session);
+            Provider.of<UserProvider>(context, listen: false).setUser(session.user);
             Navigator.pushReplacementNamed(context, '/dashboard');
           } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text("Login failed")),
-            );
+            showLoginFailure(context);
           }
         });
       } else {
         print("form is invalid");
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Login failed")),
-        );
+        showLoginFailure(context);
       }
     }
 
@@ -152,6 +149,12 @@ class _LoginState extends State<Login> {
             ),
           ),
       ),
+    );
+  }
+
+  void showLoginFailure(BuildContext context) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Login failed")),
     );
   }
 }

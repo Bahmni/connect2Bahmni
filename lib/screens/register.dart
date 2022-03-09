@@ -18,7 +18,7 @@ class _RegisterState extends State<Register> {
         child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: const <Widget>[
-              Text('Hello!  You have pushed the button this many times:',),
+              Text('Coming soon',),
             ]
         ),
       ),
