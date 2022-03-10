@@ -2,7 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import '../widgets/flutter_day_view_calendar.dart';
+import '../widgets/ss_calendar_view.dart' as sscv;
+import '../widgets/flutter_day_view_calendar.dart' as fdvc;
 import '../domain/models/bahmni_appointment.dart';
 import '../services/bahmni_appointments.dart';
 import '../utils/shared_preference.dart';
@@ -18,7 +19,6 @@ class MyAppointmentsWidget extends StatefulWidget {
 class _MyAppointmentsWidgetState extends State<MyAppointmentsWidget> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
   late Future<List<BahmniAppointment>> _futureAppointments;
-  //DateTime _forDate = DateTime.now().add(const Duration(days: -1));
   DateTime _forDate = DateTime.now();
 
   @override
@@ -56,7 +56,10 @@ class _MyAppointmentsWidgetState extends State<MyAppointmentsWidget> {
           return const Center(child: Text("Failed to load appointments"),);
         }
         if (snapshot.hasData) {
-          return dayViewCalendar(snapshot, _forDate, _navigate);
+          //return const Text('Hello World');
+          return sscv.myAppointmentWidget(snapshot);
+          //return sscv.calendarProvider(context, snapshot, _navigate);
+          //return fdvc.dayViewCalendar(snapshot, _forDate, _navigate);
         }
         return const CircularProgressIndicator();
       },

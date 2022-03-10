@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 
 import '../providers/auth.dart';
 import '../services/patients.dart';
-
+import '../utils/debouncer.dart';
 import 'models/patient_view.dart';
 
 class PatientSearch extends StatefulWidget {
@@ -18,7 +18,7 @@ class PatientSearch extends StatefulWidget {
 class _PatientsSearchWidgetState extends State<PatientSearch> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
   TextEditingController searchController = TextEditingController();
-  final _debouncer = Debouncer();
+  final Debouncer _debouncer = Debouncer();
   AuthProvider? _authProvider;
   List<PatientViewModel> patientList = [];
 
@@ -302,14 +302,4 @@ class _PatientsSearchWidgetState extends State<PatientSearch> {
 }
 
 
-class Debouncer {
-    VoidCallback? action;
-    Timer? timer;
 
-    run(VoidCallback action) {
-      if (null != timer) {
-        timer!.cancel();
-      }
-      timer = Timer(const Duration(milliseconds: Duration.millisecondsPerSecond),action,);
-    }
-}

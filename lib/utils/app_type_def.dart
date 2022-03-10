@@ -1,1 +1,1 @@
-typedef NavigateToDate = Function(DateTime date);
+typedef BrowseDate = Function(DateTime date);

@@ -65,10 +65,10 @@ Widget customEventTextBuilder(FlutterWeekViewEvent event, BuildContext context, 
       text: event.title,
       style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 10.0),
     ),
-//      TextSpan(
-//        text: ' ' +  dayView.hoursColumnStyle.timeFormatter(HourMinute.fromDateTime(dateTime: event.start))
-//            + ' - ' + dayView.hoursColumnStyle.timeFormatter(HourMinute.fromDateTime(dateTime: event.end)) + '\n\n',
-//      ),
+      TextSpan(
+        text: ' ' +  dayView.hoursColumnStyle.timeFormatter(HourMinute.fromDateTime(dateTime: event.start))
+            + ' - ' + dayView.hoursColumnStyle.timeFormatter(HourMinute.fromDateTime(dateTime: event.end)) + '\n\n',
+      ),
 //      TextSpan(
 //        text: event.description,
 //      ),
@@ -111,12 +111,12 @@ FlutterWeekViewEvent flutterWeekViewEvent(BahmniAppointment event) {
   );
 }
 
-DayView dayViewCalendar(AsyncSnapshot<List<BahmniAppointment>> snapshot, DateTime forDate, NavigateToDate nav) {
+DayView dayViewCalendar(AsyncSnapshot<List<BahmniAppointment>> snapshot, DateTime forDate, BrowseDate browseDate) {
   return DayView(
     initialTime: const HourMinute(hour: 7),
     dayBarStyle: DayBarStyle.fromDate(date: forDate, dateFormatter: _formatDate),
     date: forDate,
-    onDayBarTappedDown: (dt) => nav(dt),
+    onDayBarTappedDown: (dt) => browseDate(dt),
     events: _eventList(snapshot.data),
     style: DayViewStyle.fromDate(date: forDate, currentTimeCircleColor: Colors.red, hourRowHeight: 150.0),
     //style: DayViewStyle.fromDate(date: _forDate, currentTimeCircleColor: Colors.red, headerSize: 0),
