@@ -7,6 +7,9 @@ import '../providers/auth.dart';
 import '../services/patients.dart';
 import '../utils/debouncer.dart';
 import 'models/patient_view.dart';
+import '../screens/patient_charts.dart';
+import '../utils/app_routes.dart';
+
 
 class PatientSearch extends StatefulWidget {
   const PatientSearch({Key? key}) : super(key: key);
@@ -45,7 +48,7 @@ class _PatientsSearchWidgetState extends State<PatientSearch> {
         });
         return;
       }
-      final Future<Map<String, dynamic>> request = Patients().searchByName(searchController.text, retrieveSessionId);
+      final Future<Map<String, dynamic>> request = Patients().searchByName(searchController.text);
       request.then((response) {
         print('got patient response');
         if (response['status']) {
@@ -281,16 +284,28 @@ class _PatientsSearchWidgetState extends State<PatientSearch> {
               ),
               Padding(
                 padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 8, 0),
-                child: Column(
-                  mainAxisSize: MainAxisSize.max,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
-                    Icon(
-                      Icons.chevron_right_rounded,
-                      color: Color(0xFF82878C),
-                      size: 24,
-                    ),
-                  ],
+                child: InkWell(
+                  onTap: () async {
+                    await Navigator.pushNamed(
+                      context,
+                      AppRoutes.patientCharts,
+                      arguments: PatientChartArguments(
+                        patient.uuid,
+                        patient.fullName
+                      ),
+                    );
+                  },
+                  child: Column(
+                    mainAxisSize: MainAxisSize.max,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: const [
+                      Icon(
+                        Icons.chevron_right_rounded,
+                        color: Color(0xFF82878C),
+                        size: 24,
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ],

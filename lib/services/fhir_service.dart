@@ -1,12 +1,14 @@
+
 import 'package:http/http.dart';
 import 'package:fhir/r4.dart';
 import 'dart:convert';
 
+import '../utils/shared_preference.dart';
 import '../utils/app_urls.dart';
 
 class FhirInterface {
-  Future<Map<String, dynamic>> getRequest(Future<String?> Function() fetchSessionId, String url, [Map<String, String> params = const {}]) async {
-    String? sessionId = await fetchSessionId();
+  Future<Map<String, dynamic>> getRequest(String url, [Map<String, String> params = const {}]) async {
+    String? sessionId = await UserPreferences().getSessionId();
     if (sessionId == null) {
       return {
         'status': false,
@@ -40,8 +42,8 @@ class FhirInterface {
     };
   }
 
-  Future<Map<String, dynamic>> searchByName(String name, Future<String?> Function() fetchSessionId) async {
-    String? sessionId = await fetchSessionId();
+  Future<Map<String, dynamic>> searchByName(String name) async {
+    String? sessionId = await UserPreferences().getSessionId();
     if (sessionId == null) {
       return {
         'status': false,
@@ -49,7 +51,7 @@ class FhirInterface {
         'message': 'session expired',
       };
     }
-    String url = AppUrls.fhir.patientUrl + '?name=$name';
+    String url = AppUrls.fhir.patient + '?name=$name';
     Response response = await get(
       Uri.parse(url),
       headers: <String, String>{

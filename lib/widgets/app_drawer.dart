@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
+import '../utils/app_routes.dart';
+import '../utils/shared_preference.dart';
 
-Drawer appDrawer() {
+Drawer appDrawer(BuildContext context) {
   return Drawer(
       child: ListView(
         padding: EdgeInsets.zero,
-        children: const <Widget>[
-          SizedBox(
+        children: <Widget>[
+          const SizedBox(
             height: 80.0,
             child: DrawerHeader(
                 child: Text('', style: TextStyle(color: Colors.white,fontSize: 24,),),
@@ -14,10 +16,39 @@ Drawer appDrawer() {
                 padding: EdgeInsets.all(0.0)
             ),
           ),
-          ListTile(leading: Icon(Icons.message),title: Text('Messages'),),
-          ListTile(leading: Icon(Icons.account_circle),title: Text('Profile'),),
-          ListTile(leading: Icon(Icons.settings),title: Text('Settings'),),
-          ListTile(leading: Icon(Icons.logout),title: Text('Logout'),),
+          ListTile(leading: const Icon(Icons.message),
+            title: const Text('Messages'),
+            onTap: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text("Not yet Implemented")),
+              );
+              Navigator.pop(context);
+            },
+          ),
+          ListTile(leading: const Icon(Icons.account_circle),
+            title: const Text('Profile'),
+            onTap: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text("Not yet Implemented")),
+              );
+              Navigator.pop(context);
+            },
+          ),
+          ListTile(leading: const Icon(Icons.settings),
+            title: const Text('Settings'),
+            onTap: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text("Not yet Implemented")),
+              );
+              Navigator.pop(context);
+            },
+          ),
+          ListTile(leading: const Icon(Icons.logout),
+              title: const Text('Logout'),
+              onTap: () {
+                UserPreferences().removeSession();
+                Navigator.pushNamedAndRemoveUntil(context, AppRoutes.login, (r) => false);
+              }),
         ],
       )
   );

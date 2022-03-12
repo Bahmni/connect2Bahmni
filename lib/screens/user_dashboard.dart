@@ -22,7 +22,7 @@ class _UserDashBoardState extends State<UserDashBoard> {
         title: const Text("My Bahmni"),
         elevation: 0.1,
       ),
-      drawer: appDrawer(),
+      drawer: appDrawer(context),
       body: const DashboardWidget()
     );
   }

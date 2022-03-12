@@ -10,7 +10,7 @@ import '../utils/app_urls.dart';
 
 class Providers {
   Future<Map<String, dynamic>> practitionerByUserId(String uuid, Future<String?> Function() fetchSessionId) async {
-    String url = AppUrls.omrs.providerUrl + '?user=$uuid&v=custom:(uuid,identifier,attributes)';
+    String url = AppUrls.omrs.provider + '?user=$uuid&v=custom:(uuid,identifier,attributes)';
     String? sessionId = await fetchSessionId();
     if (sessionId == null) {
       return {
@@ -51,7 +51,7 @@ class Providers {
   }
 
   Future<Map<String, dynamic>> omrsProviderbyUserId(String uuid, Future<String?> Function() fetchSessionId) async {
-    String url = AppUrls.omrs.providerUrl + '?user=$uuid&v=custom:(uuid,identifier,attributes)';
+    String url = AppUrls.omrs.provider + '?user=$uuid&v=custom:(uuid,identifier,attributes)';
     String? sessionId = await fetchSessionId();
     if (sessionId == null) {
       return {
@@ -93,7 +93,7 @@ class Providers {
 
   Practitioner fromOmrsProvider(providerJson) {
     return Practitioner(id: Id(providerJson['uuid']),
-        identifier: [Identifier(system: FhirUri(AppUrls.omrs.providerUrl), value: providerJson['identifier'])],
+        identifier: [Identifier(system: FhirUri(AppUrls.omrs.provider), value: providerJson['identifier'])],
     );
   }
 

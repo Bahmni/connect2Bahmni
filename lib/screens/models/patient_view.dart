@@ -12,6 +12,10 @@ class PatientViewModel {
     _patient = patient;
   }
 
+  String get uuid {
+    return _patient.id?.value ?? '';
+  }
+
   String get fullName {
     String fullName = '';
     if (_patient.name != null) {

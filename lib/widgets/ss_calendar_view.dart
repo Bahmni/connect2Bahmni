@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import '../domain/models/bahmni_appointment.dart';
 import '../services/bahmni_appointments.dart';
 import '../utils/debouncer.dart';
-import '../utils/shared_preference.dart';
 
 CalendarControllerProvider calendarProvider(BuildContext context, AsyncSnapshot<List<BahmniAppointment>> snapshot) {
   return CalendarControllerProvider<BahmniAppointment>(
@@ -20,7 +19,6 @@ Widget myAppointmentWidget(AsyncSnapshot<List<BahmniAppointment>> snapshot) {
 
 
 List<CalendarEventData<BahmniAppointment>> _eventList(List<BahmniAppointment>? appointmentList) {
-  print('eventList called .... ');
   if (appointmentList == null) {
     return [];
   }
@@ -43,7 +41,6 @@ Widget _bahmniAppointmentsDayWidget(List<BahmniAppointment> eventList) {
       child: const Icon(Icons.add),
       elevation: 8,
       onPressed: () async {
-        print('Add clicked');
 //        final event =
 //        await context.pushRoute<CalendarEventData<Event>>(CreateEventPage(
 //          withDuration: true,
@@ -73,7 +70,6 @@ class AppointmentsDayView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print('Rendering Day view widget');
 
     if (initialList != null) {
       controller.addAll(_eventList(initialList));
@@ -93,7 +89,6 @@ class AppointmentsDayView extends StatelessWidget {
   }
 
   void browseToDate(DateTime date) {
-    print('Navigated to date = $date');
     fetchAppointmentsForDate(date);
 
   }
@@ -103,17 +98,14 @@ class AppointmentsDayView extends StatelessWidget {
       var dateKey = keyForDate(date);
       bool alreadyFetched = history[dateKey] ?? false;
       if (!alreadyFetched) {
-        print('Fetching for date $date => $alreadyFetched');
-        Appointments().allAppointments(date, () => UserPreferences().getSessionId())
+        Appointments().allAppointments(date)
             .then((response) {
-          print('fetched $response');
           if (response.isNotEmpty) {
             controller.addAll(_eventList(response));
           }
           history.putIfAbsent(dateKey, () => true);
         });
       } else {
-        print('Already fetched for $date. Skipping');
         history.putIfAbsent(dateKey, () => true);
       }
     });
@@ -129,7 +121,6 @@ Widget _defaultEventTileBuilder(
     DateTime startDuration,
     DateTime endDuration,
     ) {
-  print('In event builder');
 
   if (events.isNotEmpty) {
     return RoundedEventTile(

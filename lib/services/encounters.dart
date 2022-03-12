@@ -7,8 +7,8 @@ import '../utils/app_urls.dart';
 
 class Encounters {
   Future<Map<String, dynamic>> byPatientUuid(String uuid, Future<String?> Function() fetchSessionId) async {
-    String url = AppUrls.fhir.encounterUrl + '?patient=$uuid';
-    return FhirInterface().getRequest(fetchSessionId, url);
+    String url = AppUrls.fhir.encounter + '?patient=$uuid';
+    return FhirInterface().getRequest(url);
   }
 
 }

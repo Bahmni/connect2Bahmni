@@ -25,7 +25,7 @@ class UserPreferences {
     return Future.value(prefs.getString("sessionId"));
   }
 
-  void removeUserSession() async {
+  void removeSession() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.remove("session");
     prefs.remove("sessionId");

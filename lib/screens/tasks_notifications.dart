@@ -37,7 +37,7 @@ class _TasksAndNotificationsWidgetState extends State<TasksAndNotificationsWidge
         title: const Text('Tasks & Notifications'),
         elevation: 0.1,
       ),
-      drawer: appDrawer(),
+      drawer: appDrawer(context),
       body: const TaskNotificationWidget(),
     );
   }

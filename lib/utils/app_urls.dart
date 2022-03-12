@@ -7,21 +7,21 @@ class AppUrls {
 
 class OMRSRestUrls {
   const OMRSRestUrls();
-  String get baseUrl => '${AppUrls.baseUrl}/openmrs/ws/rest/v1';
-  String get sessionUrl => '$baseUrl/session';
-  String get providerUrl => '$baseUrl/provider';
+  String get base => '${AppUrls.baseUrl}/openmrs/ws/rest/v1';
+  String get session => '$base/session';
+  String get provider => '$base/provider';
 }
 
 class FHIRUrls {
   const FHIRUrls();
-  String get baseUrl => '${AppUrls.baseUrl}/openmrs/ws/fhir2/R4';
-  String get patientUrl => '$baseUrl/Patient';
-  String get encounterUrl => '$baseUrl/Encounter';
+  String get base => '${AppUrls.baseUrl}/openmrs/ws/fhir2/R4';
+  String get patient => '$base/Patient';
+  String get encounter => '$base/Encounter';
 }
 
 class BahmniRestUrls {
   const BahmniRestUrls();
-  String get baseUrl => '${AppUrls.baseUrl}/openmrs/ws/rest/v1';
-  String get appointmentsUrl => '$baseUrl/appointments';
-  String get appointmentUrl => '$baseUrl/appointment';
+  String get base => '${AppUrls.baseUrl}/openmrs/ws/rest/v1';
+  String get appointments => '$base/appointments';
+  String get appointment => '$base/appointment';
 }

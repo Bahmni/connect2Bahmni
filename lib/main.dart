@@ -9,10 +9,11 @@ import '../providers/auth.dart';
 import '../screens/user_dashboard.dart';
 import '../screens/login.dart';
 import '../screens/register.dart';
-import 'screens/my_appointments.dart';
+import '../screens/appointments_calendar.dart';
+import '../utils/app_routes.dart';
 import 'screens/patient_search.dart';
 import 'screens/tasks_notifications.dart';
-import '../utils/app_routes.dart';
+import '../screens/patient_charts.dart';
 
 void main() {
   runApp(const MyApp());
@@ -50,7 +51,7 @@ class MyApp extends StatelessWidget {
                     } else if (snapshot.data == null) {
                       return const Login();
                     } else {
-                      UserPreferences().removeUserSession();
+                      UserPreferences().removeSession();
                     }
                     return const Text('Logged in ');
                     //return const Welcome(user: snapshot.data);
@@ -60,9 +61,10 @@ class MyApp extends StatelessWidget {
             AppRoutes.dashboard: (context) => const UserDashBoard(),
             AppRoutes.login: (context) => const Login(),
             AppRoutes.register: (context) => const Register(),
-            AppRoutes.appointments: (context) => const MyAppointmentsWidget(),
+            AppRoutes.appointments: (context) => const AppointmentsCalendar(),
             AppRoutes.taskNotification: (context) => const TasksAndNotificationsWidget(),
             AppRoutes.searchPatients: (context) => const PatientSearch(),
+            AppRoutes.patientCharts: (context) => const PatientCharts(),
           }),
     );
   }

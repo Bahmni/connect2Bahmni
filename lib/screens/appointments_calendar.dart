@@ -6,17 +6,17 @@ import '../widgets/ss_calendar_view.dart' as sscv;
 import '../widgets/flutter_day_view_calendar.dart' as fdvc;
 import '../domain/models/bahmni_appointment.dart';
 import '../services/bahmni_appointments.dart';
-import '../utils/shared_preference.dart';
 import '../widgets/app_drawer.dart';
+import '../utils/app_failures.dart';
 
-class MyAppointmentsWidget extends StatefulWidget {
-  const MyAppointmentsWidget({Key? key}) : super(key: key);
+class AppointmentsCalendar extends StatefulWidget {
+  const AppointmentsCalendar({Key? key}) : super(key: key);
 
   @override
-  _MyAppointmentsWidgetState createState() => _MyAppointmentsWidgetState();
+  _AppointmentsCalendarState createState() => _AppointmentsCalendarState();
 }
 
-class _MyAppointmentsWidgetState extends State<MyAppointmentsWidget> {
+class _AppointmentsCalendarState extends State<AppointmentsCalendar> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
   late Future<List<BahmniAppointment>> _futureAppointments;
   DateTime _forDate = DateTime.now();
@@ -38,7 +38,7 @@ class _MyAppointmentsWidgetState extends State<MyAppointmentsWidget> {
           title: const Text('Appointments'),
           elevation: 0.1,
         ),
-        drawer: appDrawer(),
+        drawer: appDrawer(context),
         body: _appointmentsDayView(),
     );
   }
@@ -53,12 +53,11 @@ class _MyAppointmentsWidgetState extends State<MyAppointmentsWidget> {
         }
         if (snapshot.hasError) {
           //write to log
-          return const Center(child: Text("Failed to load appointments"),);
+          String errorMsg = _snapshotError(snapshot.error!);
+          return Center(child: Text('Failed to load appointments. $errorMsg'),);
         }
         if (snapshot.hasData) {
-          //return const Text('Hello World');
           return sscv.myAppointmentWidget(snapshot);
-          //return sscv.calendarProvider(context, snapshot, _navigate);
           //return fdvc.dayViewCalendar(snapshot, _forDate, _navigate);
         }
         return const CircularProgressIndicator();
@@ -75,7 +74,14 @@ class _MyAppointmentsWidgetState extends State<MyAppointmentsWidget> {
     });
   }
 
-  Future<List<BahmniAppointment>> fetchAppointments() => Appointments().allAppointments(_forDate, () => UserPreferences().getSessionId());
+  Future<List<BahmniAppointment>> fetchAppointments() => Appointments().allAppointments(_forDate);
+
+  String _snapshotError(Object error) {
+    if (error is Failure) {
+      return '${error.message}. response code:${error.errorCode}';
+    }
+    return error.toString();
+  }
 
 }
 

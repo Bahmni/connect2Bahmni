@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../widgets/app_drawer.dart';
 
 class PatientCharts extends StatefulWidget {
   const PatientCharts({Key? key}) : super(key: key);
@@ -12,6 +13,22 @@ class _PatientChartsWidgetState extends State<PatientCharts> {
 
   @override
   Widget build(BuildContext context) {
-    return const Text('abc');
+    final args = ModalRoute.of(context)!.settings.arguments as PatientChartArguments;
+    return Scaffold(
+      key: scaffoldKey,
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        title: const Text('Patient Charts'),
+        elevation: 0.1,
+      ),
+      drawer: appDrawer(context),
+      body: Text('Patient Chart for ${args.name}, uuid = ${args.uuid}'),
+    );
   }
+}
+
+class PatientChartArguments {
+  final String uuid;
+  final String name;
+  PatientChartArguments(this.uuid, this.name);
 }

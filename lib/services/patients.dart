@@ -6,9 +6,8 @@ import '../utils/app_urls.dart';
 import 'fhir_service.dart';
 
 class Patients {
-  Future<Map<String, dynamic>> searchByName(String name, Future<String?> Function() fetchSessionId) async {
-    String? sessionId = await fetchSessionId();
-    String url = AppUrls.fhir.patientUrl + '?name=$name';
-    return FhirInterface().getRequest(fetchSessionId, url);
+  Future<Map<String, dynamic>> searchByName(String name) async {
+    String url = AppUrls.fhir.patient + '?name=$name';
+    return FhirInterface().getRequest(url);
   }
 }

@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import '../utils/shared_preference.dart';
 import '../providers/auth.dart';
 import '../utils/validators.dart';
-import '../domain/models/user.dart';
 import '../providers/user_provider.dart';
 
 class Login extends StatefulWidget {
@@ -17,7 +16,7 @@ class _LoginState extends State<Login> {
   final _formKey = GlobalKey<FormState>();
 
   String? _username = '', _password = '';
-  bool _passwordVisible = false;
+  final bool _passwordVisible = false;
 
   @override
   Widget build(BuildContext context) {

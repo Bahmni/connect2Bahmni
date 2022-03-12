@@ -30,7 +30,7 @@ class AuthProvider with ChangeNotifier {
     String basicAuth = 'Basic ' + base64Encode(utf8.encode('$username:$password'));
     _loggedInStatus = Status.authenticating;
     notifyListeners();
-    Response response = await get(Uri.parse(AppUrls.omrs.sessionUrl),
+    Response response = await get(Uri.parse(AppUrls.omrs.session),
           headers: <String, String>{'authorization': basicAuth, 'Content-Type': 'application/json'});
     if (response.statusCode == 200) {
       final Map<String, dynamic> responseData = json.decode(response.body);
@@ -39,9 +39,7 @@ class AuthProvider with ChangeNotifier {
       if (providerResponse['status']) {
         session.user.provider = providerResponse['result'] as OmrsProvider;
       }
-      //UserPreferences().saveSession(session);
       _loggedInStatus = Status.loggedIn;
-      print('Login successful. user.name = ${session.user.username}, user.uuid = ${session.user.uuid}, user.provider.identifier = ${session.user.provider!.identifier}');
       notifyListeners();
       return {'status': true, 'message': 'Successful', 'session': session};
     } else {
