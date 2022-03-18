@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:bahmni_doctor/domain/models/bahmni_appointment.dart';
+import 'package:connect2bahmni/domain/models/bahmni_appointment.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

@@ -1,4 +1,4 @@
-import 'package:bahmni_doctor/domain/models/person.dart';
+import 'package:connect2bahmni/domain/models/person.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

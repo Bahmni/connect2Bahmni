@@ -1,4 +1,4 @@
-import 'package:bahmni_doctor/domain/models/omrs_provider.dart';
+import '../models/omrs_provider.dart';
 
 import 'person.dart';
 import 'package:json_annotation/json_annotation.dart';

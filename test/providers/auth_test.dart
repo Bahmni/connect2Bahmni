@@ -1,4 +1,4 @@
-import 'package:bahmni_doctor/providers/auth.dart';
+import 'package:connect2bahmni/providers/auth.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

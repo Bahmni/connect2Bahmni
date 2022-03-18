@@ -1,6 +1,6 @@
 {
-    "name": "bahmni_doctor",
-    "short_name": "bahmni_doctor",
+    "name": "connect2bahmni",
+    "short_name": "connect2",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

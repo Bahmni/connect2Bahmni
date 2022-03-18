@@ -1,4 +1,4 @@
-# bahmni_doctor
+# Connect2
 
 Bahmni For Doctors
 

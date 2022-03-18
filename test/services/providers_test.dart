@@ -1,7 +1,7 @@
 import 'dart:convert';
 
-import 'package:bahmni_doctor/domain/models/omrs_provider.dart';
-import 'package:bahmni_doctor/services/providers.dart';
+import 'package:connect2bahmni/domain/models/omrs_provider.dart';
+import 'package:connect2bahmni/services/providers.dart';
 import 'package:fhir/r4.dart';
 import 'package:flutter_test/flutter_test.dart';
 
