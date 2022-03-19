@@ -50,7 +50,7 @@ class _PatientsSearchWidgetState extends State<PatientSearch> {
       }
       final Future<Map<String, dynamic>> request = Patients().searchByName(searchController.text);
       request.then((response) {
-        print('got patient response');
+        //print('got patient response $response');
         if (response['status']) {
           List<PatientViewModel> patients = [];
           Bundle bundle = response['result'];

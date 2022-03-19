@@ -5,8 +5,10 @@
     <key>NSSpeechRecognitionUsageDescription</key>
     <string>Interactive UI and Consultation Notes</string>
     <key>NSMicrophoneUsageDescription</key>
-    <string>Interactive UI and Consultation Notes</string>
-	<key>CFBundleDevelopmentRegion</key>
+    <string>$(PRODUCT_NAME) needs access to your microphone for meetings.</string>
+    <key>NSCameraUsageDescription</key>
+    <string>$(PRODUCT_NAME) needs access to your camera for meetings.</string>
+    <key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
 	<string>Bahmni Doctor</string>

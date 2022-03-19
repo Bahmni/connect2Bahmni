@@ -122,6 +122,11 @@ class _LoginState extends State<Login> {
 
     return SafeArea(
       child: Scaffold(
+          appBar: AppBar(
+            automaticallyImplyLeading: false,
+            title: const Text('Connect2 Bahmni'),
+            elevation: 0.1,
+          ),
           body: Container(
             padding: const EdgeInsets.all(40.0),
             child: Form(

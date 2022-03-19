@@ -1,6 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.connect2bahmni">
+    package="com.example.connect2bahmni"
+    xmlns:tools="http://schemas.android.com/tools">
    <application
+        tools:replace="android:label"
         android:label="connect2bahmni"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
@@ -36,9 +38,9 @@
     <uses-permission android:name="android.permission.BLUETOOTH"/>
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT"/>
-    <queries>
-        <intent>
-            <action android:name="android.speech.RecognitionService" />
-        </intent>
-    </queries>
+<!--    <queries>-->
+<!--        <intent>-->
+<!--            <action android:name="android.speech.RecognitionService" />-->
+<!--        </intent>-->
+<!--    </queries>-->
 </manifest>

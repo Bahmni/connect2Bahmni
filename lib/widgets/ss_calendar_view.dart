@@ -1,10 +1,15 @@
 import 'package:calendar_view/calendar_view.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 
 import '../domain/models/bahmni_appointment.dart';
 import '../services/bahmni_appointments.dart';
 import '../utils/debouncer.dart';
+import '../providers/user_provider.dart';
+import '../domain/models/user.dart';
+import '../widgets/jitsi_meeting.dart';
 
 CalendarControllerProvider calendarProvider(BuildContext context, AsyncSnapshot<List<BahmniAppointment>> snapshot) {
   return CalendarControllerProvider<BahmniAppointment>(
@@ -60,6 +65,7 @@ class AppointmentsDayView extends StatelessWidget {
   final List<BahmniAppointment>? initialList;
   final Map<String, bool> history = <String, bool>{};
   final EventController<BahmniAppointment> controller = EventController<BahmniAppointment>();
+  User? _user;
 
   AppointmentsDayView({
     Key? key,
@@ -70,7 +76,7 @@ class AppointmentsDayView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
+    _user = Provider.of<UserProvider>(context).user;
     if (initialList != null) {
       controller.addAll(_eventList(initialList));
       //TODO, pass the initialdate as state
@@ -84,13 +90,54 @@ class AppointmentsDayView extends StatelessWidget {
       width: width,
       heightPerMinute: 1.7,
       eventTileBuilder: _defaultEventTileBuilder,
-      onEventTap: (events, date) => print('Event tapped : $events'),
+      onEventTap: (events, date) {
+        print('Event tapped : $events');
+        if (events.isNotEmpty) {
+          _showEventInfoDialog(context, events.single.event);
+        }
+        // Navigator.push(
+        //   context,
+        //   MaterialPageRoute(builder: (context) => const LaunchMeeting()),
+        // );
+      },
+    );
+  }
+
+  Future<String?> _showEventInfoDialog(BuildContext context, BahmniAppointment? event) {
+    var _isTeleConsult = event!.teleconsultation ?? false;
+    List<Widget> _actions = [];
+    _actions.add(TextButton(
+      onPressed: () => Navigator.pop(context, 'OK'),
+      child: const Text('OK'),
+    ));
+    _actions.add(TextButton(
+      onPressed: () => Navigator.pop(context, 'Charts'),
+      child: const Text('View Charts'),
+    ));
+    if (_isTeleConsult) {
+      _actions.add(TextButton(
+        onPressed: () {
+          Navigator.pop(context, 'Join');
+          joinJitsiMeeting(event!, _user!);
+        },
+        child: const Text('Join'),
+      ));
+    }
+    var _starTime = DateFormat('hh:mm a').format(event!.startDateTime!);
+    var _endTime = DateFormat('hh:mm a').format(event!.endDateTime!);
+    var _description = '${event.patient.name} ($_starTime - $_endTime)';
+    return showDialog<String>(
+      context: context,
+      builder: (BuildContext context) => AlertDialog(
+        title: const Text('Appointment'),
+        content: Text(_description),
+        actions: _actions
+      ),
     );
   }
 
   void browseToDate(DateTime date) {
     fetchAppointmentsForDate(date);
-
   }
 
   void fetchAppointmentsForDate(DateTime date) {

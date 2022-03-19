@@ -48,6 +48,7 @@ dependencies:
   # While fuller_week_view is highly customizable, there has not been many updates recently. hence ..
   calendar_view: ^0.0.4
   speech_to_text: ^5.4.3
+  jitsi_meet: ^4.0.0
 
 dev_dependencies:
   flutter_test:
