@@ -93,7 +93,7 @@ class AppointmentsDayView extends StatelessWidget {
       onEventTap: (events, date) {
         print('Event tapped : $events');
         if (events.isNotEmpty) {
-          _showEventInfoDialog(context, events.single.event);
+          _showEventInfoDialog(context, events.single.event!);
         }
         // Navigator.push(
         //   context,
@@ -103,8 +103,8 @@ class AppointmentsDayView extends StatelessWidget {
     );
   }
 
-  Future<String?> _showEventInfoDialog(BuildContext context, BahmniAppointment? event) {
-    var _isTeleConsult = event!.teleconsultation ?? false;
+  Future<String?> _showEventInfoDialog(BuildContext context, BahmniAppointment event) {
+    var _isTeleConsult = event.teleconsultation ?? false;
     List<Widget> _actions = [];
     _actions.add(TextButton(
       onPressed: () => Navigator.pop(context, 'OK'),
@@ -118,13 +118,13 @@ class AppointmentsDayView extends StatelessWidget {
       _actions.add(TextButton(
         onPressed: () {
           Navigator.pop(context, 'Join');
-          joinJitsiMeeting(event!, _user!);
+          joinJitsiMeeting(event, _user!);
         },
         child: const Text('Join'),
       ));
     }
-    var _starTime = DateFormat('hh:mm a').format(event!.startDateTime!);
-    var _endTime = DateFormat('hh:mm a').format(event!.endDateTime!);
+    var _starTime = DateFormat('hh:mm a').format(event.startDateTime!);
+    var _endTime = DateFormat('hh:mm a').format(event.endDateTime!);
     var _description = '${event.patient.name} ($_starTime - $_endTime)';
     return showDialog<String>(
       context: context,

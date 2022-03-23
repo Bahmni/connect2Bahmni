@@ -7,6 +7,8 @@ import '../domain/models/omrs_provider.dart';
 import '../utils/app_urls.dart';
 import '../utils/shared_preference.dart';
 import '../services/providers.dart';
+import '../utils/app_failures.dart';
+import '../domain/models/omrs_location.dart';
 
 enum Status {
   notLoggedIn,
@@ -26,22 +28,34 @@ class AuthProvider with ChangeNotifier {
   Status get loggedInStatus => _loggedInStatus;
   //Status get registeredInStatus => _registeredInStatus;
 
-  Future<Map<String, dynamic>> login(String username, String password) async {
-    String basicAuth = 'Basic ' + base64Encode(utf8.encode('$username:$password'));
+  Future<Map<String, dynamic>> authenticate(String username, String password) async {
     _loggedInStatus = Status.authenticating;
     notifyListeners();
-    Response response = await get(Uri.parse(AppUrls.omrs.session),
-          headers: <String, String>{'authorization': basicAuth, 'Content-Type': 'application/json'});
+    Response response = await
+      get(Uri.parse(AppUrls.omrs.session),
+          headers: <String, String>{
+                'authorization': 'Basic ' + base64Encode(utf8.encode('$username:$password')),
+                'Content-Type': 'application/json'
+          });
     if (response.statusCode == 200) {
       final Map<String, dynamic> responseData = json.decode(response.body);
+      if (!responseData['authenticated']) {
+        _loggedInStatus = Status.notLoggedIn;
+        notifyListeners();
+        return {
+          'status': false,
+          'message': 'Authentication Failed'
+        };
+      }
       Session session = Session.fromJson(responseData);
       var providerResponse = await Providers().omrsProviderbyUserId(session.user.uuid, () => Future.value(session.sessionId));
       if (providerResponse['status']) {
         session.user.provider = providerResponse['result'] as OmrsProvider;
       }
+      UserPreferences().saveSession(session);
       _loggedInStatus = Status.loggedIn;
       notifyListeners();
-      return {'status': true, 'message': 'Successful', 'session': session};
+      return {'status': true, 'message': 'Successful', 'session': session };
     } else {
       _loggedInStatus = Status.notLoggedIn;
       notifyListeners();
@@ -54,6 +68,56 @@ class AuthProvider with ChangeNotifier {
 
   Future<String?> get sessionId {
     return UserPreferences().getSessionId();
+  }
+
+  Future<String> logout() async {
+    String? sessionId = await UserPreferences().getSessionId();
+    if (sessionId == null) {
+      throw 'Logged out already!';
+    }
+
+    Response response = await delete(
+      Uri.parse(AppUrls.omrs.session),
+      headers: <String, String>{
+        'Content-Type': 'application/json',
+        "Accept": "application/json",
+        'Cookie': 'JSESSIONID=$sessionId',
+      },
+    );
+    return 'Logged out';
+  }
+
+  Future<String> updateSessionLocation(OmrsLocation location) async {
+    String? sessionId = await UserPreferences().getSessionId();
+    if (sessionId == null) {
+        throw 'Invalid Session!';
+    }
+    Response response = await post(
+      Uri.parse(AppUrls.omrs.session),
+      headers: <String, String>{
+        'Content-Type': 'application/json',
+        "Accept": "application/json",
+        'Cookie': 'JSESSIONID=$sessionId',
+      },
+      body: jsonEncode({
+        'sessionLocation': location.uuid
+      }),
+    );
+    print('response code = ${response.statusCode}');
+    switch(response.statusCode) {
+      case 200: {
+        var session = await UserPreferences().getSession();
+        session!.sessionLocation = location;
+        UserPreferences().saveSession(session);
+        return 'Success';
+      }
+      case 204: {
+        throw 'Success';
+      }
+      default: {
+        throw Failure('Could not set login location', response.statusCode);
+      }
+    }
   }
 
 }

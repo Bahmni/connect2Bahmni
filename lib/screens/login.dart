@@ -4,6 +4,9 @@ import '../utils/shared_preference.dart';
 import '../providers/auth.dart';
 import '../utils/validators.dart';
 import '../providers/user_provider.dart';
+import '../domain/models/session.dart';
+import '../utils/app_routes.dart';
+
 
 class Login extends StatefulWidget {
   const Login({Key? key}) : super(key: key);
@@ -16,7 +19,7 @@ class _LoginState extends State<Login> {
   final _formKey = GlobalKey<FormState>();
 
   String? _username = '', _password = '';
-  final bool _passwordVisible = false;
+  bool _passwordVisible = false;
 
   @override
   Widget build(BuildContext context) {
@@ -43,23 +46,23 @@ class _LoginState extends State<Login> {
         return null;
       },
       onSaved: (value) => _password = value,
-      decoration: const InputDecoration(
-        suffixIcon: Icon(Icons.visibility, color: Color.fromRGBO(50, 62, 72, 1.0)),
+      decoration: InputDecoration(
+        //suffixIcon: Icon(Icons.visibility, color: Color.fromRGBO(50, 62, 72, 1.0)),
         hintText: 'enter password',
-//        suffixIcon: GestureDetector(
-//          onLongPress: () {
-//            setState(() {
-//              _passwordVisible = true;
-//            });
-//          },
-//          onLongPressUp: () {
-//            setState(() {
-//              _passwordVisible = false;
-//            });
-//          },
-//          child: Icon(
-//              _passwordVisible ? Icons.visibility : Icons.visibility_off),
-//        ),
+       suffixIcon: GestureDetector(
+         onLongPress: () {
+           setState(() {
+             _passwordVisible = true;
+           });
+         },
+         onLongPressUp: () {
+           setState(() {
+             _passwordVisible = false;
+           });
+         },
+         child: Icon(
+             _passwordVisible ? Icons.visibility : Icons.visibility_off),
+       ),
       ),
     );
 
@@ -71,9 +74,6 @@ class _LoginState extends State<Login> {
       ],
     );
 
-
-
-
     final forgotLabel = Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: <Widget>[
@@ -83,31 +83,35 @@ class _LoginState extends State<Login> {
             },
             child: const Text('Forgot password?'),
         ),
-        TextButton(
-          onPressed: () {
-            Navigator.pushReplacementNamed(context, '/register');
-          },
-          child: const Text('Sign up'),
-        ),
       ],
     );
 
     void doLogin() {
       if (_formKey.currentState!.validate()) {
+        UserPreferences().removeSession();
         _formKey.currentState!.save();
-        final Future<Map<String, dynamic>> successfulMessage = auth.login(_username as String, _password as String);
-        successfulMessage.then((response) {
+        auth.authenticate(_username as String, _password as String)
+            .then((response) {
           if (response['status']) {
-            var session = response['session'];
-            UserPreferences().saveSession(session);
+            var session = response['session'] as Session;
             Provider.of<UserProvider>(context, listen: false).setUser(session.user);
-            Navigator.pushReplacementNamed(context, '/dashboard');
+            var providerLoginLocations = session.user.provider?.attrValue('locations');
+            if (providerLoginLocations != null && providerLoginLocations.isNotEmpty) {
+              var assignedLocations = <String, String>{};
+              for (var loc in providerLoginLocations) {
+                assignedLocations.putIfAbsent(loc['uuid'], () => loc['name']);
+              }
+              Navigator.pushNamed(context, AppRoutes.loginLocations,
+                arguments: assignedLocations,
+              );
+            } else {
+              Navigator.pushNamed(context, AppRoutes.loginLocations,);
+            }
           } else {
             showLoginFailure(context);
           }
         });
       } else {
-        print("form is invalid");
         showLoginFailure(context);
       }
     }

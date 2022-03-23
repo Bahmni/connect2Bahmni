@@ -6,4 +6,5 @@ class AppRoutes {
   static const String taskNotification = '/taskNotification';
   static const String searchPatients = '/patients';
   static const String patientCharts = '/patientCharts';
+  static const String loginLocations = '/loginLocations';
 }

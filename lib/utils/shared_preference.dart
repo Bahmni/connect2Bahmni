@@ -10,6 +10,9 @@ class UserPreferences {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setString("session", jsonEncode(session.toJson()));
     prefs.setString("sessionId", session.sessionId);
+    if (session.sessionLocation != null) {
+      prefs.setString("sessionLocationId", session.sessionLocation!.uuid);
+    }
     return Future.value(true);
   }
 
@@ -29,6 +32,7 @@ class UserPreferences {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.remove("session");
     prefs.remove("sessionId");
+    prefs.remove("sessionLocationId");
   }
 
 }

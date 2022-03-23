@@ -5,9 +5,17 @@ part 'omrs_provider.g.dart';
 class OmrsProvider {
   final String uuid;
   final String? identifier;
+  final String? display;
   final List<Map<String, dynamic>>? attributes;
 
-  OmrsProvider({required this.uuid, this.identifier, this.attributes});
+  OmrsProvider({required this.uuid, this.identifier, this.display, this.attributes});
   factory OmrsProvider.fromJson(Map<String, dynamic> json) => _$OmrsProviderFromJson(json);
   Map<String, dynamic> toJson() => _$OmrsProviderToJson(this);
+
+  List<dynamic> attrValue(String name) {
+    if (attributes != null) {
+      return List<dynamic>.of(attributes!.where((attr) => name == attr['attributeType']['display']).map((e) => e['value']));
+    }
+    return [];
+  }
 }

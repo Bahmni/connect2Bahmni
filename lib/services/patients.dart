@@ -8,6 +8,6 @@ import 'fhir_service.dart';
 class Patients {
   Future<Map<String, dynamic>> searchByName(String name) async {
     String url = AppUrls.fhir.patient + '?name=$name';
-    return FhirInterface().getRequest(url);
+    return FhirInterface().fetch(url);
   }
 }

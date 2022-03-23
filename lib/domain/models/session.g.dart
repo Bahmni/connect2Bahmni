@@ -7,13 +7,23 @@ part of 'session.dart';
 // **************************************************************************
 
 Session _$SessionFromJson(Map<String, dynamic> json) => Session(
-      json['sessionId'] as String,
-      json['authenticated'] as bool,
-      User.fromJson(json['user'] as Map<String, dynamic>),
+      sessionId: json['sessionId'] as String,
+      authenticated: json['authenticated'] as bool,
+      user: User.fromJson(json['user'] as Map<String, dynamic>),
+      sessionLocation: json['sessionLocation'] == null
+          ? null
+          : OmrsLocation.fromJson(
+              json['sessionLocation'] as Map<String, dynamic>),
+      currentProvider: json['currentProvider'] == null
+          ? null
+          : OmrsProvider.fromJson(
+              json['currentProvider'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$SessionToJson(Session instance) => <String, dynamic>{
       'sessionId': instance.sessionId,
       'authenticated': instance.authenticated,
       'user': instance.user,
+      'sessionLocation': instance.sessionLocation,
+      'currentProvider': instance.currentProvider,
     };

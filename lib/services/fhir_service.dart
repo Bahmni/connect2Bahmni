@@ -7,7 +7,7 @@ import '../utils/shared_preference.dart';
 import '../utils/app_urls.dart';
 
 class FhirInterface {
-  Future<Map<String, dynamic>> getRequest(String url, [Map<String, String> params = const {}]) async {
+  Future<Map<String, dynamic>> fetch(String url, [Map<String, String> params = const {}]) async {
     String? sessionId = await UserPreferences().getSessionId();
     if (sessionId == null) {
       return {
@@ -42,7 +42,7 @@ class FhirInterface {
     };
   }
 
-  Future<Map<String, dynamic>> searchByName(String name) async {
+  Future<Map<String, dynamic>> searchByPatientName(String name) async {
     String? sessionId = await UserPreferences().getSessionId();
     if (sessionId == null) {
       return {

@@ -1,6 +1,5 @@
 import 'dart:io';
 
-
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 import '../domain/models/session.dart';
@@ -16,6 +15,7 @@ import 'screens/patient_search.dart';
 import 'screens/tasks_notifications.dart';
 import '../screens/patient_charts.dart';
 import '../widgets/speech_activator.dart';
+import '../screens/login_location.dart';
 
 void main() {
   runApp(const MyApp());
@@ -51,6 +51,7 @@ class MyApp extends StatelessWidget {
                     if (snapshot.hasError) {
                       return Text('Error: ${snapshot.error}');
                     } else if (snapshot.data == null) {
+                      UserPreferences().removeSession();
                       return const Login();
                       //return const SpeechEg();
                     } else {
@@ -68,6 +69,7 @@ class MyApp extends StatelessWidget {
             AppRoutes.taskNotification: (context) => const TasksAndNotificationsWidget(),
             AppRoutes.searchPatients: (context) => const PatientSearch(),
             AppRoutes.patientCharts: (context) => const PatientCharts(),
+            AppRoutes.loginLocations: (context) => const LoginLocation(),
           }),
     );
   }
