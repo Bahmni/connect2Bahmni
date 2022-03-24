@@ -12,14 +12,8 @@ class Locations {
   /// and  provenance.target which is a mandatory field is not passeed
   Future<List<Location>> allLoginLocations() async {
     String url = AppUrls.fhir.location + '?_tag=Login Location';
-    var response = await FhirInterface().fetch(url);
-    if (response['status']) {
-      var searchSet = (response['result'] as Bundle);
-      print(searchSet);
-      return searchSet.entry != null ? List<Location>.from(searchSet.entry!.map((e) => e.resource)) : [];
-    } else {
-        throw 'Can not fetch login locations';
-    }
+    var result = await FhirInterface().fetch(url);
+    return result.entry != null ? List<Location>.from(result.entry!.map((e) => e.resource)) : [];
   }
 
   Future<List<OmrsLocation>> allOmrsLoginLocations() async {

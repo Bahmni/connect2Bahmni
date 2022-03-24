@@ -49,8 +49,8 @@ class AuthProvider with ChangeNotifier {
       }
       Session session = Session.fromJson(responseData);
       var providerResponse = await Providers().omrsProviderbyUserId(session.user.uuid, () => Future.value(session.sessionId));
-      if (providerResponse['status']) {
-        session.user.provider = providerResponse['result'] as OmrsProvider;
+      if (providerResponse != null) {
+        session.user.provider = providerResponse;
       }
       UserPreferences().saveSession(session);
       _loggedInStatus = Status.loggedIn;
@@ -92,6 +92,8 @@ class AuthProvider with ChangeNotifier {
     if (sessionId == null) {
         throw 'Invalid Session!';
     }
+    print('updateSessionLocation: updating session $sessionId');
+    print('calling URL ${AppUrls.omrs.session}');
     Response response = await post(
       Uri.parse(AppUrls.omrs.session),
       headers: <String, String>{
@@ -100,10 +102,12 @@ class AuthProvider with ChangeNotifier {
         'Cookie': 'JSESSIONID=$sessionId',
       },
       body: jsonEncode({
-        'sessionLocation': location.uuid
+        'sessionLocation': location.uuid,
+        'locale':'en'
       }),
     );
-    print('response code = ${response.statusCode}');
+    print('updateSessionLocation:   response code = ${response.statusCode}');
+    print('updateSessionLocation:   response body = ${response.body}');
     switch(response.statusCode) {
       case 200: {
         var session = await UserPreferences().getSession();

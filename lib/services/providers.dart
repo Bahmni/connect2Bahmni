@@ -7,17 +7,14 @@ import 'dart:convert';
 import '../domain/models/omrs_provider.dart';
 import '../services/fhir_service.dart';
 import '../utils/app_urls.dart';
+import '../utils/app_failures.dart';
 
 class Providers {
-  Future<Map<String, dynamic>> practitionerByUserId(String uuid, Future<String?> Function() fetchSessionId) async {
+  Future<Practitioner?> practitionerByUserId(String uuid, Future<String?> Function() fetchSessionId) async {
     String url = AppUrls.omrs.provider + '?user=$uuid&v=custom:(uuid,identifier,attributes)';
     String? sessionId = await fetchSessionId();
     if (sessionId == null) {
-      return {
-        'status': false,
-        'result': null,
-        'message': 'session expired',
-      };
+      throw Failure('Session expired.', 401);
     }
 
     Response response = await get(
@@ -34,31 +31,17 @@ class Providers {
       var providerList = List<Practitioner>.from(resultList.map((prov) {
         return fromOmrsProvider(prov);
       }));
-      if (providerList.isNotEmpty) {
-        return {
-          'status': true,
-          'result': providerList.first,
-          'message': 'success',
-        };
-      }
+      return providerList.isNotEmpty ? providerList.first : null;
+    } else {
+      throw Failure('Error on server', response.statusCode);
     }
-
-    return {
-      'status': false,
-      'result': null,
-      'message': 'error on server',
-    };
   }
 
-  Future<Map<String, dynamic>> omrsProviderbyUserId(String uuid, Future<String?> Function() fetchSessionId) async {
+  Future<OmrsProvider?> omrsProviderbyUserId(String uuid, Future<String?> Function() fetchSessionId) async {
     String url = AppUrls.omrs.provider + '?user=$uuid&v=custom:(uuid,identifier,attributes)';
     String? sessionId = await fetchSessionId();
     if (sessionId == null) {
-      return {
-        'status': false,
-        'result': null,
-        'message': 'session expired',
-      };
+      throw Failure('Session expired.', 401);
     }
 
     Response response = await get(
@@ -75,20 +58,10 @@ class Providers {
       var providerList = List<OmrsProvider>.from(resultList.map((model) {
         return OmrsProvider.fromJson(model);
       }));
-      if (providerList.isNotEmpty) {
-        return {
-          'status': true,
-          'result': providerList.first,
-          'message': 'success',
-        };
-      }
+      return providerList.isNotEmpty ? providerList.first : null;
+    } else {
+      throw Failure('Error on server', response.statusCode);
     }
-
-    return {
-      'status': false,
-      'result': null,
-      'message': 'error on server',
-    };
   }
 
   Practitioner fromOmrsProvider(providerJson) {

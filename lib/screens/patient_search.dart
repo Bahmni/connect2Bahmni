@@ -9,6 +9,7 @@ import '../utils/debouncer.dart';
 import 'models/patient_view.dart';
 import '../screens/patient_charts.dart';
 import '../utils/app_routes.dart';
+import '../utils/app_failures.dart';
 
 
 class PatientSearch extends StatefulWidget {
@@ -48,25 +49,22 @@ class _PatientsSearchWidgetState extends State<PatientSearch> {
         });
         return;
       }
-      final Future<Map<String, dynamic>> request = Patients().searchByName(searchController.text);
-      request.then((response) {
-        //print('got patient response $response');
-        if (response['status']) {
-          List<PatientViewModel> patients = [];
-          Bundle bundle = response['result'];
-          bundle.entry?.forEach((element) {
-            var patientViewModel = PatientViewModel(element.resource as Patient);
-            patients.add(patientViewModel);
-          });
-          setState(() {
-            patientList.clear();
-            patientList.addAll(patients);
-          });
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Search failed")),
-          );
-        }
+      final Future<Bundle> request = Patients().searchByName(searchController.text);
+      request.then((result) {
+        List<PatientViewModel> patients = result.entry != null
+            ? List<PatientViewModel>.from(result.entry!.map((e) => PatientViewModel(e.resource as Patient)))
+            : [];
+        setState(() {
+          patientList.clear();
+          patientList.addAll(patients);
+        });
+      },
+      onError: (err) {
+        debugPrint(err.toString());
+        String errorMsg = err is Failure ? err.message : '';
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Search failed. $errorMsg')),
+        );
       });
     });
   }

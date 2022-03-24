@@ -5,16 +5,13 @@ import 'dart:convert';
 
 import '../utils/shared_preference.dart';
 import '../utils/app_urls.dart';
+import '../utils/app_failures.dart';
 
 class FhirInterface {
-  Future<Map<String, dynamic>> fetch(String url, [Map<String, String> params = const {}]) async {
+  Future<Bundle> fetch(String url, [Map<String, String> params = const {}]) async {
     String? sessionId = await UserPreferences().getSessionId();
     if (sessionId == null) {
-      return {
-        'status': false,
-        'result': null,
-        'message': 'session expired',
-      };
+      throw Failure('Session expired.', 401);
     }
 
     Response response = await get(
@@ -26,30 +23,21 @@ class FhirInterface {
     );
 
     if (response.statusCode == 200) {
-      Bundle bundle = Bundle.fromJson(jsonDecode(response.body));
-      //final Map<String, dynamic> responseData = json.decode(response.body);
-      return {
-        'status': true,
-        'result': bundle,
-        'message': 'success',
-      };
+      try {
+        return Bundle.fromJson(jsonDecode(response.body));
+      } catch(err, stacktrace) {
+        print('Error: $err');
+        print('stacktrace: $stacktrace');
+        throw Failure('Error occurred during deserialization', 1500);
+      }
     }
-
-    return {
-      'status': false,
-      'result': null,
-      'message': 'error on server',
-    };
+    throw Failure('Error on server', response.statusCode);
   }
 
-  Future<Map<String, dynamic>> searchByPatientName(String name) async {
+  Future<Bundle> searchByPatientName(String name) async {
     String? sessionId = await UserPreferences().getSessionId();
     if (sessionId == null) {
-      return {
-        'status': false,
-        'result': null,
-        'message': 'session expired',
-      };
+      throw Failure('Session expired.', 401);
     }
     String url = AppUrls.fhir.patient + '?name=$name';
     Response response = await get(
@@ -60,22 +48,8 @@ class FhirInterface {
       },
     );
     if (response.statusCode == 200) {
-      Bundle bundle = Bundle.fromJson(jsonDecode(response.body));
-      //final Map<String, dynamic> responseData = json.decode(response.body);
-      return {
-        'status': true,
-        'result': bundle,
-        'message': 'success',
-      };
+      return Bundle.fromJson(jsonDecode(response.body));
     }
-
-    return {
-      'status': false,
-      'result': null,
-      'message': 'error on server',
-    };
-
+    throw Failure('Error on server', response.statusCode);
   }
-
-
 }
