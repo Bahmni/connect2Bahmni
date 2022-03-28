@@ -1,4 +1,5 @@
 
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart';
 import 'package:fhir/r4.dart';
 import 'dart:convert';
@@ -26,8 +27,8 @@ class FhirInterface {
       try {
         return Bundle.fromJson(jsonDecode(response.body));
       } catch(err, stacktrace) {
-        print('Error: $err');
-        print('stacktrace: $stacktrace');
+        debugPrint('Error: $err');
+        debugPrint('stacktrace: $stacktrace');
         throw Failure('Error occurred during deserialization', 1500);
       }
     }

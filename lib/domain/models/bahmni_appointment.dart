@@ -40,6 +40,7 @@ class BahmniAppointment {
   Map<String, dynamic> toJson() => _$BahmniAppointmentToJson(this);
 
   static DateTime _fromJsonDateTime(int int) => DateTime.fromMillisecondsSinceEpoch(int);
+  // ignore: unused_element
   static int _toJsonDateTime(DateTime time) => time.millisecondsSinceEpoch;
 }
 

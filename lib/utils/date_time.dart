@@ -3,8 +3,6 @@ import '../screens/models/person_age.dart';
 PersonAge calculateAge(DateTime birthDate) {
   DateTime today = DateTime.now();
   DateTime dob = birthDate;
-  var diff = today.difference(dob);
-
   List<int> simpleYear = [31,28,31,30,31,30,31,31,30,31,30,31];
   if(dob.isAfter(today)) {
     DateTime temp = dob;

@@ -15,7 +15,6 @@ import '../utils/app_routes.dart';
 import 'screens/patient_search.dart';
 import 'screens/tasks_notifications.dart';
 import '../screens/patient_charts.dart';
-import '../widgets/speech_activator.dart';
 import '../screens/login_location.dart';
 
 void main() async {

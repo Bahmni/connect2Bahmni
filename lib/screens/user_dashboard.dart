@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import '../widgets/app_drawer.dart';
 import '../screens/dashboard.dart';
-import '../providers/user_provider.dart';
-import '../domain/models/user.dart';
 
 class UserDashBoard extends StatefulWidget {
   const UserDashBoard({Key? key}) : super(key: key);
@@ -14,9 +11,6 @@ class UserDashBoard extends StatefulWidget {
 class _UserDashBoardState extends State<UserDashBoard> {
   @override
   Widget build(BuildContext context) {
-    User? user = Provider.of<UserProvider>(context).user;
-    final ButtonStyle style = ElevatedButton.styleFrom(textStyle: const TextStyle(fontSize: 20));
-
     return Scaffold(
       appBar: AppBar(
         title: const Text("My Bahmni"),

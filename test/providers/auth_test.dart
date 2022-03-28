@@ -3,9 +3,7 @@ import 'dart:io';
 
 import 'package:connect2bahmni/main.dart';
 import 'package:connect2bahmni/providers/auth.dart';
-import 'package:connect2bahmni/utils/app_urls.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:http/http.dart';
 
 void main() {
   test('Login test', () async {

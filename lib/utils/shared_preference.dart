@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../domain/models/user.dart';
 import '../domain/models/session.dart';
 
 class UserPreferences {

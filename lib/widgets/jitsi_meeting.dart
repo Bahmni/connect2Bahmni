@@ -1,12 +1,10 @@
 import 'dart:io';
 
-import 'package:connect2bahmni/domain/models/bahmni_appointment.dart';
-import 'package:connect2bahmni/domain/models/user.dart';
-import 'package:connect2bahmni/screens/models/patient_view.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:jitsi_meet/jitsi_meet.dart';
+import '../domain/models/bahmni_appointment.dart';
+import '../domain/models/user.dart';
 
 class LaunchMeeting extends StatefulWidget {
   const LaunchMeeting({Key? key}) : super(key: key);
@@ -165,7 +163,7 @@ class _LaunchMeetingState extends State<LaunchMeeting> {
             height: 14.0,
           ),
           CheckboxListTile(
-            title: Text("Audio Muted"),
+            title: const Text("Audio Muted"),
             value: isAudioMuted,
             onChanged: _onAudioMutedChanged,
           ),
@@ -173,7 +171,7 @@ class _LaunchMeetingState extends State<LaunchMeeting> {
             height: 14.0,
           ),
           CheckboxListTile(
-            title: Text("Video Muted"),
+            title: const Text("Video Muted"),
             value: isVideoMuted,
             onChanged: _onVideoMutedChanged,
           ),
@@ -261,7 +259,7 @@ class _LaunchMeetingState extends State<LaunchMeeting> {
         "chromeExtensionBanner": null,
         "userInfo": {"displayName": nameText.text}
       };
-    print('server url  ${options.serverURL}');
+    debugPrint('server url  ${options.serverURL}');
 
     debugPrint("JitsiMeetingOptions: $options");
     await JitsiMeet.joinMeeting(
@@ -343,7 +341,7 @@ joinJitsiMeeting(BahmniAppointment appointment, User user) async {
       "chromeExtensionBanner": null,
       "userInfo": {"displayName": user.person.display}
     };
-  print('server url  ${options.serverURL}');
+  debugPrint('server url  ${options.serverURL}');
 
   debugPrint("JitsiMeetingOptions: $options");
   await JitsiMeet.joinMeeting(

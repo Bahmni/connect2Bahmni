@@ -42,7 +42,7 @@ class _PatientsSearchWidgetState extends State<PatientSearch> {
 
   void _searchForPatients() {
     _debouncer.run(() {
-      print('Search text field: ${searchController.text}');
+      debugPrint('Search text field: ${searchController.text}');
       if (searchController.text.isEmpty) {
         setState(() {
           patientList.clear();

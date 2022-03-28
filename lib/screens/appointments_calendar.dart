@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../widgets/ss_calendar_view.dart' as sscv;
-import '../widgets/flutter_day_view_calendar.dart' as fdvc;
 import '../domain/models/bahmni_appointment.dart';
 import '../services/bahmni_appointments.dart';
 import '../widgets/app_drawer.dart';
@@ -24,13 +23,13 @@ class _AppointmentsCalendarState extends State<AppointmentsCalendar> {
   @override
   void initState() {
     super.initState();
-    print('fetching for date: $_forDate');
+    debugPrint('fetching for date: $_forDate');
     _futureAppointments = fetchAppointments();
   }
 
   @override
   Widget build(BuildContext context) {
-    print('Building appointments widget');
+    debugPrint('Building appointments widget');
     return Scaffold(
         key: scaffoldKey,
         appBar: AppBar(
@@ -66,8 +65,9 @@ class _AppointmentsCalendarState extends State<AppointmentsCalendar> {
 
   }
 
+  // ignore: unused_element
   void _navigate(DateTime date) {
-    print('fetching for date: ${date.add(const Duration(days: 1))}');
+    debugPrint('fetching for date: ${date.add(const Duration(days: 1))}');
     setState(() {
       _forDate = date.add(const Duration(days: 1));
       _futureAppointments = fetchAppointments();

@@ -1,7 +1,5 @@
 import '../services/fhir_service.dart';
-import 'package:http/http.dart';
 import 'package:fhir/r4.dart';
-import 'dart:convert';
 
 import '../utils/app_urls.dart';
 

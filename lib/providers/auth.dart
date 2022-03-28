@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 
 import '../domain/models/session.dart';
-import '../domain/models/omrs_provider.dart';
 import '../utils/app_urls.dart';
 import '../utils/shared_preference.dart';
 import '../services/providers.dart';
@@ -76,7 +75,7 @@ class AuthProvider with ChangeNotifier {
       throw 'Logged out already!';
     }
 
-    Response response = await delete(
+    await delete(
       Uri.parse(AppUrls.omrs.session),
       headers: <String, String>{
         'Content-Type': 'application/json',
@@ -92,8 +91,8 @@ class AuthProvider with ChangeNotifier {
     if (sessionId == null) {
         throw 'Invalid Session!';
     }
-    print('updateSessionLocation: updating session $sessionId');
-    print('calling URL ${AppUrls.omrs.session}');
+    debugPrint('updateSessionLocation: updating session $sessionId');
+    debugPrint('calling URL ${AppUrls.omrs.session}');
     Response response = await post(
       Uri.parse(AppUrls.omrs.session),
       headers: <String, String>{
@@ -106,8 +105,8 @@ class AuthProvider with ChangeNotifier {
         'locale':'en'
       }),
     );
-    print('updateSessionLocation:   response code = ${response.statusCode}');
-    print('updateSessionLocation:   response body = ${response.body}');
+    debugPrint('updateSessionLocation:   response code = ${response.statusCode}');
+    debugPrint('updateSessionLocation:   response body = ${response.body}');
     switch(response.statusCode) {
       case 200: {
         var session = await UserPreferences().getSession();

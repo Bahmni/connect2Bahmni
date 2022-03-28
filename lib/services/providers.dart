@@ -5,7 +5,6 @@ import 'package:fhir/r4.dart';
 import 'dart:convert';
 
 import '../domain/models/omrs_provider.dart';
-import '../services/fhir_service.dart';
 import '../utils/app_urls.dart';
 import '../utils/app_failures.dart';
 

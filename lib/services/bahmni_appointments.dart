@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart';
 import '../domain/models/bahmni_appointment.dart';
 import '../utils/shared_preference.dart';
@@ -16,9 +17,9 @@ class Appointments {
   Future<List<BahmniAppointment>> allAppointments(DateTime forDate) async {
     var searchForDate = DateTime(forDate.year, forDate.month, forDate.day).toIso8601String();
     String url = AppUrls.bahmni.appointment + '/all?forDate=$searchForDate';
-    print('calling URL $url');
+    debugPrint('calling URL $url');
     String? sessionId = await UserPreferences().getSessionId();
-    print('sessionId = $sessionId');
+    debugPrint('sessionId = $sessionId');
     if (sessionId == null) {
       throw Failure(errorInvalidSession, 401);
     }
@@ -34,7 +35,7 @@ class Appointments {
   }
 
   List<BahmniAppointment> _handleResponse(Response response) {
-    print('response code = ${response.statusCode}');
+    debugPrint('response code = ${response.statusCode}');
     switch(response.statusCode) {
       case 200: {
         return _mapToList(response);
@@ -55,7 +56,7 @@ class Appointments {
     var startDate = DateTime(fromDate.year, fromDate.month, fromDate.day).toIso8601String();
     var endDate = tillDate.toIso8601String();
     String url = AppUrls.bahmni.appointments + '/search';
-    print('Searching appointments $url, startDate = $startDate, endDate = $endDate');
+    debugPrint('Searching appointments $url, startDate = $startDate, endDate = $endDate');
     String? sessionId = await UserPreferences().getSessionId();
     if (sessionId == null) {
       throw Exception(errorInvalidSession);

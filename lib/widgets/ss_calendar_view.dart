@@ -28,7 +28,7 @@ List<CalendarEventData<BahmniAppointment>> _eventList(List<BahmniAppointment>? a
     return [];
   }
   return appointmentList.map((event) {
-    print('appointment found. name = ${event.patient.name}, start = ${event.startDateTime}, end = ${event.endDateTime}');
+    debugPrint('appointment found. name = ${event.patient.name}, start = ${event.startDateTime}, end = ${event.endDateTime}');
     return CalendarEventData(
       date: event.startDateTime!,
       event: event,
@@ -59,15 +59,12 @@ Widget _bahmniAppointmentsDayWidget(List<BahmniAppointment> eventList) {
 }
 
 
-class AppointmentsDayView extends StatelessWidget {
+class AppointmentsDayView extends StatefulWidget {
   final GlobalKey<DayViewState>? state;
   final double? width;
   final List<BahmniAppointment>? initialList;
-  final Map<String, bool> history = <String, bool>{};
-  final EventController<BahmniAppointment> controller = EventController<BahmniAppointment>();
-  User? _user;
 
-  AppointmentsDayView({
+  const AppointmentsDayView({
     Key? key,
     this.state,
     this.width,
@@ -75,23 +72,34 @@ class AppointmentsDayView extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  State<AppointmentsDayView> createState() => _AppointmentsDayViewState();
+}
+
+class _AppointmentsDayViewState extends State<AppointmentsDayView> {
+  final Map<String, bool> history = <String, bool>{};
+
+  final EventController<BahmniAppointment> controller = EventController<BahmniAppointment>();
+
+  User? _user;
+
+  @override
   Widget build(BuildContext context) {
     _user = Provider.of<UserProvider>(context).user;
-    if (initialList != null) {
-      controller.addAll(_eventList(initialList));
+    if (widget.initialList != null) {
+      controller.addAll(_eventList(widget.initialList));
       //TODO, pass the initialdate as state
       history.putIfAbsent(keyForDate(DateTime.now()), () => true);
     }
 
     return DayView<BahmniAppointment>(
       onPageChange: (date, page) => browseToDate(date),
-      key: state,
+      key: widget.state,
       controller: controller,
-      width: width,
+      width: widget.width,
       heightPerMinute: 1.7,
       eventTileBuilder: _defaultEventTileBuilder,
       onEventTap: (events, date) {
-        print('Event tapped : $events');
+        debugPrint('Event tapped : $events');
         if (events.isNotEmpty) {
           _showEventInfoDialog(context, events.single.event!);
         }
