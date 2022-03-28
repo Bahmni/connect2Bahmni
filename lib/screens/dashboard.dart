@@ -8,6 +8,7 @@ import '../domain/models/user.dart';
 import '../providers/user_provider.dart';
 import '../utils/app_routes.dart';
 import '../widgets/appointments_list_view.dart';
+import '../domain/models/person.dart';
 
 class DashboardWidget extends StatefulWidget {
   const DashboardWidget({Key? key}) : super(key: key);
@@ -185,7 +186,7 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                         mainAxisSize: MainAxisSize.max,
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          _patiientSearch(),
+                          _patientSearch(),
                           _myAppointments(),
                           _myNotifications(),
                         ],
@@ -208,14 +209,14 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                         ],
                       ),
                     ),
-                    _quickViewList(user!.provider!.uuid),
+                    _quickViewList(user),
                   ],
                 ),
               ),
             );
   }
 
-  Widget _patiientSearch() {
+  Widget _patientSearch() {
     return Container(
       width: 100,
       height: 100,
@@ -358,10 +359,22 @@ class _DashboardWidgetState extends State<DashboardWidget> {
     );
   }
 
-  Widget _quickViewList(String practitionerUuid) {
+  Widget _quickViewList(User? user) {
+      var practitionerUuid = user!.provider!.uuid;
       return Column(
         children: [
-          Container(
+          ..._recentPatients(user),
+          ..._newInformation(),
+          AppointmentsListView(practitionerUuid: practitionerUuid),
+        ],
+      );
+  }
+
+  List<Padding> _newInformation() {
+    List<Padding> newInfo = [];
+    newInfo.add(Padding(
+          padding: const EdgeInsetsDirectional.fromSTEB(0, 8, 0, 0),
+          child: Container(
             width: MediaQuery.of(context).size.width * 0.92,
             height: 70,
             decoration: BoxDecoration(
@@ -372,7 +385,8 @@ class _DashboardWidgetState extends State<DashboardWidget> {
               mainAxisSize: MainAxisSize.max,
               children: [
                 Padding(
-                  padding: const EdgeInsetsDirectional.fromSTEB(8, 0, 0, 0),
+                  padding:
+                  const EdgeInsetsDirectional.fromSTEB(8, 0, 0, 0),
                   child: Card(
                     clipBehavior: Clip.antiAliasWithSaveLayer,
                     color: const Color(0x6639D2C0),
@@ -382,20 +396,22 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                     child: const Padding(
                       padding: EdgeInsetsDirectional.fromSTEB(
                           8, 8, 8, 8),
-                      child: Icon(Icons.person_rounded, size: 24,),
+                      child: Icon(Icons.notification_important_rounded, size: 24,),
                     ),
                   ),
                 ),
                 Expanded(
                   child: Padding(
-                    padding: const EdgeInsetsDirectional.fromSTEB(12, 0, 0, 0),
+                    padding: const EdgeInsetsDirectional.fromSTEB(
+                        12, 0, 0, 0),
                     child: Column(
                       mainAxisSize: MainAxisSize.max,
                       mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                      crossAxisAlignment:
+                      CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Elvis Presley',
+                          'Hina Patel (Example)',
                           style: Theme.of(context).textTheme.subtitle1?.merge(const TextStyle(
                             fontFamily: 'Lexend Deca',
                             color: Color(0xFF1E2429),
@@ -406,7 +422,7 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                         Padding(
                           padding: const EdgeInsetsDirectional.fromSTEB(0, 4, 0, 0),
                           child: Text(
-                            'Recently visited',
+                            'New Health Record',
                             style: Theme.of(context).textTheme.bodyText1?.merge(const TextStyle(
                               fontFamily: 'Lexend Deca',
                               color: Color(0xFF090F13),
@@ -420,15 +436,15 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                   ),
                 ),
                 Padding(
-                  padding:
-                  const EdgeInsetsDirectional.fromSTEB(12, 0, 12, 0),
+                  padding: const EdgeInsetsDirectional.fromSTEB(
+                      12, 0, 12, 0),
                   child: Column(
                     mainAxisSize: MainAxisSize.max,
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       Text(
-                        'M 87',
+                        'F 26',
                         textAlign: TextAlign.end,
                         style: Theme.of(context).textTheme.subtitle2?.merge(const TextStyle(
                           fontFamily: 'Lexend Deca',
@@ -440,14 +456,13 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                       Padding(
                         padding: const EdgeInsetsDirectional.fromSTEB(0, 4, 0, 0),
                         child: Text(
-                          'Favorite',
+                          'Diagnostic Report',
                           textAlign: TextAlign.end,
                           style: Theme.of(context).textTheme.bodyText1?.merge(const TextStyle(
-                            fontFamily: 'Lexend Deca',
-                            color: Color(0xFF090F13),
-                            fontSize: 12,
-                            fontWeight: FontWeight.normal,
-                          )),
+                              fontFamily: 'Lexend Deca',
+                              color: Color(0xFF090F13),
+                              fontSize: 12,
+                              fontWeight: FontWeight.normal)),
                         ),
                       ),
                     ],
@@ -456,109 +471,218 @@ class _DashboardWidgetState extends State<DashboardWidget> {
               ],
             ),
           ),
-          Padding(
-            padding: const EdgeInsetsDirectional.fromSTEB(0, 8, 0, 0),
-            child: Container(
-              width: MediaQuery.of(context).size.width * 0.92,
-              height: 70,
-              decoration: BoxDecoration(
-                color: const Color(0xFFF4F5F7),
-                borderRadius: BorderRadius.circular(8),
+        ));
+    return newInfo;
+  }
+
+  List<Container> _recentPatients(User user) {
+    var recentlyViewedPatients = user.recentlyViewedPatients();
+    int _limit = recentlyViewedPatients.length < 3 ? recentlyViewedPatients.length : 3;
+    var subList = recentlyViewedPatients.isNotEmpty ? recentlyViewedPatients.sublist(0,_limit) : [];
+    List<Container> recentList =
+      List<Container>.of(subList.map((person) {
+        return _recentPatient(person);
+      }));
+    if (recentList.isEmpty) {
+      recentList.add(_demoRecentPatient());
+    }
+    return recentList;
+  }
+
+  Container _demoRecentPatient() {
+    return Container(
+        width: MediaQuery.of(context).size.width * 0.92,
+        height: 70,
+        decoration: BoxDecoration(
+          color: const Color(0xFFF4F5F7),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.max,
+          children: [
+            Padding(
+              padding: const EdgeInsetsDirectional.fromSTEB(8, 0, 0, 0),
+              child: Card(
+                clipBehavior: Clip.antiAliasWithSaveLayer,
+                color: const Color(0x6639D2C0),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(40),
+                ),
+                child: const Padding(
+                  padding: EdgeInsetsDirectional.fromSTEB(
+                      8, 8, 8, 8),
+                  child: Icon(Icons.person_rounded, size: 24,),
+                ),
               ),
-              child: Row(
+            ),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsetsDirectional.fromSTEB(12, 0, 0, 0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.max,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Rutgar Ragos (Example)',
+                      style: Theme.of(context).textTheme.subtitle1?.merge(const TextStyle(
+                        fontFamily: 'Lexend Deca',
+                        color: Color(0xFF1E2429),
+                        fontSize: 18,
+                        fontWeight: FontWeight.w500,
+                      )),
+                    ),
+                    Padding(
+                      padding: const EdgeInsetsDirectional.fromSTEB(0, 4, 0, 0),
+                      child: Text(
+                        'Recently visited',
+                        style: Theme.of(context).textTheme.bodyText1?.merge(const TextStyle(
+                          fontFamily: 'Lexend Deca',
+                          color: Color(0xFF090F13),
+                          fontSize: 14,
+                          fontWeight: FontWeight.normal,
+                        )),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            Padding(
+              padding:
+              const EdgeInsetsDirectional.fromSTEB(12, 0, 12, 0),
+              child: Column(
                 mainAxisSize: MainAxisSize.max,
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  Padding(
-                    padding:
-                    const EdgeInsetsDirectional.fromSTEB(8, 0, 0, 0),
-                    child: Card(
-                      clipBehavior: Clip.antiAliasWithSaveLayer,
-                      color: const Color(0x6639D2C0),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(40),
-                      ),
-                      child: const Padding(
-                        padding: EdgeInsetsDirectional.fromSTEB(
-                            8, 8, 8, 8),
-                        child: Icon(Icons.notification_important_rounded, size: 24,),
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsetsDirectional.fromSTEB(
-                          12, 0, 0, 0),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.max,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment:
-                        CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Hina Patel',
-                            style: Theme.of(context).textTheme.subtitle1?.merge(const TextStyle(
-                              fontFamily: 'Lexend Deca',
-                              color: Color(0xFF1E2429),
-                              fontSize: 18,
-                              fontWeight: FontWeight.w500,
-                            )),
-                          ),
-                          Padding(
-                            padding: const EdgeInsetsDirectional.fromSTEB(0, 4, 0, 0),
-                            child: Text(
-                              'New Health Record',
-                              style: Theme.of(context).textTheme.bodyText1?.merge(const TextStyle(
-                                fontFamily: 'Lexend Deca',
-                                color: Color(0xFF090F13),
-                                fontSize: 14,
-                                fontWeight: FontWeight.normal,
-                              )),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+                  Text(
+                    'M 87',
+                    textAlign: TextAlign.end,
+                    style: Theme.of(context).textTheme.subtitle2?.merge(const TextStyle(
+                      fontFamily: 'Lexend Deca',
+                      color: Color(0xFF39D2C0),
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    )),
                   ),
                   Padding(
-                    padding: const EdgeInsetsDirectional.fromSTEB(
-                        12, 0, 12, 0),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.max,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Text(
-                          'F 26',
-                          textAlign: TextAlign.end,
-                          style: Theme.of(context).textTheme.subtitle2?.merge(const TextStyle(
-                            fontFamily: 'Lexend Deca',
-                            color: Color(0xFF39D2C0),
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                          )),
-                        ),
-                        Padding(
-                          padding: const EdgeInsetsDirectional.fromSTEB(0, 4, 0, 0),
-                          child: Text(
-                            'Diagnostic Report',
-                            textAlign: TextAlign.end,
-                            style: Theme.of(context).textTheme.bodyText1?.merge(const TextStyle(
-                                fontFamily: 'Lexend Deca',
-                                color: Color(0xFF090F13),
-                                fontSize: 12,
-                                fontWeight: FontWeight.normal)),
-                          ),
-                        ),
-                      ],
+                    padding: const EdgeInsetsDirectional.fromSTEB(0, 4, 0, 0),
+                    child: Text(
+                      'Favorite',
+                      textAlign: TextAlign.end,
+                      style: Theme.of(context).textTheme.bodyText1?.merge(const TextStyle(
+                        fontFamily: 'Lexend Deca',
+                        color: Color(0xFF090F13),
+                        fontSize: 12,
+                        fontWeight: FontWeight.normal,
+                      )),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      );
+  }
+
+  Container _recentPatient(Person person) {
+    return Container(
+      width: MediaQuery.of(context).size.width * 0.92,
+      height: 70,
+      decoration: BoxDecoration(
+        color: const Color(0xFFF4F5F7),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.max,
+        children: [
+          Padding(
+            padding: const EdgeInsetsDirectional.fromSTEB(8, 0, 0, 0),
+            child: Card(
+              clipBehavior: Clip.antiAliasWithSaveLayer,
+              color: const Color(0x6639D2C0),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(40),
+              ),
+              child: const Padding(
+                padding: EdgeInsetsDirectional.fromSTEB(
+                    8, 8, 8, 8),
+                child: Icon(Icons.person_rounded, size: 24,),
+              ),
+            ),
+          ),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsetsDirectional.fromSTEB(12, 0, 0, 0),
+              child: Column(
+                mainAxisSize: MainAxisSize.max,
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    person.display,
+                    style: Theme.of(context).textTheme.subtitle1?.merge(const TextStyle(
+                      fontFamily: 'Lexend Deca',
+                      color: Color(0xFF1E2429),
+                      fontSize: 18,
+                      fontWeight: FontWeight.w500,
+                    )),
+                  ),
+                  Padding(
+                    padding: const EdgeInsetsDirectional.fromSTEB(0, 4, 0, 0),
+                    child: Text(
+                      'Recently visited',
+                      style: Theme.of(context).textTheme.bodyText1?.merge(const TextStyle(
+                        fontFamily: 'Lexend Deca',
+                        color: Color(0xFF090F13),
+                        fontSize: 14,
+                        fontWeight: FontWeight.normal,
+                      )),
                     ),
                   ),
                 ],
               ),
             ),
           ),
-          AppointmentsListView(practitionerUuid: practitionerUuid),
+          Padding(
+            padding:
+            const EdgeInsetsDirectional.fromSTEB(12, 0, 12, 0),
+            child: Column(
+              mainAxisSize: MainAxisSize.max,
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(
+                  '',
+                  textAlign: TextAlign.end,
+                  style: Theme.of(context).textTheme.subtitle2?.merge(const TextStyle(
+                    fontFamily: 'Lexend Deca',
+                    color: Color(0xFF39D2C0),
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                  )),
+                ),
+                Padding(
+                  padding: const EdgeInsetsDirectional.fromSTEB(0, 4, 0, 0),
+                  child: Text(
+                    'Patient',
+                    textAlign: TextAlign.end,
+                    style: Theme.of(context).textTheme.bodyText1?.merge(const TextStyle(
+                      fontFamily: 'Lexend Deca',
+                      color: Color(0xFF090F13),
+                      fontSize: 12,
+                      fontWeight: FontWeight.normal,
+                    )),
+                  ),
+                ),
+              ],
+            ),
+          ),
         ],
-      );
+      ),
+    );
   }
 
 }

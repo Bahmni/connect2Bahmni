@@ -1,6 +1,8 @@
+
 import 'package:fhir/r4.dart';
 
 import '../utils/app_urls.dart';
+import '../utils/app_config.dart';
 import 'fhir_service.dart';
 
 class Patients {
@@ -8,4 +10,14 @@ class Patients {
     String url = AppUrls.fhir.patient + '?name=$name';
     return FhirInterface().fetch(url);
   }
+
+  Future<Bundle?> searchByName2(String name) async {
+    //TODO
+    //v=custom:(uuid,identifiers:(uuid,identifier,identifierType:(uuid,name),location),person:(display,gender,birthdate))
+    if (!AppConfig.fhirSupport) {
+
+    }
+    return Future.value(null);
+  }
+
 }

@@ -12,6 +12,7 @@ class OMRSRestUrls {
   String get session => '$base/session';
   String get provider => '$base/provider';
   String get location => '$base/location';
+  String get patient => '$base/patient';
 }
 
 class FHIRUrls {

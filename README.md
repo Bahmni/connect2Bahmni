@@ -12,3 +12,8 @@ As of now, this project is experimental, only a starting point and far from bein
 
 ##Development
 - Git clone and load onto Android Studio
+- run > flutter pub get  
+- create a ".env" file at project root, add properties
+
+## Build
+- flutter build apk --debug

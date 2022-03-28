@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 import '../domain/models/session.dart';
@@ -17,7 +18,8 @@ import '../screens/patient_charts.dart';
 import '../widgets/speech_activator.dart';
 import '../screens/login_location.dart';
 
-void main() {
+void main() async {
+  await dotenv.load(fileName: ".env");
   runApp(const MyApp());
 }
 
