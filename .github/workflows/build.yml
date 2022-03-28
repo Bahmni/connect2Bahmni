@@ -23,6 +23,7 @@ jobs:
         uses: actions/setup-java@v2
         with:
           java-version: $JAVA_VERSION
+          distribution: 'zulu'
       - name: setup flutter
         uses: subosito/flutter-action@v2
         with:
