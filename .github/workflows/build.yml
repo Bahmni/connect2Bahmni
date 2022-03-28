@@ -13,21 +13,18 @@ jobs:
   build:
     name: flutter build
     runs-on: ubuntu-latest
-    env:
-      JAVA_VERSION: "11.0"
-      FLUTTER_VERSION: "2.8.1"
     steps:
       - name: checkout
         uses: actions/checkout@v2
       - name: setup JDK
         uses: actions/setup-java@v2
         with:
-          java-version: $JAVA_VERSION
+          java-version: '11.0'
           distribution: 'zulu'
       - name: setup flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: $FLUTTER_VERSION
+          flutter-version: '2.8.1'
       - name: create env file
         run: |
           touch .env
