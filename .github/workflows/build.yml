@@ -32,9 +32,7 @@ jobs:
           echo bahmni.server=https://next.mybahmni.org >> .env
       - run: flutter pub get
       - run: flutter analyze
-      - run: flutter build apk
-      - name: check files
-        run: find . -name "*.apk"
+      - run: flutter build apk --debug
       - name: archive debug results
         uses: actions/upload-artifact@v3
         with:
