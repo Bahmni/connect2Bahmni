@@ -30,7 +30,11 @@ jobs:
           touch .env
           echo fhir.support=false >> .env
           echo bahmni.server=https://next.mybahmni.org >> .env
-          cat .env
       - run: flutter pub get
       - run: flutter analyze
       - run: flutter build apk
+      - name: archive debug results
+        uses: actions/upload-artifact@v3
+        with:
+          name: app-debug-build
+          path: build/app/outputs/flutter-apk/app-debug.apk

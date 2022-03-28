@@ -1,4 +1,4 @@
-package com.example.connect2bahmni
+package org.bahmni.connect2bahmni
 
 import io.flutter.embedding.android.FlutterActivity
 
