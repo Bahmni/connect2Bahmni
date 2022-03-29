@@ -10,4 +10,7 @@ class UserProvider with ChangeNotifier {
     _user = user;
     notifyListeners();
   }
+  void updateUser(User user) {
+    _user = user;
+  }
 }

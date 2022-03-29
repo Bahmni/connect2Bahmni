@@ -3,8 +3,6 @@ import 'dart:io';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
-import '../domain/models/session.dart';
-import '../utils/shared_preference.dart';
 import '../providers/user_provider.dart';
 import '../providers/auth.dart';
 import '../screens/user_dashboard.dart';
@@ -12,6 +10,7 @@ import '../screens/login.dart';
 import '../screens/register.dart';
 import '../screens/appointments_calendar.dart';
 import '../utils/app_routes.dart';
+import 'domain/models/session.dart';
 import 'screens/patient_search.dart';
 import 'screens/tasks_notifications.dart';
 import '../screens/patient_charts.dart';
@@ -27,12 +26,13 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Future<Session?> getUserData() => UserPreferences().getSession();
+    var authProvider = AuthProvider();
+    Future<Session?> getSession() => authProvider.getSession();
     HttpOverrides.global = DevHttpOverrides();
 
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => AuthProvider()),
+        ChangeNotifierProvider(create: (_) => authProvider),
         ChangeNotifierProvider(create: (_) => UserProvider()),
       ],
       child: MaterialApp(
@@ -42,24 +42,21 @@ class MyApp extends StatelessWidget {
             visualDensity: VisualDensity.adaptivePlatformDensity,
           ),
           home: FutureBuilder(
-              future: getUserData(),
-              builder: (context, snapshot) {
+              future: getSession(),
+              builder: (context, AsyncSnapshot<Session?> snapshot) {
                 switch (snapshot.connectionState) {
                   case ConnectionState.none:
                   case ConnectionState.waiting:
-                    return const CircularProgressIndicator();
+                    return const Center(child: CircularProgressIndicator());
                   default:
                     if (snapshot.hasError) {
                       return Text('Error: ${snapshot.error}');
-                    } else if (snapshot.data == null) {
-                      UserPreferences().removeSession();
-                      return const Login();
-                      //return const SpeechEg();
-                    } else {
-                      UserPreferences().removeSession();
                     }
-                    return const Text('Logged in ');
-                    //return const Welcome(user: snapshot.data);
+                    if (!snapshot.hasData) {
+                      return const Login();
+                    }
+                    Provider.of<UserProvider>(context, listen: false).updateUser((snapshot.data as Session).user);
+                    return const UserDashBoard();
                 }
               }),
           routes: {

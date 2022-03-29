@@ -123,4 +123,12 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
+  Future<Session?> getSession() {
+    return UserPreferences().getSession();
+  }
+
+  Future<String?> getServerUrl() {
+    return UserPreferences().getServerUrl();
+  }
+
 }

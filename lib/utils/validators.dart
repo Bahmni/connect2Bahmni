@@ -8,3 +8,11 @@ String? validateUserName(String? value) {
   }
   return null;
 }
+
+String? validateUrl(String? value) {
+  if (value == null || value.isEmpty) {
+    return "URL value is required";
+  }
+  bool result = Uri.parse(value).isAbsolute;
+  return result ? null : 'Please provide a valid URL';
+}

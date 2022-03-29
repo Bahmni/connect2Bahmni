@@ -1,6 +1,9 @@
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 class AppUrls {
-  //static const String baseUrl = 'https://qa-02.hip.bahmni-covid19.in';
-  static const String baseUrl = 'https://next.mybahmni.org';
+  // static const String defaultServer = 'https://qa-02.hip.bahmni-covid19.in';
+  static const String defaultServer = 'https://next.mybahmni.org';
+  static String baseUrl = dotenv.get('bahmni.server', fallback: defaultServer);
   static OMRSRestUrls omrs = const OMRSRestUrls();
   static FHIRUrls fhir = const FHIRUrls();
   static BahmniRestUrls bahmni = const BahmniRestUrls();
