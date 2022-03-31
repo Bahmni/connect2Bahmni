@@ -50,6 +50,7 @@ dependencies:
   speech_to_text: ^5.4.3
   jitsi_meet: ^4.0.0
   flutter_dotenv: ^5.0.2
+  multi_split_view: ^1.11.0+1
 
 dev_dependencies:
   flutter_test:

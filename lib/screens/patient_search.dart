@@ -7,13 +7,14 @@ import '../providers/auth.dart';
 import '../services/patients.dart';
 import '../utils/debouncer.dart';
 import 'models/patient_view.dart';
-import '../screens/patient_charts.dart';
 import '../utils/app_routes.dart';
 import '../utils/app_failures.dart';
+import '../utils/arguments.dart';
 
 
-class PatientSearch extends StatefulWidget {
-  const PatientSearch({Key? key}) : super(key: key);
+class PatientSearch extends StatefulWidget {  
+  final OnSelect? onSelect;
+  const PatientSearch({Key? key, this.onSelect}) : super(key: key);
 
   @override
   _PatientsSearchWidgetState createState() => _PatientsSearchWidgetState();
@@ -83,10 +84,7 @@ class _PatientsSearchWidgetState extends State<PatientSearch> {
       body: Column(
         children: [
           Container(
-            width: MediaQuery
-                .of(context)
-                .size
-                .width,
+            width: MediaQuery.of(context).size.width,
             height: 100,
             decoration: BoxDecoration(
               color: Colors.white,
@@ -286,8 +284,8 @@ class _PatientsSearchWidgetState extends State<PatientSearch> {
                   onTap: () async {
                     await Navigator.pushNamed(
                       context,
-                      AppRoutes.patientCharts,
-                      arguments: PatientChartArguments(
+                      AppRoutes.patients,
+                      arguments: SelectedPatient(
                         patient.uuid,
                         patient.fullName
                       ),
@@ -313,6 +311,8 @@ class _PatientsSearchWidgetState extends State<PatientSearch> {
     );
   }
 }
+
+typedef OnSelect = void Function(SelectedPatient selectedPatient);
 
 
 

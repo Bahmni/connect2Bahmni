@@ -13,7 +13,7 @@ import '../utils/app_routes.dart';
 import 'domain/models/session.dart';
 import 'screens/patient_search.dart';
 import 'screens/tasks_notifications.dart';
-import '../screens/patient_charts.dart';
+import '../screens/patient_dashboard.dart';
 import '../screens/login_location.dart';
 
 void main() async {
@@ -66,7 +66,7 @@ class MyApp extends StatelessWidget {
             AppRoutes.appointments: (context) => const AppointmentsCalendar(),
             AppRoutes.taskNotification: (context) => const TasksAndNotificationsWidget(),
             AppRoutes.searchPatients: (context) => const PatientSearch(),
-            AppRoutes.patientCharts: (context) => const PatientCharts(),
+            AppRoutes.patients: (context) => const PatientDashboard(),
             AppRoutes.loginLocations: (context) => const LoginLocation(),
           }),
     );
