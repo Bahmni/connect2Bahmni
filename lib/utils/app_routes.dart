@@ -4,7 +4,8 @@ class AppRoutes {
   static const String login = '/login';
   static const String register = '/register';
   static const String taskNotification = '/taskNotification';
-  static const String searchPatients = '/patients';
-  static const String patientCharts = '/patientCharts';
+  static const String searchPatients = '/searchPatients';
+  static const String patients = '/patients';
   static const String loginLocations = '/loginLocations';
+  static const String addCondition = '/condition';
 }

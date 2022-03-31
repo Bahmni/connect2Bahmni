@@ -7,6 +7,7 @@ class AppUrls {
   static OMRSRestUrls omrs = const OMRSRestUrls();
   static FHIRUrls fhir = const FHIRUrls();
   static BahmniRestUrls bahmni = const BahmniRestUrls();
+  static EmrApiUrls emrApi = const EmrApiUrls();
 }
 
 class OMRSRestUrls {
@@ -16,6 +17,7 @@ class OMRSRestUrls {
   String get provider => '$base/provider';
   String get location => '$base/location';
   String get patient => '$base/patient';
+  String get visit => '$base/visit';
 }
 
 class FHIRUrls {
@@ -31,4 +33,10 @@ class BahmniRestUrls {
   String get base => '${AppUrls.baseUrl}/openmrs/ws/rest/v1';
   String get appointments => '$base/appointments';
   String get appointment => '$base/appointment';
+}
+
+class EmrApiUrls {
+  const EmrApiUrls();
+  String get base => '${AppUrls.baseUrl}/openmrs/ws/rest/emrapi/';
+  String get concept => '$base/concept';
 }

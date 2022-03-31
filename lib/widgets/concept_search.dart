@@ -1,31 +1,28 @@
 import 'dart:async';
-import 'package:fhir/r4.dart';
 import 'package:flutter/material.dart';
 
-import '../services/patients.dart';
 import '../utils/debouncer.dart';
-import 'models/patient_view.dart';
-import '../utils/app_routes.dart';
 import '../utils/app_failures.dart';
-import '../utils/arguments.dart';
+import '../domain/models/omrs_concept.dart';
+import '../services/concept_dictionary.dart';
 
-
-class PatientSearch extends StatefulWidget {
-  final OnSelectPatient? onSelect;
-  const PatientSearch({Key? key, this.onSelect}) : super(key: key);
+class ConceptSearch extends StatefulWidget {
+  final OnSelectConcept? onSelect;
+  const ConceptSearch({Key? key, this.onSelect}) : super(key: key);
 
   @override
-  _PatientsSearchWidgetState createState() => _PatientsSearchWidgetState();
+  _ConceptSearchWidgetState createState() => _ConceptSearchWidgetState();
 }
 
-class _PatientsSearchWidgetState extends State<PatientSearch> {
+class _ConceptSearchWidgetState extends State<ConceptSearch> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
   TextEditingController searchController = TextEditingController();
   final Debouncer _debouncer = Debouncer();
-  List<PatientViewModel> patientList = [];
+  List<OmrsConcept> conceptList = [];
 
   @override
   void dispose() {
+    print('disposing concept search');
     searchController.dispose();
     super.dispose();
   }
@@ -33,13 +30,13 @@ class _PatientsSearchWidgetState extends State<PatientSearch> {
   @override
   void initState() {
     super.initState();
-    searchController.addListener(_searchForPatients);
+    searchController.addListener(_searchForConcept);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Search Patients'),),
+      appBar: AppBar(title: const Text('Search Concepts'),),
       body: Column(
         children: [
           Container(
@@ -58,7 +55,7 @@ class _PatientsSearchWidgetState extends State<PatientSearch> {
                 children: [
                   Padding(
                     padding: const EdgeInsetsDirectional.fromSTEB(12, 0, 12, 0),
-                    child: _searchPatientsView(),
+                    child: _searchResultsView(),
                   ),
                 ],
               ),
@@ -71,7 +68,7 @@ class _PatientsSearchWidgetState extends State<PatientSearch> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  for (var p in patientList) _patientRow(p)
+                  for (var p in conceptList) _resultRow(p)
                 ],
               ),
             ),
@@ -82,37 +79,34 @@ class _PatientsSearchWidgetState extends State<PatientSearch> {
     );
   }
 
-  void _searchForPatients() {
+  void _searchForConcept() {
     if (searchController.text.trim().isEmpty) return;
     if (searchController.text.trim().length < 3) return;
     _debouncer.run(() {
       if (searchController.text.isEmpty) {
         setState(() {
-          patientList.clear();
+          conceptList.clear();
         });
         return;
       }
-      final Future<Bundle> request = Patients().searchByName(searchController.text);
-      request.then((result) {
-        List<PatientViewModel> patients = result.entry != null
-            ? List<PatientViewModel>.from(result.entry!.map((e) => PatientViewModel(e.resource as Patient)))
-            : [];
-        setState(() {
-          patientList.clear();
-          patientList.addAll(patients);
-        });
-      },
-      onError: (err) {
-        debugPrint(err.toString());
-        String errorMsg = err is Failure ? err.message : '';
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Search failed. $errorMsg')),
-        );
-      });
+      final Future<List<OmrsConcept>> request = ConceptDictionary().searchCondition(searchController.text);
+      request.then((results) {
+            setState(() {
+              conceptList.clear();
+              conceptList.addAll(results);
+            });
+          },
+          onError: (err) {
+            debugPrint(err.toString());
+            String errorMsg = err is Failure ? err.message : '';
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Search failed. $errorMsg')),
+            );
+          });
     });
   }
 
-  Card _searchPatientsView() {
+  Card _searchResultsView() {
     return Card(
       clipBehavior: Clip.antiAliasWithSaveLayer,
       color: Colors.white,
@@ -139,6 +133,7 @@ class _PatientsSearchWidgetState extends State<PatientSearch> {
                   controller: searchController,
                   obscureText: false,
                   decoration: InputDecoration(
+                    //labelText: 'Search for patients...',
                     labelStyle: Theme
                         .of(context)
                         .textTheme
@@ -149,7 +144,7 @@ class _PatientsSearchWidgetState extends State<PatientSearch> {
                       fontSize: 14,
                       fontWeight: FontWeight.normal,
                     )),
-                    hintText: 'Find patients by name or identifier',
+                    hintText: 'Find concepts',
                     hintStyle: Theme.of(context).textTheme.bodyText1?.merge(const TextStyle(
                       fontFamily: 'Lexend Deca',
                       color: Color(0xFF95A1AC),
@@ -197,7 +192,7 @@ class _PatientsSearchWidgetState extends State<PatientSearch> {
     );
   }
 
-  Row _patientRow(PatientViewModel patient) {
+  Row _resultRow(OmrsConcept concept) {
     return Row(
       mainAxisSize: MainAxisSize.max,
       children: [
@@ -225,7 +220,7 @@ class _PatientsSearchWidgetState extends State<PatientSearch> {
                       height: 60,
                       clipBehavior: Clip.antiAlias,
                       decoration: const BoxDecoration(shape: BoxShape.circle,),
-                      child: const Icon(Icons.person_rounded, size: 24,),
+                      child: const Icon(Icons.category, size: 24,),
                     ),
                   ],
                 ),
@@ -239,7 +234,7 @@ class _PatientsSearchWidgetState extends State<PatientSearch> {
                       mainAxisSize: MainAxisSize.max,
                       children: [
                         Text(
-                          patient.fullName,
+                          concept.display ?? 'unknown',
                           style: Theme.of(context).textTheme.subtitle1?.merge(const TextStyle(
                             fontFamily: 'Lexend Deca',
                             color: Color(0xFF15212B),
@@ -257,8 +252,8 @@ class _PatientsSearchWidgetState extends State<PatientSearch> {
                             overflow: TextOverflow.ellipsis,
                             strutStyle: const StrutStyle(fontSize: 12.0),
                             text: TextSpan(
-                                style: const TextStyle(color: Colors.black),
-                                  text: patient.minimalInfo,),
+                              style: const TextStyle(color: Colors.black),
+                              text: _showDescription(concept),),
                           ),
                         ),
                       ],
@@ -269,15 +264,9 @@ class _PatientsSearchWidgetState extends State<PatientSearch> {
               Padding(
                 padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 8, 0),
                 child: InkWell(
-                  onTap: () async {
-                    await Navigator.pushNamed(
-                      context,
-                      AppRoutes.patients,
-                      arguments: SelectedPatient(
-                        patient.uuid,
-                        patient.fullName
-                      ),
-                    );
+                  onTap: () {
+                    _debouncer.forceStop();
+                    Navigator.pop(context, concept);
                   },
                   child: Column(
                     mainAxisSize: MainAxisSize.max,
@@ -298,9 +287,16 @@ class _PatientsSearchWidgetState extends State<PatientSearch> {
       ],
     );
   }
+
+  String? _showDescription(OmrsConcept concept) {
+    if ((concept.descriptions != null) && concept.descriptions!.isNotEmpty) {
+      return concept.descriptions?.first.display;
+    }
+    return concept.display;
+  }
 }
 
-typedef OnSelectPatient = void Function(SelectedPatient selectedPatient);
+typedef OnSelectConcept = void Function(OmrsConcept selectedConcept);
 
 
 

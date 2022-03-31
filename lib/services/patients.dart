@@ -1,4 +1,5 @@
 
+import '../domain/models/omrs_patient.dart';
 import 'package:fhir/r4.dart';
 
 import '../utils/app_urls.dart';
@@ -11,7 +12,7 @@ class Patients {
     return FhirInterface().fetch(url);
   }
 
-  Future<Bundle?> searchByName2(String name) async {
+  Future<List<OmrsPatient>?> searchOmrsByName(String name) async {
     //TODO
     //v=custom:(uuid,identifiers:(uuid,identifier,identifierType:(uuid,name),location),person:(display,gender,birthdate))
     if (!AppConfig.fhirSupport) {

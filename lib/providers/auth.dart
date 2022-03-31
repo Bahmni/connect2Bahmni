@@ -22,10 +22,13 @@ enum Status {
 class AuthProvider with ChangeNotifier {
 
   Status _loggedInStatus = Status.notLoggedIn;
-  //Status _registeredInStatus = Status.notRegistered;
-
   Status get loggedInStatus => _loggedInStatus;
+
+  //Status _registeredInStatus = Status.notRegistered;
   //Status get registeredInStatus => _registeredInStatus;
+
+  OmrsLocation? _sessionLocation;
+  OmrsLocation? get sessionLocation => _sessionLocation;
 
   Future<Map<String, dynamic>> authenticate(String username, String password) async {
     _loggedInStatus = Status.authenticating;
@@ -110,6 +113,7 @@ class AuthProvider with ChangeNotifier {
     switch(response.statusCode) {
       case 200: {
         var session = await UserPreferences().getSession();
+        _sessionLocation = location;
         session!.sessionLocation = location;
         UserPreferences().saveSession(session);
         return 'Success';
