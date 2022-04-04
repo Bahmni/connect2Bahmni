@@ -1,6 +1,4 @@
 
-import 'package:fhir/r4.dart';
-
 import '../../domain/models/omrs_concept.dart';
 import '../../domain/models/omrs_patient.dart';
 import '../../domain/models/omrs_provider.dart';

@@ -15,7 +15,6 @@ import 'screens/patient_search.dart';
 import 'screens/tasks_notifications.dart';
 import '../screens/patient_dashboard.dart';
 import '../screens/login_location.dart';
-import '../widgets/condition.dart';
 
 void main() async {
   await dotenv.load(fileName: ".env");

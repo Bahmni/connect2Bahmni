@@ -25,8 +25,7 @@ class _PatientDashboardWidgetState extends State<PatientDashboard> {
   @override
   Widget build(BuildContext context) {
     var user = Provider.of<UserProvider>(context).user;
-    var currentLocation = Provider.of<AuthProvider>(context).sessionLocation;
-    print('Current Location : $currentLocation');
+    //var currentLocation = Provider.of<AuthProvider>(context).sessionLocation;
     var args = ModalRoute.of(context)!.settings.arguments as SelectedPatient;
     return ChangeNotifierProvider(
       create: (context) => ConsultationModel(user!),

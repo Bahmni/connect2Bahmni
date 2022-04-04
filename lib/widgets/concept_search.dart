@@ -22,7 +22,6 @@ class _ConceptSearchWidgetState extends State<ConceptSearch> {
 
   @override
   void dispose() {
-    print('disposing concept search');
     searchController.dispose();
     super.dispose();
   }

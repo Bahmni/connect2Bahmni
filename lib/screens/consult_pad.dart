@@ -1,6 +1,5 @@
 import 'package:connect2bahmni/screens/models/condition_model.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../screens/models/consultation_model.dart';
 
@@ -50,8 +49,7 @@ class _ConsultPadWidgetState extends State<ConsultPadWidget> {
   }
 
   Widget _showConsultation(ConsultationModel consultation, BuildContext context) {
-    var startTime = DateFormat('dd-MMM-yyy, hh:mm a').format(consultation.startTime);
-    print('in showconsultation');
+    //var startTime = DateFormat('dd-MMM-yyy, hh:mm a').format(consultation.startTime);
     String? display = _statusDisplays[consultation.status];
     return Container(
         color: Theme.of(context).colorScheme.onBackground,
@@ -98,12 +96,12 @@ class _ConsultPadWidgetState extends State<ConsultPadWidget> {
       ],
     );
 
-    return ListTile(
-      leading: const Icon(Icons.category, size: 24,),
-      title: Text(display),
-      subtitle: Text('Certainty: $status'),
-      tileColor: Colors.red,
-    );
+    // return ListTile(
+    //   leading: const Icon(Icons.category, size: 24,),
+    //   title: Text(display),
+    //   subtitle: Text('Certainty: $status'),
+    //   tileColor: Colors.red,
+    // );
   }
 }
 
