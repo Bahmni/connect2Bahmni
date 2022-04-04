@@ -3,24 +3,29 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:jitsi_meet/jitsi_meet.dart';
+import 'package:provider/provider.dart';
+import 'package:uuid/uuid.dart';
 import '../domain/models/bahmni_appointment.dart';
 import '../domain/models/user.dart';
+import '../providers/user_provider.dart';
 
 class LaunchMeeting extends StatefulWidget {
-  const LaunchMeeting({Key? key}) : super(key: key);
+  final BahmniAppointment? event;
+  const LaunchMeeting({Key? key, this.event}) : super(key: key);
 
   @override
   _LaunchMeetingState createState() => _LaunchMeetingState();
 }
 
+const String defaultTitleText = "Consultation";
+
 class _LaunchMeetingState extends State<LaunchMeeting> {
   final serverText = TextEditingController();
-  final roomText = TextEditingController(text: "plugintestroom");
-  final subjectText = TextEditingController(text: "My Plugin Test Meeting");
-  final nameText = TextEditingController(text: "Plugin Test User");
-  final emailText = TextEditingController(text: "fake@email.com");
-  final iosAppBarRGBAColor =
-  TextEditingController(text: "#0080FF80"); //transparent blue
+  final roomIdentifier = TextEditingController();
+  final titleText = TextEditingController(text: defaultTitleText);
+  final nameText = TextEditingController();
+  final emailText = TextEditingController();
+  final iosAppBarRGBAColor = TextEditingController(text: "#0080FF80"); //transparent blue
   bool? isAudioOnly = true;
   bool? isAudioMuted = true;
   bool? isVideoMuted = true;
@@ -43,6 +48,11 @@ class _LaunchMeetingState extends State<LaunchMeeting> {
 
   @override
   Widget build(BuildContext context) {
+    var _userProvider = Provider.of<UserProvider>(context, listen: false);
+    roomIdentifier.text = widget.event?.uuid ?? const Uuid().v4();
+    titleText.text = defaultTitleText;
+    nameText.text = _userProvider.user!.person.display;
+
     double width = MediaQuery.of(context).size.width;
     return MaterialApp(
       home: Scaffold(
@@ -105,7 +115,7 @@ class _LaunchMeetingState extends State<LaunchMeeting> {
             height: 14.0,
           ),
           TextField(
-            controller: roomText,
+            controller: roomIdentifier,
             decoration: const InputDecoration(
               border: OutlineInputBorder(),
               labelText: "Room",
@@ -115,7 +125,7 @@ class _LaunchMeetingState extends State<LaunchMeeting> {
             height: 14.0,
           ),
           TextField(
-            controller: subjectText,
+            controller: titleText,
             decoration: const InputDecoration(
               border: OutlineInputBorder(),
               labelText: "Subject",
@@ -241,9 +251,9 @@ class _LaunchMeetingState extends State<LaunchMeeting> {
       }
     }
     // Define meetings options here
-    var options = JitsiMeetingOptions(room: roomText.text)
+    var options = JitsiMeetingOptions(room: roomIdentifier.text)
       ..serverURL = serverUrl
-      ..subject = subjectText.text
+      ..subject = titleText.text
       ..userDisplayName = nameText.text
       ..userEmail = emailText.text
       ..iosAppBarRGBAColor = iosAppBarRGBAColor.text
@@ -252,7 +262,7 @@ class _LaunchMeetingState extends State<LaunchMeeting> {
       ..videoMuted = isVideoMuted
       ..featureFlags.addAll(featureFlags)
       ..webOptions = {
-        "roomName": roomText.text,
+        "roomName": roomIdentifier.text,
         "width": "100%",
         "height": "100%",
         "enableWelcomePage": false,

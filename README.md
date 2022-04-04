@@ -10,10 +10,17 @@ As of now, this project is experimental, only a starting point and far from bein
 - [New to flutter?](https://flutter.dev/docs/get-started/codelab)
 - [Flutter samples](https://flutter.dev/docs/cookbook)
 
-##Development
+### Development
 - Git clone and load onto Android Studio
-- run > flutter pub get  
+- run > flutter pub get
 - create a ".env" file at project root, add properties
+
+| property | value | description |
+| ----------- | ----------- | ----------- |
+| bahmni.server | http://www.example.org | no trailing slash |
+| app.allowedVisitTypes | OPD,IPD,FIELD  | subset of visit types on server, matched by name |
+| app.allowedEncTypes| Consultation,REG,TRANSFER | subset of encounter types on server, matched by name |
+
 
 ## Build
 - flutter build apk --debug

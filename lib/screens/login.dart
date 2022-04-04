@@ -4,8 +4,8 @@ import '../utils/shared_preference.dart';
 import '../providers/auth.dart';
 import '../utils/validators.dart';
 import '../providers/user_provider.dart';
-import '../domain/models/session.dart';
 import '../utils/app_routes.dart';
+import '../providers/meta_provider.dart';
 
 
 class Login extends StatefulWidget {
@@ -53,9 +53,10 @@ class _LoginState extends State<Login> {
       _formKey.currentState!.save();
       _authProvider!.authenticate(_username as String, _password as String)
           .then((response) {
-        if (response['status']) {
-          var session = response['session'] as Session;
+        if (response.status) {
+          var session = response.session!;
           Provider.of<UserProvider>(context, listen: false).setUser(session.user);
+          Provider.of<MetaProvider>(context, listen: false).initialize();
           var providerLoginLocations = session.user.provider?.attrValue('locations');
           if (providerLoginLocations != null && providerLoginLocations.isNotEmpty) {
             var assignedLocations = <String, String>{};

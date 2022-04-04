@@ -8,7 +8,8 @@ import '../services/concept_dictionary.dart';
 
 class ConceptSearch extends StatefulWidget {
   final OnSelectConcept? onSelect;
-  const ConceptSearch({Key? key, this.onSelect}) : super(key: key);
+  final String? searchType;
+  const ConceptSearch({Key? key, this.searchType, this.onSelect}) : super(key: key);
 
   @override
   _ConceptSearchWidgetState createState() => _ConceptSearchWidgetState();
@@ -34,8 +35,9 @@ class _ConceptSearchWidgetState extends State<ConceptSearch> {
 
   @override
   Widget build(BuildContext context) {
+    String heading = widget.searchType ?? 'Concepts';
     return Scaffold(
-      appBar: AppBar(title: const Text('Search Concepts'),),
+      appBar: AppBar(title: Text('Search $heading')),
       body: Column(
         children: [
           Container(

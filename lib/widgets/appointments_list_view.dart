@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import '../utils/date_time.dart';
 import '../services/bahmni_appointments.dart';
 import '../domain/models/bahmni_appointment.dart';
 
@@ -32,7 +32,7 @@ class _AppointmentsListViewState extends State<AppointmentsListView> {
         initialData: const [],
         builder: (BuildContext context, AsyncSnapshot<List<BahmniAppointment>> snapshot) {
             if (snapshot.connectionState != ConnectionState.done) {
-              return const CircularProgressIndicator();
+              return const Center(child: CircularProgressIndicator());
             }
             if (snapshot.hasError) {
               //write to log
@@ -40,15 +40,15 @@ class _AppointmentsListViewState extends State<AppointmentsListView> {
             }
             if (snapshot.hasData) {
               return Column (
-                children: demoData(context, snapshot.data),
+                children: _upcomingAppointments(context, snapshot.data),
               );
             }
-            return const CircularProgressIndicator();
+            return const Center(child: CircularProgressIndicator());
           }
     );
   }
 
-  List<Padding> demoData(BuildContext context, List<BahmniAppointment>? appointments) {
+  List<Padding> _upcomingAppointments(BuildContext context, List<BahmniAppointment>? appointments) {
     var list = appointments ?? [];
     return list.map((e) {
       return createAppointmentWidget(context, e);
@@ -101,7 +101,7 @@ class _AppointmentsListViewState extends State<AppointmentsListView> {
                     ),
                     Padding(
                       padding: const EdgeInsetsDirectional.fromSTEB(0, 4, 0, 0),
-                      child: Text(DateFormat('hh:mm a').format(appointment.startDateTime!),
+                      child: Text(formattedTime(appointment.startDateTime!),
                         style: Theme.of(context).textTheme.bodyText1?.merge(const TextStyle(
                           fontFamily: 'Lexend Deca',
                           color: Color(0xFF090F13),

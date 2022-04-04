@@ -1,6 +1,5 @@
 import 'package:calendar_view/calendar_view.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 
@@ -10,6 +9,10 @@ import '../utils/debouncer.dart';
 import '../providers/user_provider.dart';
 import '../domain/models/user.dart';
 import '../widgets/jitsi_meeting.dart';
+import '../screens/models/patient_view.dart';
+import '../services/patients.dart';
+import '../utils/app_routes.dart';
+import '../utils/date_time.dart';
 
 CalendarControllerProvider calendarProvider(BuildContext context, AsyncSnapshot<List<BahmniAppointment>> snapshot) {
   return CalendarControllerProvider<BahmniAppointment>(
@@ -101,12 +104,21 @@ class _AppointmentsDayViewState extends State<AppointmentsDayView> {
       onEventTap: (events, date) {
         debugPrint('Event tapped : $events');
         if (events.isNotEmpty) {
-          _showEventInfoDialog(context, events.single.event!);
+          var _event = events.single.event;
+          _showEventInfoDialog(context, _event!).then((value) async {
+            if (value == 'Charts') {
+              var patientModel = await _patientUuidFromEvent(_event);
+              Navigator.pushNamed(context, AppRoutes.patients, arguments: patientModel);
+            }
+            if (value == 'OK') {
+              joinJitsiMeeting(_event, _user!);
+              // Navigator.push(
+              //   context,
+              //   MaterialPageRoute(builder: (context) => LaunchMeeting(event: _event)),
+              // );
+            }
+          });
         }
-        // Navigator.push(
-        //   context,
-        //   MaterialPageRoute(builder: (context) => const LaunchMeeting()),
-        // );
       },
     );
   }
@@ -124,15 +136,12 @@ class _AppointmentsDayViewState extends State<AppointmentsDayView> {
     ));
     if (_isTeleConsult) {
       _actions.add(TextButton(
-        onPressed: () {
-          Navigator.pop(context, 'Join');
-          joinJitsiMeeting(event, _user!);
-        },
+        onPressed: () => Navigator.pop(context, 'Join'),
         child: const Text('Join'),
       ));
     }
-    var _starTime = DateFormat('hh:mm a').format(event.startDateTime!);
-    var _endTime = DateFormat('hh:mm a').format(event.endDateTime!);
+    var _starTime = formattedTime(event.startDateTime!);
+    var _endTime = formattedTime(event.endDateTime!);
     var _description = '${event.patient.name} ($_starTime - $_endTime)';
     return showDialog<String>(
       context: context,
@@ -167,6 +176,12 @@ class _AppointmentsDayViewState extends State<AppointmentsDayView> {
   }
 
   String keyForDate(DateTime date) => '${date.year}${date.month}${date.day}';
+
+  Future<PatientModel?> _patientUuidFromEvent(BahmniAppointment? event) async {
+    if (event == null) return Future.value(null);
+    var omrsPatient = await Patients().withUuid(event.patient.uuid);
+    return omrsPatient != null ? Future.value(PatientModel(omrsPatient.toFhir())) : Future.value(null);
+  }
 }
 
 Widget _defaultEventTileBuilder(

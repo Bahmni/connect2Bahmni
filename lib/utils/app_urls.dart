@@ -18,6 +18,9 @@ class OMRSRestUrls {
   String get location => '$base/location';
   String get patient => '$base/patient';
   String get visit => '$base/visit';
+  String get concept => '$base/concept';
+  String get visitType => '$base/visittype';
+  String get encType => '$base/encountertype';
 }
 
 class FHIRUrls {
@@ -33,6 +36,8 @@ class BahmniRestUrls {
   String get base => '${AppUrls.baseUrl}/openmrs/ws/rest/v1';
   String get appointments => '$base/appointments';
   String get appointment => '$base/appointment';
+  String get diagnosis => '$base/bahmnicore/diagnosis/search';
+  String get bahmniEncounter => '$base/bahmnicore/bahmniencounter';
 }
 
 class EmrApiUrls {

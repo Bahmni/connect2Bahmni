@@ -7,13 +7,18 @@ void main() {
     final person = Person(
       uuid: '1', display: 'rutgar ragos',
       gender: 'M',
-      birthdate: DateTime.parse('2000-02-26T00:00:00.000+0530')
+      birthdate: DateTime.parse('2000-02-26T00:00:00.000+0530'),
+      preferredName: PersonName(
+        display: 'rutgar ragos'
+      )
     );
     expect(person.toJson(), {
       'uuid': '1',
       'display': 'rutgar ragos',
       'gender': 'M',
-      'birthdate': '2000-02-25T18:30:00.000Z'
+      'birthdate': '2000-02-25T18:30:00.000Z',
+      'preferredName': person.preferredName,
+      'preferredAddress': null
     });
 
     final Person p = Person.fromJson({
@@ -32,7 +37,9 @@ void main() {
       'uuid': 'f5f47931-c3b9-4a37-805d-273d97d305dc',
       'display': 'Rutgar Ragos',
       'gender': 'M',
-      'birthdate': '2000-02-25T18:30:00.000Z'
+      'birthdate': '2000-02-25T18:30:00.000Z',
+      'preferredName': null,
+      'preferredAddress': null
     });
 
     expect(p.birthdate, DateTime.parse('2000-02-25T18:30:00.000Z'));

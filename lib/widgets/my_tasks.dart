@@ -74,7 +74,7 @@ class Task extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      leading: const Image(image: AssetImage('assets/2955252_calander_calendar_appointment_date_event_icon.png'), width: 60.0, height: 60.0,),
+      leading: const Image(image: AssetImage('assets/task_1.png'), width: 60.0, height: 60.0,),
       title: Text(taskNotification.body),
     );
   }

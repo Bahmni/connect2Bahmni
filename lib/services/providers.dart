@@ -36,7 +36,7 @@ class Providers {
     }
   }
 
-  Future<OmrsProvider?> omrsProviderbyUserId(String uuid, Future<String?> Function() fetchSessionId) async {
+  Future<OmrsProvider?> omrsProviderForUser(String uuid, Future<String?> Function() fetchSessionId) async {
     String url = AppUrls.omrs.provider + '?user=$uuid&v=custom:(uuid,identifier,attributes)';
     String? sessionId = await fetchSessionId();
     if (sessionId == null) {

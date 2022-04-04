@@ -3,9 +3,12 @@ import 'dart:convert';
 import 'package:connect2bahmni/domain/models/omrs_provider.dart';
 import 'package:connect2bahmni/services/providers.dart';
 import 'package:fhir/r4.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-void main() {
+void main() async {
+  TestWidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load(fileName: ".env");
   test('provider to practitioner deserialization test', () async {
     var jsonString = '''{
       "results": [

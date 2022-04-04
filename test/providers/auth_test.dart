@@ -1,28 +1,28 @@
-
-import 'dart:io';
-
-import 'package:connect2bahmni/main.dart';
 import 'package:connect2bahmni/providers/auth.dart';
+import 'package:connect2bahmni/utils/app_urls.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mockito/annotations.dart';
+import 'package:http/http.dart' as http;
+import 'package:mockito/mockito.dart';
 
-void main() {
+import 'auth_test.mocks.dart';
+
+
+@GenerateMocks([http.Client])
+void main() async {
+  TestWidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load(fileName: ".env");
   test('Login test', () async {
-    HttpOverrides.global = DevHttpOverrides();
-    Map<String, dynamic> loginResponse = await AuthProvider().authenticate("superman", "Admin1234");
-    expect(loginResponse["status"], true);
+    var client = MockClient();
+    when(client
+        .get(Uri.parse(AppUrls.omrs.session), headers: {
+             'authorization': 'Basic ZHJPbmU6dGVzdA==',
+             'Content-Type': 'application/json'
+        }))
+        .thenAnswer((_) async =>
+        http.Response('{"authenticated": false, "sessionId": "xyz"}', 200));
+    var loginResponse = await AuthProvider(client: client).authenticate("drOne", "test");
+    expect(loginResponse.status, false);
   });
-
-  // test('fetch session details', () async {
-  //   HttpOverrides.global = DevHttpOverrides();
-  //   String sessionId = 'DA8DC715F7C88245995CF409B09BFA7F';
-  //   Response response = await get(
-  //     Uri.parse(AppUrls.omrs.session),
-  //     headers: <String, String>{
-  //       'Content-Type': 'application/json',
-  //       'Accept': 'application/json',
-  //       'Cookie': 'JSESSIONID=$sessionId',
-  //     },
-  //   );
-  //   print(response.body);
-  // });
 }

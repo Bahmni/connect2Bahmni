@@ -1,3 +1,4 @@
+@Deprecated('To be removed')
 class SelectedPatient {
   final String uuid;
   final String name;

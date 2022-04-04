@@ -1,13 +1,12 @@
-import 'dart:async';
 import 'package:fhir/r4.dart';
 import 'package:flutter/material.dart';
 
 import '../services/patients.dart';
 import '../utils/debouncer.dart';
-import 'models/patient_view.dart';
+import '../screens/models/patient_view.dart';
 import '../utils/app_routes.dart';
 import '../utils/app_failures.dart';
-import '../utils/arguments.dart';
+import '../widgets/patient_info.dart';
 
 
 class PatientSearch extends StatefulWidget {
@@ -22,7 +21,7 @@ class _PatientsSearchWidgetState extends State<PatientSearch> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
   TextEditingController searchController = TextEditingController();
   final Debouncer _debouncer = Debouncer();
-  List<PatientViewModel> patientList = [];
+  List<PatientModel> patientList = [];
 
   @override
   void dispose() {
@@ -92,10 +91,9 @@ class _PatientsSearchWidgetState extends State<PatientSearch> {
         });
         return;
       }
-      final Future<Bundle> request = Patients().searchByName(searchController.text);
-      request.then((result) {
-        List<PatientViewModel> patients = result.entry != null
-            ? List<PatientViewModel>.from(result.entry!.map((e) => PatientViewModel(e.resource as Patient)))
+      Patients().searchByName(searchController.text).then((result) {
+        List<PatientModel> patients = result.entry != null
+            ? List<PatientModel>.from(result.entry!.map((e) => PatientModel(e.resource as Patient)))
             : [];
         setState(() {
           patientList.clear();
@@ -197,7 +195,7 @@ class _PatientsSearchWidgetState extends State<PatientSearch> {
     );
   }
 
-  Row _patientRow(PatientViewModel patient) {
+  Row _patientRow(PatientModel patient) {
     return Row(
       mainAxisSize: MainAxisSize.max,
       children: [
@@ -270,13 +268,11 @@ class _PatientsSearchWidgetState extends State<PatientSearch> {
                 padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 8, 0),
                 child: InkWell(
                   onTap: () async {
+                    _debouncer.forceStop();
                     await Navigator.pushNamed(
                       context,
                       AppRoutes.patients,
-                      arguments: SelectedPatient(
-                        patient.uuid,
-                        patient.fullName
-                      ),
+                      arguments: patient,
                     );
                   },
                   child: Column(
@@ -300,7 +296,6 @@ class _PatientsSearchWidgetState extends State<PatientSearch> {
   }
 }
 
-typedef OnSelectPatient = void Function(SelectedPatient selectedPatient);
 
 
 

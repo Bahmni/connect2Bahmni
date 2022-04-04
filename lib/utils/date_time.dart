@@ -1,3 +1,5 @@
+import 'package:intl/intl.dart';
+
 import '../screens/models/person_age.dart';
 
 PersonAge calculateAge(DateTime birthDate) {
@@ -38,4 +40,15 @@ bool isLeapYear(int year) {
     return true;
   }
   return false;
+}
+
+String formattedDate(DateTime dateTime) {
+  var localDateTime = dateTime.isUtc ? dateTime.toLocal() : dateTime;
+  return DateFormat('dd-MMM-yyy, hh:mm a').format(localDateTime);
+}
+
+
+String formattedTime(DateTime dateTime) {
+  var localDateTime = dateTime.isUtc ? dateTime.toLocal() : dateTime;
+  return DateFormat('hh:mm a').format(localDateTime);
 }

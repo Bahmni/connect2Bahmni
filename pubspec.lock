@@ -237,6 +237,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.4"
+  flutter_slidable:
+    dependency: "direct main"
+    description:
+      name: flutter_slidable
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.2.0"
   flutter_spinkit:
     dependency: "direct main"
     description:
@@ -394,6 +401,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.12.11"
+  material_color_utilities:
+    dependency: transitive
+    description:
+      name: material_color_utilities
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.1.3"
   meta:
     dependency: transitive
     description:
@@ -408,6 +422,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.1"
+  mockito:
+    dependency: "direct dev"
+    description:
+      name: mockito
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "5.1.0"
   nested:
     dependency: transitive
     description:
@@ -685,7 +706,7 @@ packages:
       name: test_api
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.4.3"
+    version: "0.4.8"
   timing:
     dependency: transitive
     description:
@@ -701,7 +722,7 @@ packages:
     source: hosted
     version: "1.3.0"
   uuid:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: uuid
       url: "https://pub.dartlang.org"

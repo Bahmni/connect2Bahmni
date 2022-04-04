@@ -11,10 +11,11 @@ import '../screens/register.dart';
 import '../screens/appointments_calendar.dart';
 import '../utils/app_routes.dart';
 import 'domain/models/session.dart';
-import 'screens/patient_search.dart';
+import 'widgets/patient_search.dart';
 import 'screens/tasks_notifications.dart';
 import '../screens/patient_dashboard.dart';
 import '../screens/login_location.dart';
+import '../providers/meta_provider.dart';
 
 void main() async {
   await dotenv.load(fileName: ".env");
@@ -27,13 +28,13 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var authProvider = AuthProvider();
-    Future<Session?> getSession() => authProvider.getSession();
     HttpOverrides.global = DevHttpOverrides();
 
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => authProvider),
         ChangeNotifierProvider(create: (_) => UserProvider()),
+        ChangeNotifierProvider(create: (_) => MetaProvider())
       ],
       child: MaterialApp(
           title: 'Bahmni For Doctors',
@@ -42,7 +43,7 @@ class MyApp extends StatelessWidget {
             visualDensity: VisualDensity.adaptivePlatformDensity,
           ),
           home: FutureBuilder(
-              future: getSession(),
+              future: authProvider.getSession(),
               builder: (context, AsyncSnapshot<Session?> snapshot) {
                 switch (snapshot.connectionState) {
                   case ConnectionState.none:

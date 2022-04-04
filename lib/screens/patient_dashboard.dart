@@ -1,17 +1,19 @@
-import 'package:connect2bahmni/domain/models/omrs_concept.dart';
-import 'package:connect2bahmni/widgets/concept_search.dart';
-import 'package:fhir/r4.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../widgets/app_drawer.dart';
-import '../screens/consult_pad.dart';
-import '../screens/patient_chart.dart';
+import '../widgets/consult_pad.dart';
+import '../widgets/patient_chart.dart';
 import '../providers/user_provider.dart';
 import '../screens/models/consultation_model.dart';
-import '../utils/arguments.dart';
 import '../widgets/condition.dart';
+import '../domain/condition_model.dart';
+import '../domain/models/omrs_concept.dart';
+import '../widgets/concept_search.dart';
+import '../providers/meta_provider.dart';
+import '../screens/models/patient_view.dart';
+import '../utils/app_routes.dart';
+import '../domain/models/omrs_location.dart';
 import '../providers/auth.dart';
-import '../screens/models/condition_model.dart';
 
 
 class PatientDashboard extends StatefulWidget {
@@ -25,62 +27,147 @@ class _PatientDashboardWidgetState extends State<PatientDashboard> {
   @override
   Widget build(BuildContext context) {
     var user = Provider.of<UserProvider>(context).user;
-    //var currentLocation = Provider.of<AuthProvider>(context).sessionLocation;
-    var args = ModalRoute.of(context)!.settings.arguments as SelectedPatient;
+    var argument = ModalRoute.of(context)!.settings.arguments;
+    if (argument == null) {
+      return const Center(
+        child: Text('Please select a patient first!')
+      );
+    }
     return ChangeNotifierProvider(
       create: (context) => ConsultationModel(user!),
-      child: _DashboardWidget(patient: _toFhirPatient(args)),
+      child: _DashboardWidget(
+          patient: argument as PatientModel,
+          onConsultationSave: () {
+            setState(() {});
+          },
+      ),
     );
   }
 }
 
+typedef OnSaveConsultation = void Function();
+
 class _DashboardWidget extends StatefulWidget {
-  final Patient patient;
-  const _DashboardWidget({Key? key, required this.patient}) : super(key: key);
+  final PatientModel patient;
+  final OnSaveConsultation? onConsultationSave;
+  const _DashboardWidget({Key? key, required this.patient, this.onConsultationSave}) : super(key: key);
   @override
   State<_DashboardWidget> createState() => _DashboardWidgetState();
 }
 
 class _DashboardWidgetState extends State<_DashboardWidget> {
   final _widgetState = GlobalKey<_DashboardWidgetState>();
+  OmrsLocation? _currentLocation;
   @override
   Widget build(BuildContext context) {
-    var panels = _buildDraggableScrollable();
+    _currentLocation = Provider.of<AuthProvider>(context).sessionLocation;
     return Scaffold(
       key: _widgetState,
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        title: _displayHeading(),
-        elevation: 0.1,
-        actions: <Widget>[
-          IconButton(
-            tooltip: 'Consultation',
-            icon: const Icon(
-              Icons.add_comment,
-              color: Colors.white,
-            ),
-            onPressed: () {
-              Provider.of<ConsultationModel>(context, listen: false).initialize(widget.patient);
-            },
-          )
-        ],
-      ),
+      //floatingActionButton: _floatingActions(),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
+      appBar: _buildAppBar(context),
       drawer: appDrawer(context),
-      body: panels,
+      body: _buildDraggableScrollable(),
       bottomNavigationBar: const ConsultationActions(),
     );
   }
 
+  AppBar _buildAppBar(BuildContext context) {
+    return AppBar(
+      //automaticallyImplyLeading: true,
+      leading:  IconButton(
+        icon: const Icon(Icons.home),
+        highlightColor: Colors.pink,
+        onPressed: () {
+          Navigator.pushNamedAndRemoveUntil(context, AppRoutes.dashboard, (r) => false);
+        },
+      ),
+      title: _displayHeading(),
+      elevation: 0.1,
+      actions: <Widget>[
+        Consumer<ConsultationModel>(
+            builder: (context, consultation, child) {
+              if (consultation.status == ConsultationStatus.none) {
+                return _startNewConsultAction(context);
+              }
+              return _saveConsultAction(context);
+            }
+        ),
+        _moreOptions()
+      ],
+    );
+  }
+
+  PopupMenuButton<String> _moreOptions() {
+    return PopupMenuButton<String>(
+          onSelected: (_) {},
+          itemBuilder: (BuildContext context) {
+            return {'New Appointment', 'Graphs'}.map((String choice) {
+              return PopupMenuItem<String>(
+                value: choice,
+                child: Text(choice),
+              );
+            }).toList();
+          },
+        );
+  }
+
+  IconButton _startNewConsultAction(BuildContext context) {
+    return IconButton(
+      tooltip: 'New Consult',
+      icon: const Icon(
+        Icons.add_to_queue,
+        //color: Colors.white,
+      ),
+      onPressed: () {
+          Provider.of<ConsultationModel>(context, listen: false).initialize(widget.patient, _currentLocation);
+      },
+    );
+  }
+
+  IconButton _saveConsultAction(BuildContext context) {
+    return IconButton(
+      tooltip: 'Save Draft',
+      icon: const Icon(
+        Icons.save_outlined,
+        //color: Colors.white,
+      ),
+      onPressed: () {
+        var currentConsultation = Provider.of<ConsultationModel>(context, listen: false);
+        if (currentConsultation.status == ConsultationStatus.finalized) {
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Consultation is already finalized.')));
+        } else {
+          currentConsultation.save().then((value) {
+            var message = value
+                ? 'Consultation Saved'
+                : 'Could not save consultation';
+            ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(message)));
+            if (widget.onConsultationSave != null) {
+              widget.onConsultationSave!();
+            }
+          });
+        }
+      },
+    );
+  }
+
+  // ignore: unused_element
+  FloatingActionButton _floatingActions() {
+    return FloatingActionButton(
+      child: const Icon(Icons.event_outlined),
+      elevation: 8,
+      onPressed: () => {},
+    );
+  }
+
   Widget _displayHeading() {
-    String? patientName = widget.patient.name?.first.text;
-    patientName ??= 'unknown';
-    return Text(patientName);
+    return const Text('Patient Chart');
+    //return Text(widget.patient.fullName);
   }
 
   PatientChartWidget _buildPatientChart() {
-    var uuid = widget.patient.id?.value;
-    var name = widget.patient.name?.first.text;
-    return PatientChartWidget(patientUuid: uuid ?? '', patientName: name ?? '');
+    return PatientChartWidget(patient: widget.patient);
   }
 
   Widget _buildDraggableScrollable() {
@@ -94,16 +181,6 @@ class _DashboardWidgetState extends State<_DashboardWidget> {
     );
   }
 }
-
-Patient _toFhirPatient(SelectedPatient args) {
-  return Patient(
-    id: Id(args.uuid),
-    name: [
-      HumanName(text: args.name)
-    ],
-  );
-}
-
 
 class ConsultationActions extends StatelessWidget {
   const ConsultationActions({Key? key}) : super(key: key);
@@ -128,21 +205,26 @@ class ConsultationActions extends StatelessWidget {
             if (centerLocations.contains(fabLocation)) const Spacer(),
             IconButton(
               tooltip: 'Condition',
-              icon: const Icon(Icons.add_to_photos_outlined),
+              icon: const Icon(Icons.category),
               onPressed: () {
                 _navigateToAddCondition(context);
               },
             ),
             IconButton(
-              tooltip: 'Investigations',
-              icon: const Icon(Icons.add_chart_rounded),
+              tooltip: 'Medication',
+              icon: const Icon(Icons.medication_sharp),
+              onPressed: () {},
+            ),
+            IconButton(
+              tooltip: 'Investigation',
+              icon: const Icon(Icons.assessment),
               onPressed: () {},
             ),
             IconButton(
               tooltip: 'Notes',
-              icon: const Icon(Icons.new_releases_sharp),
+              icon: const Icon(Icons.description),
               onPressed: () {},
-            ),
+            )
           ],
         ),
       ),
@@ -151,12 +233,14 @@ class ConsultationActions extends StatelessWidget {
 
   void _navigateToAddCondition(BuildContext context) async {
     final concept = await Navigator.push(context,
-      MaterialPageRoute(builder: (context) => const ConceptSearch()),
+      MaterialPageRoute(builder: (context) => const ConceptSearch(searchType: 'Condition')),
     );
 
     if (concept != null) {
+      var vsCertainty = Provider.of<MetaProvider>(context, listen: false).conditionCertainty;
+      var newCondition = ConditionModel(code: concept as OmrsConcept);
       final condition = await Navigator.push(context,
-        MaterialPageRoute(builder: (context) => ConditionWidget(concept: concept as OmrsConcept)),
+        MaterialPageRoute(builder: (context) => ConditionWidget(condition: newCondition, valueSetCertainty: vsCertainty)),
       );
       if (condition != null) {
         var consultation = Provider.of<ConsultationModel>(context, listen: false);

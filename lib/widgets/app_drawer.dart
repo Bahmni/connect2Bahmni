@@ -43,6 +43,13 @@ Drawer appDrawer(BuildContext context) {
               Navigator.pop(context);
             },
           ),
+          ListTile(leading: const Icon(Icons.info),
+            title: const Text('About'),
+            onTap: () async {
+              Navigator.pop(context);
+              displayAbout(context);
+            },
+          ),
           ListTile(leading: const Icon(Icons.logout),
               title: const Text('Logout'),
               onTap: () {
@@ -51,5 +58,23 @@ Drawer appDrawer(BuildContext context) {
               }),
         ],
       )
+  );
+}
+
+void displayAbout(BuildContext context) {
+  showAboutDialog(
+    context: context,
+    applicationVersion: '1.0.0+1',
+    applicationIcon: const FlutterLogo(),
+    children: <Widget>[
+      const Text.rich(TextSpan(
+        text: 'Bahmni App for clinicians',
+        style: TextStyle(color: Colors.black),
+        children: <TextSpan>[
+          TextSpan(text: '\nWe believe health is human right.',
+              style: TextStyle(fontWeight: FontWeight.w300, fontSize: 12))
+        ],
+      ))
+    ]
   );
 }

@@ -2,6 +2,7 @@
 import 'package:connect2bahmni/domain/models/person.dart';
 import 'package:connect2bahmni/domain/models/user.dart';
 import 'package:connect2bahmni/screens/models/consultation_model.dart';
+import 'package:connect2bahmni/screens/models/patient_view.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fhir/r4.dart' as r4;
 
@@ -20,11 +21,10 @@ void main() {
     consultation.addListener(() {
       expect(consultation.status, ConsultationStatus.draft);
     });
-    consultation.initialize(r4.Patient(
-      name: [
-        r4.HumanName(family: 'LastName', given: ['FirstName'])
-      ]
-    ));
+    consultation.initialize(
+      PatientModel(
+        r4.Patient(name: [r4.HumanName(family: 'LastName', given: ['FirstName'])])
+      ));
   });
 }
 

@@ -7,6 +7,7 @@ import '../domain/models/bahmni_appointment.dart';
 import '../services/bahmni_appointments.dart';
 import '../widgets/app_drawer.dart';
 import '../utils/app_failures.dart';
+import '../utils/app_routes.dart';
 
 class AppointmentsCalendar extends StatefulWidget {
   const AppointmentsCalendar({Key? key}) : super(key: key);
@@ -33,9 +34,21 @@ class _AppointmentsCalendarState extends State<AppointmentsCalendar> {
     return Scaffold(
         key: scaffoldKey,
         appBar: AppBar(
-          automaticallyImplyLeading: false,
+          //  automaticallyImplyLeading: false,
           title: const Text('Appointments'),
           elevation: 0.1,
+          actions: <Widget>[
+            IconButton(
+              tooltip: 'Consultation',
+              icon: const Icon(
+                Icons.home,
+                color: Colors.white,
+              ),
+              onPressed: () {
+                Navigator.pushReplacementNamed(context, AppRoutes.dashboard);
+              },
+            )
+          ],
         ),
         drawer: appDrawer(context),
         body: _appointmentsDayView(),
@@ -48,7 +61,7 @@ class _AppointmentsCalendarState extends State<AppointmentsCalendar> {
       initialData: const [],
       builder: (BuildContext context, AsyncSnapshot<List<BahmniAppointment>> snapshot) {
         if (snapshot.connectionState != ConnectionState.done) {
-          return const CircularProgressIndicator();
+          return const Center(child: CircularProgressIndicator());
         }
         if (snapshot.hasError) {
           //write to log
@@ -59,7 +72,7 @@ class _AppointmentsCalendarState extends State<AppointmentsCalendar> {
           return sscv.myAppointmentWidget(snapshot);
           //return fdvc.dayViewCalendar(snapshot, _forDate, _navigate);
         }
-        return const CircularProgressIndicator();
+        return const Center(child: CircularProgressIndicator());
       },
     );
 

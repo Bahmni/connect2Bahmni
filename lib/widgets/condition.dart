@@ -1,12 +1,13 @@
-import 'package:connect2bahmni/domain/models/omrs_concept.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../screens/models/condition_model.dart';
+import '../domain/condition_model.dart';
 import '../providers/user_provider.dart';
+import '../domain/models/omrs_concept.dart';
 
 class ConditionWidget extends StatefulWidget {
-  final OmrsConcept? concept;
-  const ConditionWidget({Key? key, this.concept}) : super(key: key);
+  final ConditionModel? condition;
+  final OmrsConcept? valueSetCertainty;
+  const ConditionWidget({Key? key, this.condition, this.valueSetCertainty}) : super(key: key);
 
   @override
   _ConditionWidgetState createState() => _ConditionWidgetState();
@@ -24,8 +25,10 @@ class _ConditionWidgetState extends State<ConditionWidget> {
     var arg = ModalRoute.of(context)!.settings.arguments;
     if (arg is ConditionModel) {
       _conditionModel = arg;
+    } else if (widget.condition != null){
+      _conditionModel = widget.condition!;
     }
-    _conditionModel.code = widget.concept;
+
     _conditionModel.recorder = _currentUser?.provider;
     return Scaffold(
       appBar: AppBar(title: const Text('Add Condition'),),
@@ -37,6 +40,7 @@ class _ConditionWidgetState extends State<ConditionWidget> {
             _conditionView(),
             _rowCategory(),
             _rowCertainty(),
+            _rowOrder(),
             _notesSection(context),
             const SizedBox(height: 20),
             ElevatedButton(
@@ -60,41 +64,44 @@ class _ConditionWidgetState extends State<ConditionWidget> {
     );
   }
 
-  Padding _notesSection(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsetsDirectional.fromSTEB(0, 16, 0, 0),
-      child: TextFormField(
-        controller: _notesController,
-        obscureText: false,
-        decoration: InputDecoration(
-          labelStyle: _labelStyle(context),
-          hintText: 'comments ...',
-          hintStyle: _labelStyle(context),
-          enabledBorder: OutlineInputBorder(
-            borderSide: const BorderSide(
-              color: Color(0xFFDBE2E7),
-              width: 2,
+  Widget _notesSection(BuildContext context) {
+    _notesController.text = _conditionModel.note ?? '';
+    return Expanded(
+      child: Padding(
+        padding: const EdgeInsetsDirectional.fromSTEB(0, 16, 0, 0),
+        child: TextFormField(
+          controller: _notesController,
+          obscureText: false,
+          decoration: InputDecoration(
+            labelStyle: _labelStyle(context),
+            hintText: 'comments ...',
+            hintStyle: _labelStyle(context),
+            enabledBorder: OutlineInputBorder(
+              borderSide: const BorderSide(
+                color: Color(0xFFDBE2E7),
+                width: 2,
+              ),
+              borderRadius: BorderRadius.circular(8),
             ),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderSide: const BorderSide(
-              color: Color(0xFFDBE2E7),
-              width: 2,
+            focusedBorder: OutlineInputBorder(
+              borderSide: const BorderSide(
+                color: Color(0xFFDBE2E7),
+                width: 2,
+              ),
+              borderRadius: BorderRadius.circular(8),
             ),
-            borderRadius: BorderRadius.circular(8),
+            contentPadding: const EdgeInsetsDirectional.fromSTEB(20, 40, 24, 0),
           ),
-          contentPadding: const EdgeInsetsDirectional.fromSTEB(20, 40, 24, 0),
-        ),
-        style: Theme.of(context).textTheme.bodyText1!.merge(
-          const TextStyle(
-            fontFamily: 'Lexend Deca',
-            color: Color(0xFF1E2429),
-            fontSize: 14,
-            fontWeight: FontWeight.normal,
-          )),
-        textAlign: TextAlign.start,
-        maxLines: 4,
+          style: Theme.of(context).textTheme.bodyText1!.merge(
+            const TextStyle(
+              fontFamily: 'Lexend Deca',
+              color: Color(0xFF1E2429),
+              fontSize: 14,
+              fontWeight: FontWeight.normal,
+            )),
+          textAlign: TextAlign.start,
+          maxLines: 4,
+        )
       )
     );
   }
@@ -109,8 +116,12 @@ class _ConditionWidgetState extends State<ConditionWidget> {
           ));
   }
 
-  Row _rowCertainty() {
-    var valueSet = _conditionModel.valueSetVerificationStatus;
+  Widget _rowCertainty() {
+    var valueSet = widget.valueSetCertainty?.answers;
+    valueSet ??= [];
+    if (valueSet.isEmpty) {
+      return const SizedBox(height: 1.0);
+    }
     return Row(
       children:[
         const Expanded(
@@ -137,6 +148,33 @@ class _ConditionWidgetState extends State<ConditionWidget> {
     );
   }
 
+  Widget _rowOrder() {
+    return Row(
+      children:[
+        const Expanded(
+          child: Text("Order"),
+        ),
+        Align(
+          alignment: Alignment.centerRight,
+          child: Wrap(
+            children: ConditionOrder.values.map((_order) => ChoiceChip(
+              padding: const EdgeInsets.all(10),
+              label: Text(_order.name),
+              selected: (_conditionModel.order != null) && (_conditionModel.order == _order),
+              onSelected: (bool selected) {
+                if (selected) {
+                  setState(() {
+                    _conditionModel.order = _order;
+                  });
+                }
+              },
+            )).toList(),
+          ),
+        ),
+      ],
+    );
+  }
+
   Row _rowCategory() {
     var valueSet = _conditionModel.valueSetCategory;
     return Row(
@@ -150,8 +188,8 @@ class _ConditionWidgetState extends State<ConditionWidget> {
             children: valueSet.map((value) => ChoiceChip(
               padding: const EdgeInsets.all(10),
               label: Text(value.display ?? ''),
-              selected: (_conditionModel.category != null) && (_conditionModel.category!.uuid == value.uuid),
-              onSelected: (bool selected) {
+              selected: _isSelectedCategory(value),
+              onSelected: (selected) {
                 if (selected) {
                   setState(() {
                     _conditionModel.category = value;
@@ -164,6 +202,8 @@ class _ConditionWidgetState extends State<ConditionWidget> {
       ],
     );
   }
+
+  bool _isSelectedCategory(OmrsConcept value) => (_conditionModel.category != null) && (_conditionModel.category!.uuid == value.uuid);
 
   Widget _conditionView() {
     String? display = _conditionModel.code?.display;

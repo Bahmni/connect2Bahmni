@@ -2,13 +2,13 @@ import 'package:fhir/r4.dart';
 import '../../utils/date_time.dart';
 import 'person_age.dart';
 
-class PatientViewModel {
+class PatientModel {
   Patient _patient = Patient();
   final _genderMap = {
     'male':'M',
     'female':'F'
   };
-  PatientViewModel(Patient patient) {
+  PatientModel(Patient patient) {
     _patient = patient;
   }
 
@@ -46,6 +46,10 @@ class PatientViewModel {
 
   String get minimalInfo {
     return '$genderAndAge,  $location';
+  }
+
+  Patient toFhirPatient() {
+    return _patient;
   }
 
 }

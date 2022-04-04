@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import '../utils/date_time.dart';
 import '../domain/models/oms_visit.dart';
 import '../services/visits.dart';
 
@@ -21,9 +21,7 @@ class _PatientVisitListState extends State<PatientVisitList> {
         initialData: const [],
         builder: (BuildContext context, AsyncSnapshot<List<OmrsVisit>> snapshot) {
           if (snapshot.connectionState != ConnectionState.done) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
+            return const SizedBox(child: Center(child: SizedBox(child: CircularProgressIndicator(), width: 15, height: 15)), height: 40);
           }
           if (snapshot.hasError) {
             return const Center(child: Text("Failed to load visits"),);
@@ -32,13 +30,18 @@ class _PatientVisitListState extends State<PatientVisitList> {
           if (snapshot.hasData) {
             visits = snapshot.data ?? [];
           }
-          return ListView(
-            padding: const EdgeInsets.all(1.0),
+          return Column(
             children: [
-              const Text('Visits',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                ),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Container(
+                  padding: const EdgeInsets.fromLTRB(10, 5, 0, 0),
+                  child: const Text('Visits',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
               ),
               ..._buildVisitList(visits),
             ],
@@ -48,14 +51,15 @@ class _PatientVisitListState extends State<PatientVisitList> {
     );
   }
 
-  _buildVisitList(List<OmrsVisit> visits) {
+  List<Widget> _buildVisitList(List<OmrsVisit> visits) {
     List<Widget> columnContent = [];
     for (var v in visits) {
-      var visitTime = DateFormat('dd-MMM-yyy, hh:mm a').format(v.startDatetime!);
+      var visitTime = formattedDate(v.startDatetime!);
       columnContent.add(
         ListTile(
           title: Text('${v.location!.name} - $visitTime'),
-          leading: const Icon(Icons.location_city_rounded),
+          leading: const Image(image: AssetImage('assets/facility_1.png'), width: 24.0, height: 24.0,),
+          dense: true,
         ),
       );
     }
