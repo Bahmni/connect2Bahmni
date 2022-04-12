@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../screens/models/patient_view.dart';
 
-class PatientInfo extends StatefulWidget {
+class PatientInfo extends StatelessWidget {
   const PatientInfo({
     Key? key,
     required this.patient,
@@ -11,24 +11,16 @@ class PatientInfo extends StatefulWidget {
   final PatientModel patient;
   final OnSelectPatient? onSelect;
 
-
-  @override
-  _PatientInfoState createState() => _PatientInfoState();
-}
-
-enum SingingCharacter { lafayette, jefferson }
-
-class _PatientInfoState extends State<PatientInfo> {
   @override
   Widget build(BuildContext context) {
-    return _patientRow(widget.patient);
+    return _patientRow(patient, context);
   }
 
-  Row _patientRow(PatientModel patient) {
+  Row _patientRow(PatientModel patient, BuildContext context) {
     return Row(
       mainAxisSize: MainAxisSize.max,
       children: [
-        Container(
+        Flexible(child: Container(
           width: MediaQuery.of(context).size.width,
           height: 65,
           decoration: BoxDecoration(
@@ -39,7 +31,7 @@ class _PatientInfoState extends State<PatientInfo> {
             ),
           ),
           child: Row(
-            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.start,
             children: [
               Padding(
                 padding: const EdgeInsetsDirectional.fromSTEB(8, 0, 8, 0),
@@ -96,20 +88,20 @@ class _PatientInfoState extends State<PatientInfo> {
               _selectOption(),
             ],
           ),
-        ),
+        )),
       ],
     );
   }
 
   Widget _selectOption() {
-    if (widget.onSelect == null) {
+    if (onSelect == null) {
       return const SizedBox(width: 1);
     }
     return Padding(
       padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 8, 0),
       child: InkWell(
         onTap: () {
-          widget.onSelect!(widget.patient);
+          onSelect!(patient);
         },
         child: Column(
           mainAxisSize: MainAxisSize.max,

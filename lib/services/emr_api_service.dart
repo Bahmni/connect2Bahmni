@@ -39,7 +39,7 @@ class EmrApiService {
     }
 
     DateTime encounterDateTime = consultation.lastUpdateAt ?? DateTime.now();
-    var encounterTime =  encounterDateTime.toUtc();
+    //var encounterTime =  encounterDateTime.isUtc ? encounterDateTime.toLocal() :  encounterDateTime;
     return UserPreferences().getSessionId()
       .then((sessionId) {
         var payload = jsonEncode({
@@ -47,11 +47,11 @@ class EmrApiService {
           'locationUuid': consultation.location?.uuid,
           'visitTypeUuid': consultation.visitType?.uuid,
           'encounterTypeUuid': consultation.encounterType?.uuid,
-          'encounterDateTime': encounterTime.toIso8601String(),
+          'encounterDateTime': encounterDateTime.millisecondsSinceEpoch,
           'providers': [{
             'uuid': consultation.user.provider?.uuid
           }],
-          'bahmniDiagnoses': _diagnosesPayload(consultation, encounterTime)
+          'bahmniDiagnoses': _diagnosesPayload(consultation, encounterDateTime)
         });
         //print('posting consultation: $payload');
         return http.post(
@@ -75,7 +75,6 @@ class EmrApiService {
         default:
           {
             //TODO, log error
-            //print('consultation save error. response code: ${response.statusCode}');
             //print('consultation save error: response  ${response.body}');
             return false;
           }
@@ -85,15 +84,9 @@ class EmrApiService {
 
   List<String> _validate(ConsultationModel consultation) {
     List<String> validationResults = [];
-    if (consultation.location == null) {
-      validationResults.add("required:location");
-    }
-    if (consultation.visitType == null) {
-      validationResults.add("required:visit type");
-    }
-    if (consultation.encounterType == null) {
-      validationResults.add("required:encounter type");
-    }
+    consultation.location ?? validationResults.add("required:location");
+    consultation.visitType ?? validationResults.add("required:visit type");
+    consultation.encounterType ?? validationResults.add("required:encounter type");
     return validationResults;
   }
 
@@ -104,7 +97,7 @@ class EmrApiService {
         'order': dia.order?.name.toUpperCase(),
         'certainty': dia.verificationStatus?.display?.toUpperCase(),
         'comments' : dia.note,
-        'diagnosisDateTime': recordedDate.toIso8601String(),
+        'diagnosisDateTime': recordedDate.millisecondsSinceEpoch,
         'providers': [{
           'uuid': consultation.user.provider?.uuid
         }],

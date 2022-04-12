@@ -9,11 +9,12 @@ import '../widgets/condition.dart';
 import '../domain/condition_model.dart';
 import '../domain/models/omrs_concept.dart';
 import '../widgets/concept_search.dart';
-import '../providers/meta_provider.dart';
+import '../screens/models/consultation_board.dart';
 import '../screens/models/patient_view.dart';
 import '../utils/app_routes.dart';
 import '../domain/models/omrs_location.dart';
 import '../providers/auth.dart';
+import '../widgets/consultation_context.dart';
 
 
 class PatientDashboard extends StatefulWidget {
@@ -33,8 +34,9 @@ class _PatientDashboardWidgetState extends State<PatientDashboard> {
         child: Text('Please select a patient first!')
       );
     }
+
     return ChangeNotifierProvider(
-      create: (context) => ConsultationModel(user!),
+      create: (context) => ConsultationBoard(user!),
       child: _DashboardWidget(
           patient: argument as PatientModel,
           onConsultationSave: () {
@@ -64,7 +66,7 @@ class _DashboardWidgetState extends State<_DashboardWidget> {
     return Scaffold(
       key: _widgetState,
       //floatingActionButton: _floatingActions(),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
+      //floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
       appBar: _buildAppBar(context),
       drawer: appDrawer(context),
       body: _buildDraggableScrollable(),
@@ -85,12 +87,10 @@ class _DashboardWidgetState extends State<_DashboardWidget> {
       title: _displayHeading(),
       elevation: 0.1,
       actions: <Widget>[
-        Consumer<ConsultationModel>(
-            builder: (context, consultation, child) {
-              if (consultation.status == ConsultationStatus.none) {
-                return _startNewConsultAction(context);
-              }
-              return _saveConsultAction(context);
+        Consumer<ConsultationBoard>(
+            builder: (context, board, child) {
+              //good case for Selector?
+              return board.currentConsultation == null ? _startNewConsultAction(context) : _saveConsultAction(context);
             }
         ),
         _moreOptions()
@@ -102,7 +102,7 @@ class _DashboardWidgetState extends State<_DashboardWidget> {
     return PopupMenuButton<String>(
           onSelected: (_) {},
           itemBuilder: (BuildContext context) {
-            return {'New Appointment', 'Graphs'}.map((String choice) {
+            return {'New Appointment', 'Graphs', 'Discard'}.map((String choice) {
               return PopupMenuItem<String>(
                 value: choice,
                 child: Text(choice),
@@ -119,8 +119,23 @@ class _DashboardWidgetState extends State<_DashboardWidget> {
         Icons.add_to_queue,
         //color: Colors.white,
       ),
-      onPressed: () {
-          Provider.of<ConsultationModel>(context, listen: false).initialize(widget.patient, _currentLocation);
+      onPressed: () async {
+        var board = Provider.of<ConsultationBoard>(context, listen: false);
+        var consultEncTypeUuid = (board.currentConsultation == null) ?  null : board.currentConsultation?.encounterType?.uuid;
+        var consultVisitTypeUuid = (board.currentConsultation == null) ?  null : board.currentConsultation?.visitType?.uuid;
+        final consultInfo = await Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => ConsultationContext(
+                  encTypeUuid: consultEncTypeUuid,
+                  visitTypeUuid: consultVisitTypeUuid,
+                  patient: widget.patient,
+                  isNew: true,
+              )),
+        );
+        if (consultInfo != null) {
+          board.initNewConsult(widget.patient, _currentLocation, consultInfo['visitType'], consultInfo['encounterType']);
+        }
       },
     );
   }
@@ -133,17 +148,17 @@ class _DashboardWidgetState extends State<_DashboardWidget> {
         //color: Colors.white,
       ),
       onPressed: () {
-        var currentConsultation = Provider.of<ConsultationModel>(context, listen: false);
-        if (currentConsultation.status == ConsultationStatus.finalized) {
+        var board = Provider.of<ConsultationBoard>(context, listen: false);
+        if (board.currentConsultation?.status == ConsultationStatus.finalized) {
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Consultation is already finalized.')));
         } else {
-          currentConsultation.save().then((value) {
+          board.save().then((value) {
             var message = value
                 ? 'Consultation Saved'
                 : 'Could not save consultation';
             ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(content: Text(message)));
-            if (widget.onConsultationSave != null) {
+            if (value && (widget.onConsultationSave != null)) {
               widget.onConsultationSave!();
             }
           });
@@ -207,7 +222,7 @@ class ConsultationActions extends StatelessWidget {
               tooltip: 'Condition',
               icon: const Icon(Icons.category),
               onPressed: () {
-                _navigateToAddCondition(context);
+                _addConditionToConsultation(context);
               },
             ),
             IconButton(
@@ -231,20 +246,23 @@ class ConsultationActions extends StatelessWidget {
     );
   }
 
-  void _navigateToAddCondition(BuildContext context) async {
+  void _addConditionToConsultation(BuildContext context) async {
+    var board = Provider.of<ConsultationBoard>(context, listen: false);
+    if (board.currentConsultation == null) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please initialize the session first')));
+        return;
+    }
     final concept = await Navigator.push(context,
       MaterialPageRoute(builder: (context) => const ConceptSearch(searchType: 'Condition')),
     );
 
     if (concept != null) {
-      var vsCertainty = Provider.of<MetaProvider>(context, listen: false).conditionCertainty;
       var newCondition = ConditionModel(code: concept as OmrsConcept);
       final condition = await Navigator.push(context,
-        MaterialPageRoute(builder: (context) => ConditionWidget(condition: newCondition, valueSetCertainty: vsCertainty)),
+        MaterialPageRoute(builder: (context) => ConditionWidget(condition: newCondition)),
       );
       if (condition != null) {
-        var consultation = Provider.of<ConsultationModel>(context, listen: false);
-        consultation.addCondition(condition as ConditionModel);
+        board.addCondition(condition as ConditionModel);
       }
     }
   }

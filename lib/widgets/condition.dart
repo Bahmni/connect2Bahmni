@@ -1,23 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../domain/condition_model.dart';
+import '../providers/meta_provider.dart';
 import '../providers/user_provider.dart';
 import '../domain/models/omrs_concept.dart';
 
 class ConditionWidget extends StatefulWidget {
   final ConditionModel? condition;
-  final OmrsConcept? valueSetCertainty;
-  const ConditionWidget({Key? key, this.condition, this.valueSetCertainty}) : super(key: key);
+  //final OmrsConcept? valueSetCertainty;
+  const ConditionWidget({Key? key, this.condition}) : super(key: key);
 
   @override
   _ConditionWidgetState createState() => _ConditionWidgetState();
 }
 
-  enum SingingCharacter { lafayette, jefferson }
-
 class _ConditionWidgetState extends State<ConditionWidget> {
   ConditionModel _conditionModel = ConditionModel();
   final TextEditingController _notesController = TextEditingController();
+  //var vsCertainty = Provider.of<MetaProvider>(context, listen: false).conditionCertainty;
+  OmrsConcept? valueSetCertainty;
+
+  @override
+  void initState() {
+    super.initState();
+    valueSetCertainty = Provider.of<MetaProvider>(context, listen: false).conditionCertainty;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -117,7 +124,7 @@ class _ConditionWidgetState extends State<ConditionWidget> {
   }
 
   Widget _rowCertainty() {
-    var valueSet = widget.valueSetCertainty?.answers;
+    var valueSet = valueSetCertainty?.answers;
     valueSet ??= [];
     if (valueSet.isEmpty) {
       return const SizedBox(height: 1.0);

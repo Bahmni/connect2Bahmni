@@ -24,6 +24,7 @@ class _PatientChartWidgetState extends State<PatientChartWidget> {
     return Scaffold(
       body: ListView(
         children: [
+          //Flex(direction: Axis.horizontal,children: [PatientInfo(patient: widget.patient)]),
           PatientInfo(patient: widget.patient),
           PatientVisitList(patientUuid: widget.patient.uuid),
           PatientConditionList(patientUuid: widget.patient.uuid),

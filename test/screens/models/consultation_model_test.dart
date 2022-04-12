@@ -18,13 +18,11 @@ void main() {
     );
     final consultation = ConsultationModel(user);
     expect(consultation.status, ConsultationStatus.none);
-    consultation.addListener(() {
-      expect(consultation.status, ConsultationStatus.draft);
-    });
     consultation.initialize(
       PatientModel(
         r4.Patient(name: [r4.HumanName(family: 'LastName', given: ['FirstName'])])
       ));
+    expect(consultation.status, ConsultationStatus.draft);
   });
 }
 

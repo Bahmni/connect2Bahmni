@@ -77,13 +77,14 @@ class _LoginLocationState extends State<LoginLocation> {
                       //   // filled: true,
                       //   // fillColor: Colors.blueAccent,
                       // ),
-                      validator: (value) => value == null ? "Select a country" : null,
+                      validator: (value) => value == null ? "Select a location" : null,
                       //dropdownColor: Colors.blueAccent,
                       value: selectedValue,
                       onChanged: (newVal)  {
                         selectedValue = newVal;
                       },
-                      items: locationList),
+                      items: locationList
+                  ),
                   const SizedBox(height: 5.0),
                   ElevatedButton(
                       onPressed: () {

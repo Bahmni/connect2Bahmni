@@ -1,13 +1,16 @@
-import 'package:flutter/foundation.dart';
+import 'package:uuid/uuid.dart';
+
 import '../../domain/models/omrs_location.dart';
 import '../../domain/condition_model.dart';
 import '../../screens/models/patient_view.dart';
 
 import '../../domain/models/user.dart';
-import '../../domain/visit_encounter_type.dart';
+import '../../domain/models/omrs_encounter_type.dart';
+import '../../domain/models/omrs_visit_type.dart';
 import '../../services/emr_api_service.dart';
 
-class ConsultationModel extends ChangeNotifier {
+class ConsultationModel {
+  final String uuid = const Uuid().v4();
   final User user;
   PatientModel? patient;
   OmrsLocation? location;
@@ -17,24 +20,19 @@ class ConsultationModel extends ChangeNotifier {
   DateTime? lastUpdateAt;
   List<ConditionModel> problemList = [];
   List<ConditionModel> diagnosisList = [];
-  VisitType? visitType = VisitType(uuid: 'c22a5000-3f10-11e4-adec-0800271c1b75', display: 'OPD');
-  EncounterType? encounterType = EncounterType(uuid: '81852aee-3f10-11e4-adec-0800271c1b75', display: 'Consultation');
+  OmrsVisitType? visitType;
+  OmrsEncounterType? encounterType;
 
 
   ConsultationModel(this.user);
 
-  void initialize(PatientModel forWhom,[OmrsLocation? atLocation]) {
+  void initialize(PatientModel forWhom,[OmrsLocation? atLocation, OmrsVisitType? vType, OmrsEncounterType? eType]) {
     if (status != ConsultationStatus.none) return;
     patient = forWhom;
     location = atLocation;
     status = ConsultationStatus.draft;
-    _notifyObservers();
-  }
-
-  void _notifyObservers() {
-    startTime ??= DateTime.now();
-    lastUpdateAt = DateTime.now();
-    notifyListeners();
+    visitType = vType;
+    encounterType = eType;
   }
 
   void addCondition(ConditionModel conditionModel) {
@@ -57,13 +55,11 @@ class ConsultationModel extends ChangeNotifier {
     if (status == ConsultationStatus.none) {
       status = ConsultationStatus.draft;
     }
-    _notifyObservers();
   }
 
   void removeCondition(ConditionModel conditionModel) {
     if (status == ConsultationStatus.finalized) return;
     conditionModel.isEncounterDiagnosis ? diagnosisList.remove(conditionModel) : problemList.remove(conditionModel);
-    _notifyObservers();
   }
 
   Future<bool> save() {
@@ -77,6 +73,11 @@ class ConsultationModel extends ChangeNotifier {
 
   void _finalizeConsultation() {
     status = ConsultationStatus.finalized;
+  }
+
+  void updateContext(OmrsVisitType vType, OmrsEncounterType eType) {
+    visitType = vType;
+    encounterType = eType;
   }
 }
 

@@ -1,8 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import '../domain/models/omrs_concept.dart';
-import '../services/concept_dictionary.dart';
 import '../domain/models/omrs_encounter_type.dart';
+import '../services/concept_dictionary.dart';
 import '../domain/models/omrs_visit_type.dart';
 import '../services/encounters.dart';
 
