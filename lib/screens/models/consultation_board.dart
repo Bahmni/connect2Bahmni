@@ -8,6 +8,8 @@ import '../../domain/models/omrs_encounter_type.dart';
 import '../../domain/models/omrs_location.dart';
 import '../../domain/models/omrs_visit_type.dart';
 import '../../domain/models/user.dart';
+import '../../domain/models/omrs_concept.dart';
+import '../../domain/models/omrs_obs.dart';
 
 class ConsultationBoard extends ChangeNotifier {
   final User user;
@@ -15,6 +17,8 @@ class ConsultationBoard extends ChangeNotifier {
   ConsultationModel? get currentConsultation => _currentConsultation;
 
   ConsultationBoard(this.user);
+
+  bool get isEmpty => _currentConsultation == null;
 
   void initNewConsult(PatientModel forWhom,[OmrsLocation? atLocation, OmrsVisitType? vType, OmrsEncounterType? eType]) {
     var canInitNew = (_currentConsultation == null) ? true :  (_currentConsultation?.status != ConsultationStatus.draft);
@@ -64,6 +68,14 @@ class ConsultationBoard extends ChangeNotifier {
   void removeCondition(ConditionModel condition) {
     _verifyEditable();
     _currentConsultation?.removeCondition(condition);
+  }
+
+  void addConsultationNotes(String notes, OmrsConcept? consultNoteConcept) {
+    _verifyEditable();
+    var obsConcept = consultNoteConcept ?? OmrsConcept();
+    var consultNotes = OmrsObs(concept: obsConcept, value: notes);
+    _currentConsultation?.addNotes(consultNotes);
+    notifyListeners();
   }
 
 }

@@ -8,6 +8,7 @@ import '../screens/models/consultation_board.dart';
 import 'condition.dart';
 import '../utils/string_utils.dart';
 import '../widgets/consultation_context.dart';
+import '../domain/models/omrs_obs.dart';
 
 class ConsultPadWidget extends StatefulWidget {
   const ConsultPadWidget({
@@ -69,6 +70,7 @@ class _ConsultPadWidgetState extends State<ConsultPadWidget> {
             _consultationContext(context, consultation),
             ..._diagnoses(consultation?.diagnosisList),
             ..._problemList(consultation?.problemList),
+            _ConsultationNotesWidget(consultNote: consultation?.consultNote)
           ],
         ));
   }
@@ -255,6 +257,51 @@ class _ConsultPadWidgetState extends State<ConsultPadWidget> {
       foregroundColor: Colors.white,
       icon: Icons.edit,
       label: 'Edit',
+    );
+  }
+}
+
+class _ConsultationNotesWidget extends StatelessWidget {
+  final OmrsObs? consultNote;
+
+  const _ConsultationNotesWidget({Key? key, this.consultNote})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    var display = consultNote?.valueAsString ?? '';
+    return _showCard(display);
+  }
+
+  Card _showCard(String notes) {
+    return Card(
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(2.0))),
+      elevation: 2,
+      //margin: const EdgeInsets.all(1.0),
+      child: Padding(
+        padding: const EdgeInsets.all(1.0),
+        child: ExpansionTile(
+            initiallyExpanded: true,
+            backgroundColor: Colors.white,
+            title: Row(children: [
+              const Expanded(child: Text('Consultation Notes')),
+              OutlinedButton(
+                onPressed: () async {
+                  debugPrint('Edit note');
+                },
+                child: const Text('edit'),
+              )
+            ]),
+            controlAffinity: ListTileControlAffinity.leading,
+            expandedAlignment: Alignment.topLeft,
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.all(2.0),
+                child: Text(notes),
+              ),
+            ]
+        ),
+      ),
     );
   }
 }

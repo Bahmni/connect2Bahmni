@@ -4,19 +4,20 @@ import 'package:flutter/material.dart';
 
 class Debouncer {
   VoidCallback? action;
-  Timer? timer;
+  Timer? _timer;
   bool forceStopped = false;
 
   run(VoidCallback action) {
-    if (null != timer) {
-      timer!.cancel();
-    }
+    _timer?.cancel();
     if (forceStopped) return;
-    timer = Timer(const Duration(milliseconds: Duration.millisecondsPerSecond),action,);
-    //timer = Timer(const Duration(milliseconds: 500),action,);
+    _timer = Timer(const Duration(milliseconds: Duration.millisecondsPerSecond), action);
   }
 
-  void forceStop() {
-    forceStopped = true;
+  void stop() {
+    _timer?.cancel();
+  }
+
+  dispose() {
+    _timer?.cancel();
   }
 }

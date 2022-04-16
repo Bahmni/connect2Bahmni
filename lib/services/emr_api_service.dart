@@ -51,7 +51,8 @@ class EmrApiService {
           'providers': [{
             'uuid': consultation.user.provider?.uuid
           }],
-          'bahmniDiagnoses': _diagnosesPayload(consultation, encounterDateTime)
+          'bahmniDiagnoses': _diagnosesPayload(consultation, encounterDateTime),
+          'observations': _obsPayload(consultation, encounterDateTime),
         });
         //print('posting consultation: $payload');
         return http.post(
@@ -64,21 +65,23 @@ class EmrApiService {
           body: payload,
         );
       }).then((response) {
-      switch (response.statusCode) {
-        case 200:
-        case 201:
-        case 202:
-        case 204:
-          {
-              return true;
-          }
-        default:
-          {
-            //TODO, log error
-            //print('consultation save error: response  ${response.body}');
-            return false;
-          }
-      }
+        // print('response code: ${response.statusCode}');
+        // print('response : ${response.body}');
+        switch (response.statusCode) {
+          case 200:
+          case 201:
+          case 202:
+          case 204:
+            {
+                return true;
+            }
+          default:
+            {
+              //TODO, log error
+              //print('consultation save error: response  ${response.body}');
+              return false;
+            }
+        }
     });
   }
 
@@ -87,6 +90,9 @@ class EmrApiService {
     consultation.location ?? validationResults.add("required:location");
     consultation.visitType ?? validationResults.add("required:visit type");
     consultation.encounterType ?? validationResults.add("required:encounter type");
+    if (consultation.consultNote?.concept.uuid == null) {
+      validationResults.add("required:consult notes concept");
+    }
     return validationResults;
   }
 
@@ -107,6 +113,19 @@ class EmrApiService {
       };
     }
     ).toList();
+  }
+
+  List<Map<String, dynamic>> _obsPayload(ConsultationModel consultation, DateTime encounterDateTime) {
+    List<Map<String, dynamic>> obsList = [];
+    if (consultation.consultNote != null) {
+      obsList.add({
+        'concept': {
+          'uuid': consultation.consultNote?.concept.uuid,
+        },
+        'value': consultation.consultNote?.valueAsString,
+      });
+    }
+    return obsList;
   }
 
 }

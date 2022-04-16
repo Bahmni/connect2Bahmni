@@ -15,11 +15,13 @@ As of now, this project is experimental, only a starting point and far from bein
 - run > flutter pub get
 - create a ".env" file at project root, add properties
 
-| property | value | description |
+| property | description | example value | 
 | ----------- | ----------- | ----------- |
-| bahmni.server | http://www.example.org | no trailing slash |
-| app.allowedVisitTypes | OPD,IPD,FIELD  | subset of visit types on server, matched by name |
-| app.allowedEncTypes| Consultation,REG,TRANSFER | subset of encounter types on server, matched by name |
+| bahmni.server | HTTPS and without trailing slash | https://next.mybahmni.org |
+| app.allowedVisitTypes | subset of visit types on server, matched by name | OPD,IPD,FIELD  | 
+| app.allowedEncTypes| subset of encounter types on server, matched by name | Consultation,REG,TRANSFER | 
+| app.allowedEncTypes| subset of encounter types on server, matched by name | Consultation,REG,TRANSFER |  
+| app.conceptConsultationNotes | uuid of the obs concept (datatype = text) for recording consult notes | 81d6e852-3f10-11e4-adec-0800271c1b75 |
 
 
 ## Build

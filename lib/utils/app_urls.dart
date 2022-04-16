@@ -21,6 +21,7 @@ class OMRSRestUrls {
   String get concept => '$base/concept';
   String get visitType => '$base/visittype';
   String get encType => '$base/encountertype';
+  String get obs => '$base/obs';
 }
 
 class FHIRUrls {

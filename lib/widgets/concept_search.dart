@@ -266,7 +266,7 @@ class _ConceptSearchWidgetState extends State<ConceptSearch> {
                 padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 8, 0),
                 child: InkWell(
                   onTap: () {
-                    _debouncer.forceStop();
+                    _debouncer.stop();
                     Navigator.pop(context, concept);
                   },
                   child: Column(

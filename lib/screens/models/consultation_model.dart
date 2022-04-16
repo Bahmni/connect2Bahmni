@@ -6,6 +6,7 @@ import '../../screens/models/patient_view.dart';
 
 import '../../domain/models/user.dart';
 import '../../domain/models/omrs_encounter_type.dart';
+import '../../domain/models/omrs_obs.dart';
 import '../../domain/models/omrs_visit_type.dart';
 import '../../services/emr_api_service.dart';
 
@@ -23,6 +24,10 @@ class ConsultationModel {
   OmrsVisitType? visitType;
   OmrsEncounterType? encounterType;
 
+  OmrsObs? consultNote;
+  String? get consultationNotes {
+    return (consultNote == null) ? null : consultNote?.valueAsString;
+  }
 
   ConsultationModel(this.user);
 
@@ -78,6 +83,10 @@ class ConsultationModel {
   void updateContext(OmrsVisitType vType, OmrsEncounterType eType) {
     visitType = vType;
     encounterType = eType;
+  }
+
+  void addNotes(OmrsObs notes) {
+     consultNote = notes;
   }
 }
 

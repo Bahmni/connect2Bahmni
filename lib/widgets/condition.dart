@@ -26,6 +26,13 @@ class _ConditionWidgetState extends State<ConditionWidget> {
     valueSetCertainty = Provider.of<MetaProvider>(context, listen: false).conditionCertainty;
   }
 
+
+  @override
+  void dispose() {
+    _notesController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     var _currentUser = Provider.of<UserProvider>(context).user;

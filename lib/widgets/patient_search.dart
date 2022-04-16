@@ -268,7 +268,7 @@ class _PatientsSearchWidgetState extends State<PatientSearch> {
                 padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 8, 0),
                 child: InkWell(
                   onTap: () async {
-                    _debouncer.forceStop();
+                    _debouncer.stop();
                     await Navigator.pushNamed(
                       context,
                       AppRoutes.patients,

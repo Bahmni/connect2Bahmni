@@ -9,11 +9,13 @@ import '../services/encounters.dart';
 class MetaProvider with ChangeNotifier {
   OmrsConcept? _conditionCertainty;
   OmrsConcept? _diagnosisOrder;
+  OmrsConcept? _consultNoteConcept;
   List<OmrsVisitType>? _visitTypes;
   List<OmrsEncounterType>? _encTypes;
 
   OmrsConcept? get conditionCertainty => _conditionCertainty;
   OmrsConcept? get diagnosisOrder => _diagnosisOrder;
+  OmrsConcept? get consultNoteConcept => _consultNoteConcept;
   List<OmrsVisitType>? get visitTypes => _visitTypes;
   List<OmrsEncounterType>? get encTypes => _encTypes;
 
@@ -34,11 +36,11 @@ class MetaProvider with ChangeNotifier {
   }
 
   void initialize() {
-    ConceptDictionary().getDiagnosisCertainty().then((value) {
+    ConceptDictionary().fetchDiagnosisCertainty().then((value) {
       _conditionCertainty = value;
       notifyListeners();
     });
-    ConceptDictionary().getDiagnosisOrder().then((value) {
+    ConceptDictionary().fetchDiagnosisOrder().then((value) {
       _diagnosisOrder = value;
       notifyListeners();
     });
@@ -51,6 +53,14 @@ class MetaProvider with ChangeNotifier {
       _encTypes = value;
       notifyListeners();
     }).catchError((e) => _logError(e));
+
+    var consultConceptUuid = dotenv.get('app.conceptConsultationNotes', fallback: '');
+    if (consultConceptUuid.isNotEmpty) {
+      ConceptDictionary().fetchConceptByUuid(consultConceptUuid).then((value) {
+        _consultNoteConcept = value;
+        notifyListeners();
+      }).catchError((e) => _logError(e));
+    }
   }
 
   _logError(e) {

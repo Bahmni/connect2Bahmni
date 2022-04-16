@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../widgets/app_drawer.dart';
 import '../widgets/consult_pad.dart';
+import '../widgets/consultation_notes.dart';
 import '../widgets/patient_chart.dart';
 import '../providers/user_provider.dart';
 import '../screens/models/consultation_model.dart';
@@ -15,6 +16,7 @@ import '../utils/app_routes.dart';
 import '../domain/models/omrs_location.dart';
 import '../providers/auth.dart';
 import '../widgets/consultation_context.dart';
+import '../providers/meta_provider.dart';
 
 
 class PatientDashboard extends StatefulWidget {
@@ -208,6 +210,7 @@ class ConsultationActions extends StatelessWidget {
     FloatingActionButtonLocation.centerFloat,
   ];
 
+
   @override
   Widget build(BuildContext context) {
     return BottomAppBar(
@@ -238,7 +241,7 @@ class ConsultationActions extends StatelessWidget {
             IconButton(
               tooltip: 'Notes',
               icon: const Icon(Icons.description),
-              onPressed: () {},
+              onPressed: () => _addConsultationNotes(context),
             )
           ],
         ),
@@ -247,11 +250,9 @@ class ConsultationActions extends StatelessWidget {
   }
 
   void _addConditionToConsultation(BuildContext context) async {
-    var board = Provider.of<ConsultationBoard>(context, listen: false);
-    if (board.currentConsultation == null) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please initialize the session first')));
-        return;
-    }
+    var board = _activeBoardToUpdate(context);
+    if (board == null) return;
+
     final concept = await Navigator.push(context,
       MaterialPageRoute(builder: (context) => const ConceptSearch(searchType: 'Condition')),
     );
@@ -266,5 +267,30 @@ class ConsultationActions extends StatelessWidget {
       }
     }
   }
+
+  Future<void> _addConsultationNotes(BuildContext ctx) async {
+    var board = _activeBoardToUpdate(ctx);
+    if (board == null) return;
+    var notes = await showDialog(
+        context: ctx,
+        builder: (BuildContext context) => ConsultationNotesWidget(
+            notes: board.currentConsultation?.consultationNotes)
+    );
+    if (notes != null) {
+      var _consultNoteConcept = Provider.of<MetaProvider>(ctx, listen: false).consultNoteConcept;
+      board.addConsultationNotes(notes, _consultNoteConcept);
+    }
+  }
+
+  ConsultationBoard? _activeBoardToUpdate(BuildContext context) {
+    var board = Provider.of<ConsultationBoard>(context, listen: false);
+    if (board.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please start a session first')));
+      return null;
+    }
+    return board;
+  }
 }
+
+
 
