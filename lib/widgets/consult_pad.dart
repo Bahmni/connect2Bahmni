@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import '../utils/date_time.dart';
 import 'package:provider/provider.dart';
-import '../screens/models/consultation_model.dart';
-import '../domain/condition_model.dart';
-import '../screens/models/consultation_board.dart';
 import 'condition.dart';
+import '../utils/date_time.dart';
 import '../utils/string_utils.dart';
+import '../screens/models/consultation_model.dart';
+import '../screens/models/consultation_board.dart';
 import '../widgets/consultation_context.dart';
+import '../domain/condition_model.dart';
 import '../domain/models/omrs_obs.dart';
 
 class ConsultPadWidget extends StatefulWidget {
@@ -70,7 +70,7 @@ class _ConsultPadWidgetState extends State<ConsultPadWidget> {
             _consultationContext(context, consultation),
             ..._diagnoses(consultation?.diagnosisList),
             ..._problemList(consultation?.problemList),
-            _ConsultationNotesWidget(consultNote: consultation?.consultNote)
+            (consultation?.consultNote != null) ? _ObsListItem(consultNote: consultation!.consultNote!, sliding: true,) : const SizedBox(height: 1),
           ],
         ));
   }
@@ -261,21 +261,24 @@ class _ConsultPadWidgetState extends State<ConsultPadWidget> {
   }
 }
 
-class _ConsultationNotesWidget extends StatelessWidget {
-  final OmrsObs? consultNote;
+class _ObsListItem extends StatelessWidget {
+  final OmrsObs consultNote;
+  final bool? sliding;
 
-  const _ConsultationNotesWidget({Key? key, this.consultNote})
+  const _ObsListItem({Key? key, required this.consultNote, this.sliding})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    var display = consultNote?.valueAsString ?? '';
-    return _showCard(display);
+    return _showObs(context, sliding ?? false);
   }
 
-  Card _showCard(String notes) {
+  Card _showObs(BuildContext context, bool shouldSlide) {
+    var notes = consultNote.valueAsString ?? '';
+    var _title = shouldSlide ? _slidablePane(context) : _simpleRow();
+
     return Card(
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(2.0))),
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(1.0))),
       elevation: 2,
       //margin: const EdgeInsets.all(1.0),
       child: Padding(
@@ -283,15 +286,7 @@ class _ConsultationNotesWidget extends StatelessWidget {
         child: ExpansionTile(
             initiallyExpanded: true,
             backgroundColor: Colors.white,
-            title: Row(children: [
-              const Expanded(child: Text('Consultation Notes')),
-              OutlinedButton(
-                onPressed: () async {
-                  debugPrint('Edit note');
-                },
-                child: const Text('edit'),
-              )
-            ]),
+            title: _title,
             controlAffinity: ListTileControlAffinity.leading,
             expandedAlignment: Alignment.topLeft,
             children: <Widget>[
@@ -303,5 +298,44 @@ class _ConsultationNotesWidget extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Slidable _slidablePane(BuildContext context) {
+    return Slidable(
+      key: UniqueKey(),
+      child: Container(
+        color: Theme.of(context).colorScheme.onBackground,
+        child: const ListTile(
+          title: Text('Consultation Notes'),
+          tileColor: Colors.red,
+        ),
+      ),
+      endActionPane: ActionPane(
+        motion: const ScrollMotion(),
+        children: [
+          SlidableAction(
+            onPressed: (_) async {
+              debugPrint('Edit note slide');
+            },
+            backgroundColor: Colors.green,
+            foregroundColor: Colors.white,
+            icon: Icons.edit,
+            label: 'Edit',
+          )
+        ],
+      ),
+    );
+  }
+
+  Row _simpleRow() {
+    return Row(children: [
+      const Expanded(child: Text('Consultation Notes')),
+      OutlinedButton(
+        onPressed: () async {
+          debugPrint('Edit note row');
+        },
+        child: const Text('edit'),
+      )
+    ]);
   }
 }
