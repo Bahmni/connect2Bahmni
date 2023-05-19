@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:uuid/uuid.dart';
+import '../../domain/models/bahmni_appointment.dart';
 import '../widgets/app_drawer.dart';
 import '../widgets/consult_pad.dart';
 import '../widgets/consultation_notes.dart';
+import '../widgets/jitsi_meeting.dart';
 import '../widgets/patient_chart.dart';
 import '../providers/user_provider.dart';
 import '../screens/models/consultation_model.dart';
@@ -104,12 +107,41 @@ class _DashboardWidgetState extends State<_DashboardWidget> {
     return PopupMenuButton<String>(
           onSelected: (_) {},
           itemBuilder: (BuildContext context) {
-            return {'New Appointment', 'Graphs', 'Discard'}.map((String choice) {
-              return PopupMenuItem<String>(
-                value: choice,
-                child: Text(choice),
-              );
-            }).toList();
+            return [
+              PopupMenuItem<String>(
+                value: 'scheduleAppointment',
+                child: const Text('Schedule Appointment'),
+                onTap: () => {},
+              ),
+              PopupMenuItem<String>(
+                value: 'virtualAppointment',
+                child: const Text('Start Virtual'),
+                onTap: () {
+                  var appointment = BahmniAppointment(
+                      uuid: const Uuid().v4(),
+                      patient: Subject(
+                          uuid: widget.patient.uuid,
+                          name: widget.patient.fullName,
+                          identifier: widget.patient.uuid)
+                  );
+                  print('launching meeting');
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => LaunchMeeting(event: appointment)),
+                  );
+                },
+              ),
+              PopupMenuItem<String>(
+                value: 'graphs',
+                child: const Text('Graphs'),
+                onTap: () => {},
+              ),
+              PopupMenuItem<String>(
+                value: 'discardSession',
+                child: const Text('Discard Session'),
+                onTap: () => {},
+              )
+            ];
           },
         );
   }

@@ -110,7 +110,7 @@ class _AppointmentsDayViewState extends State<AppointmentsDayView> {
               var patientModel = await _patientUuidFromEvent(_event);
               Navigator.pushNamed(context, AppRoutes.patients, arguments: patientModel);
             }
-            if (value == 'OK') {
+            if (value == 'Join') {
               joinJitsiMeeting(_event, _user!);
               // Navigator.push(
               //   context,
@@ -124,7 +124,7 @@ class _AppointmentsDayViewState extends State<AppointmentsDayView> {
   }
 
   Future<String?> _showEventInfoDialog(BuildContext context, BahmniAppointment event) {
-    var _isTeleConsult = event.teleconsultation ?? false;
+    var _isTeleConsult = true;//event.teleconsultation ?? false;
     List<Widget> _actions = [];
     _actions.add(TextButton(
       onPressed: () => Navigator.pop(context, 'OK'),

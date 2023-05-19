@@ -70,7 +70,7 @@ class _ConditionWidgetState extends State<ConditionWidget> {
                 _conditionModel.note = _notesController.text;
                 Navigator.pop(context, _conditionModel);
               },
-              child: const Text('Add Condition'),
+              child: const Text('Add'),
             ),
           ],
         )
@@ -148,6 +148,7 @@ class _ConditionWidgetState extends State<ConditionWidget> {
               padding: const EdgeInsets.all(10),
               label: Text(value.display ?? ''),
               selected: (_conditionModel.verificationStatus != null) && (_conditionModel.verificationStatus!.uuid == value.uuid),
+              selectedColor: Colors.lightBlue,
               onSelected: (bool selected) {
                 if (selected) {
                   setState(() {
@@ -175,6 +176,7 @@ class _ConditionWidgetState extends State<ConditionWidget> {
               padding: const EdgeInsets.all(10),
               label: Text(_order.name),
               selected: (_conditionModel.order != null) && (_conditionModel.order == _order),
+              selectedColor: Colors.lightBlue,
               onSelected: (bool selected) {
                 if (selected) {
                   setState(() {
@@ -203,6 +205,7 @@ class _ConditionWidgetState extends State<ConditionWidget> {
               padding: const EdgeInsets.all(10),
               label: Text(value.display ?? ''),
               selected: _isSelectedCategory(value),
+              selectedColor: Colors.lightBlue,
               onSelected: (selected) {
                 if (selected) {
                   setState(() {

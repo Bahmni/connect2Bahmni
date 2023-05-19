@@ -30,8 +30,7 @@ class ConditionModel {
   factory ConditionModel.fromPatientDiagnosis(OmrsPatient patient, Map<String, dynamic> json) {
     return ConditionModel(
       id: json['existingObs'],
-      recordedDate: json['diagnosisDateTime'] == null ? null
-          : DateTime.parse(json['diagnosisDateTime'] as String),
+      recordedDate: _fromDateTime(json['diagnosisDateTime']),
       note: json['comments'],
       subject: patient,
       code: json['codedAnswer'] == null ? OmrsConcept(display: json['freeTextAnswer'])
@@ -54,6 +53,7 @@ class ConditionModel {
   bool get isEncounterDiagnosis {
     return category?.display == 'encounter-diagnosis';
   }
+
 }
 
 enum ConditionOrder { primary, secondary }
@@ -64,5 +64,12 @@ ConditionOrder? _fromOrderString(String? diagnosisOrder) {
   for (var value in ConditionOrder.values) {
     if (value.name.toUpperCase() == diagnosisOrder.toUpperCase()) return value;
   }
+  return null;
+}
+
+DateTime? _fromDateTime(dynamic jsonValue) {
+  if (jsonValue == null) return null;
+  if (jsonValue is int) return DateTime.fromMillisecondsSinceEpoch(jsonValue);
+  if (jsonValue is String) return DateTime.parse(jsonValue);
   return null;
 }

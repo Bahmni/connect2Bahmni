@@ -110,14 +110,20 @@ class _ConsultPadWidgetState extends State<ConsultPadWidget> {
         padding: const EdgeInsets.fromLTRB(5, 0, 5, 0),
         child: Row(children: [
           Expanded(child: Text.rich(textSpan)),
-          _editContextButton()
+          _editContextButton(consultation.status)
         ]));
   }
 
-  Widget _editContextButton() {
+  Widget _editContextButton(ConsultationStatus status) {
     return OutlinedButton(
           onPressed: () async {
             debugPrint('Edit Context');
+            if (status == ConsultationStatus.finalized) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text("Already saved!")),
+              );
+              return;
+            }
             var board = Provider.of<ConsultationBoard>(context, listen: false);
             final consultInfo = await Navigator.push(
               context,
