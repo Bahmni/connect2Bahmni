@@ -124,7 +124,7 @@ class _DashboardWidgetState extends State<_DashboardWidget> {
                           name: widget.patient.fullName,
                           identifier: widget.patient.uuid)
                   );
-                  print('launching meeting');
+                  //print('launching meeting');
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => LaunchMeeting(event: appointment)),
