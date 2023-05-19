@@ -17,7 +17,7 @@ As of now, this project is experimental, only a starting point and far from bein
 
 | property | description | example value | 
 | ----------- | ----------- | ----------- |
-| bahmni.server | HTTPS and without trailing slash | https://next.mybahmni.org |
+| bahmni.server | HTTPS and without trailing slash | https://dev.lite.mybahmni.in |
 | app.allowedVisitTypes | subset of visit types on server, matched by name | OPD,IPD,FIELD  | 
 | app.allowedEncTypes| subset of encounter types on server, matched by name | Consultation,REG,TRANSFER | 
 | app.allowedEncTypes| subset of encounter types on server, matched by name | Consultation,REG,TRANSFER |  
