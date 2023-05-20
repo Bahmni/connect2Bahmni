@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -51,11 +52,12 @@ class AuthProvider with ChangeNotifier {
             return AuthResponse(status: false, message: 'Authentication Failed');
           }
           Session session = Session.fromJson(responseData);
-          Iterable<String> itr = (response.headers['set-cookie'] ?? "").split(";").where((c) => c.contains('JSESSIONID'));
-          if (itr.isNotEmpty) {
-            session.sessionId = itr.first.substring(itr.first.indexOf('=')+1);
+          var cookie = Cookie.fromSetCookieValue(response.headers['set-cookie'] ?? "");
+          debugPrint('cookie - name=${cookie.name}, value=${cookie.value}, domain = ${cookie.domain}, httpOnly = ${cookie.httpOnly}, expires= ${cookie.expires}');
+          if (cookie.name == 'JSESSIONID') {
+            session.sessionId = cookie.value;
           } else {
-            // no JSESSIONID - throw error
+             //no sessionId. should throw error
           }
           var providerResponse = await Providers().omrsProviderForUser(
               session.user.uuid, () => Future.value(session.sessionId));
