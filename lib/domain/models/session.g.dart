@@ -7,7 +7,7 @@ part of 'session.dart';
 // **************************************************************************
 
 Session _$SessionFromJson(Map<String, dynamic> json) => Session(
-      sessionId: json['sessionId'] as String,
+      sessionId: json['sessionId'] as String?,
       authenticated: json['authenticated'] as bool,
       user: User.fromJson(json['user'] as Map<String, dynamic>),
       sessionLocation: json['sessionLocation'] == null

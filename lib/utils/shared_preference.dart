@@ -8,7 +8,7 @@ class UserPreferences {
   Future<bool> saveSession(Session session) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setString("session", jsonEncode(session.toJson()));
-    prefs.setString("sessionId", session.sessionId);
+    prefs.setString("sessionId", session.sessionId!);
     if (session.sessionLocation != null) {
       prefs.setString("sessionLocationId", session.sessionLocation!.uuid);
     }

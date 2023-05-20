@@ -31,7 +31,7 @@ jobs:
         run: |
           touch .env
           echo fhir.support=false >> .env
-          echo bahmni.server=https://next.mybahmni.org >> .env
+          echo bahmni.server=https://dev.lite.mybahmni.in >> .env
       - run: flutter pub get
       - run: flutter analyze
       - run: flutter build apk --debug

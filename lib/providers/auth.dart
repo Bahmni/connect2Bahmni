@@ -51,6 +51,12 @@ class AuthProvider with ChangeNotifier {
             return AuthResponse(status: false, message: 'Authentication Failed');
           }
           Session session = Session.fromJson(responseData);
+          Iterable<String> itr = (response.headers['set-cookie'] ?? "").split(";").where((c) => c.contains('JSESSIONID'));
+          if (itr.isNotEmpty) {
+            session.sessionId = itr.first.substring(itr.first.indexOf('=')+1);
+          } else {
+            // no JSESSIONID - throw error
+          }
           var providerResponse = await Providers().omrsProviderForUser(
               session.user.uuid, () => Future.value(session.sessionId));
           if (providerResponse != null) {
