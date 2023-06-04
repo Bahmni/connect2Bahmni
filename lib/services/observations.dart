@@ -11,8 +11,7 @@ class Observations {
     return FhirInterface().fetch(url);
   }
 
-
-  Future<http.Response> _fetch(String url) {
+  Future<http.Response> fetch(String url) {
     return UserPreferences().getSessionId().then((sessionId) {
       if (sessionId == null) {
         throw 'Authentication Failure';
