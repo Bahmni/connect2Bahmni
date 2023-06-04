@@ -17,11 +17,12 @@ As of now, this project is experimental, only a starting point and far from bein
 
 | property | description | example value | 
 | ----------- | ----------- | ----------- |
-| bahmni.server | HTTPS and without trailing slash | https://dev.lite.mybahmni.in |
+| bahmni.server | HTTPS and without trailing slash | https://dev.lite.mybahmni.in (use https://10.0.2.2 if running on https://localhost) |
 | app.allowedVisitTypes | subset of visit types on server, matched by name | OPD,IPD,FIELD  | 
 | app.allowedEncTypes| subset of encounter types on server, matched by name | Consultation,REG,TRANSFER | 
 | app.allowedEncTypes| subset of encounter types on server, matched by name | Consultation,REG,TRANSFER |  
 | app.conceptConsultationNotes | uuid of the obs concept (datatype = text) for recording consult notes | 81d6e852-3f10-11e4-adec-0800271c1b75 |
+| app.conceptCodedDiagnosis | uuid of the obs concept (datatype = text) for recording coded diagnosis | 81d6e852-3f10-11e4-adec-0800271c1b75 |
 
 
 ## Build

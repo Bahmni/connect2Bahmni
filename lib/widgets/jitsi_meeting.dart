@@ -2,7 +2,8 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:jitsi_meet/jitsi_meet.dart';
+import 'package:jitsi_meet_fix/jitsi_meet.dart';
+
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 import '../domain/models/bahmni_appointment.dart';

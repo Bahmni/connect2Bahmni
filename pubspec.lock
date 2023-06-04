@@ -338,13 +338,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.3"
-  jitsi_meet:
+  jitsi_meet_fix:
     dependency: "direct main"
     description:
-      name: jitsi_meet
+      name: jitsi_meet_fix
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "4.0.0"
+    version: "4.0.5"
   jitsi_meet_platform_interface:
     dependency: transitive
     description:
@@ -352,13 +352,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.0.0"
-  jitsi_meet_web_plugin:
+  jitsi_meet_web_plugin_fix:
     dependency: transitive
     description:
-      name: jitsi_meet_web_plugin
+      name: jitsi_meet_web_plugin_fix
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.0.0"
+    version: "2.0.2"
   js:
     dependency: transitive
     description:
