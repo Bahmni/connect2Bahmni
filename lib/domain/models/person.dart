@@ -52,7 +52,7 @@ class PersonName {
     }
 
     return HumanName(
-          id: uuid,
+          fhirId: uuid,
           given: givenNames.isNotEmpty ? givenNames : null,
           text: display,
           family: familyName
@@ -75,7 +75,7 @@ class PersonAddress {
 
    Address get address {
     return Address(
-      id: uuid,
+      fhirId: uuid,
       city:  cityVillage,
       country: country,
       state: stateProvince,

@@ -17,7 +17,7 @@ class OmrsPatient {
 
   fhir.Patient toFhir() {
     return fhir.Patient(
-      id: fhir.Id(uuid),
+      fhirId: uuid,
       name: _humanName(),
       birthDate: _birthDate(),
       address: _address(),
@@ -30,9 +30,9 @@ class OmrsPatient {
     return name != null ? [name] : null;
   }
 
-  fhir.Date? _birthDate() {
+  fhir.FhirDate? _birthDate() {
     var dt = person?.birthdate;
-    return dt != null ? fhir.Date.fromDateTime(dt) : null;
+    return dt != null ? fhir.FhirDate.fromDateTime(dt) : null;
   }
 
   _address() {
@@ -43,7 +43,7 @@ class OmrsPatient {
   List<fhir.Identifier>? _identifiers() {
     return identifiers?.map((e) {
       return fhir.Identifier(
-        id: e.uuid,
+        fhirId: e.uuid,
         type: fhir.CodeableConcept(
           text: e.identifierType.name
         ),
