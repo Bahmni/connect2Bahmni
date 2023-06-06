@@ -204,9 +204,9 @@ class _DashboardWidgetState extends State<_DashboardWidget> {
   // ignore: unused_element
   FloatingActionButton _floatingActions() {
     return FloatingActionButton(
-      child: const Icon(Icons.event_outlined),
       elevation: 8,
       onPressed: () => {},
+      child: const Icon(Icons.event_outlined),
     );
   }
 
@@ -309,8 +309,8 @@ class ConsultationActions extends StatelessWidget {
             notes: board.currentConsultation?.consultationNotes)
     );
     if (notes != null) {
-      var _consultNoteConcept = Provider.of<MetaProvider>(ctx, listen: false).consultNoteConcept;
-      board.addConsultationNotes(notes, _consultNoteConcept);
+      var consultNoteConcept = Provider.of<MetaProvider>(ctx, listen: false).consultNoteConcept;
+      board.addConsultationNotes(notes, consultNoteConcept);
     }
   }
 

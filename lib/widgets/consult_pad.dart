@@ -82,7 +82,7 @@ class _ConsultPadWidgetState extends State<ConsultPadWidget> {
     String? display = _statusDisplays[currentStatus];
     return Text(
       '$display $lastUpdateTxt',
-      style: Theme.of(context).textTheme.bodyText1,
+      style: Theme.of(context).textTheme.bodyLarge,
       textAlign: TextAlign.center,
     );
   }
@@ -211,6 +211,13 @@ class _ConsultPadWidgetState extends State<ConsultPadWidget> {
     );
     return Slidable(
       key: Key(keyId),
+      endActionPane: ActionPane(
+        motion: const ScrollMotion(),
+        children: [
+          _removeConditionAction(condition),
+          _editConditionAction(condition),
+        ],
+      ),
       child: Container(
         color: Theme.of(context).colorScheme.onBackground,
         child: ListTile(
@@ -222,13 +229,6 @@ class _ConsultPadWidgetState extends State<ConsultPadWidget> {
           subtitle: Text(conditionNotes),
           tileColor: Colors.red,
         ),
-      ),
-      endActionPane: ActionPane(
-        motion: const ScrollMotion(),
-        children: [
-          _removeConditionAction(condition),
-          _editConditionAction(condition),
-        ],
       ),
     );
   }
@@ -281,7 +281,7 @@ class _ObsListItem extends StatelessWidget {
 
   Card _showObs(BuildContext context, bool shouldSlide) {
     var notes = consultNote.valueAsString ?? '';
-    var _title = shouldSlide ? _slidablePane(context) : _simpleRow();
+    var title = shouldSlide ? _slidablePane(context) : _simpleRow();
 
     return Card(
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(1.0))),
@@ -292,7 +292,7 @@ class _ObsListItem extends StatelessWidget {
         child: ExpansionTile(
             initiallyExpanded: true,
             backgroundColor: Colors.white,
-            title: _title,
+            title: title,
             controlAffinity: ListTileControlAffinity.leading,
             expandedAlignment: Alignment.topLeft,
             children: <Widget>[
@@ -309,13 +309,6 @@ class _ObsListItem extends StatelessWidget {
   Slidable _slidablePane(BuildContext context) {
     return Slidable(
       key: UniqueKey(),
-      child: Container(
-        color: Theme.of(context).colorScheme.onBackground,
-        child: const ListTile(
-          title: Text('Consultation Notes'),
-          tileColor: Colors.red,
-        ),
-      ),
       endActionPane: ActionPane(
         motion: const ScrollMotion(),
         children: [
@@ -329,6 +322,13 @@ class _ObsListItem extends StatelessWidget {
             label: 'Edit',
           )
         ],
+      ),
+      child: Container(
+        color: Theme.of(context).colorScheme.onBackground,
+        child: const ListTile(
+          title: Text('Consultation Notes'),
+          tileColor: Colors.red,
+        ),
       ),
     );
   }

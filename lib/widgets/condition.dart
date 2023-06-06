@@ -35,7 +35,7 @@ class _ConditionWidgetState extends State<ConditionWidget> {
 
   @override
   Widget build(BuildContext context) {
-    var _currentUser = Provider.of<UserProvider>(context).user;
+    var currentUser = Provider.of<UserProvider>(context).user;
     var arg = ModalRoute.of(context)!.settings.arguments;
     if (arg is ConditionModel) {
       _conditionModel = arg;
@@ -43,7 +43,7 @@ class _ConditionWidgetState extends State<ConditionWidget> {
       _conditionModel = widget.condition!;
     }
 
-    _conditionModel.recorder = _currentUser?.provider;
+    _conditionModel.recorder = currentUser?.provider;
     return Scaffold(
       appBar: AppBar(title: const Text('Add Condition'),),
       body: Container(
@@ -106,7 +106,7 @@ class _ConditionWidgetState extends State<ConditionWidget> {
             ),
             contentPadding: const EdgeInsetsDirectional.fromSTEB(20, 40, 24, 0),
           ),
-          style: Theme.of(context).textTheme.bodyText1!.merge(
+          style: Theme.of(context).textTheme.bodyLarge!.merge(
             const TextStyle(
               fontFamily: 'Lexend Deca',
               color: Color(0xFF1E2429),
@@ -121,7 +121,7 @@ class _ConditionWidgetState extends State<ConditionWidget> {
   }
 
   TextStyle _labelStyle(BuildContext context) {
-    return Theme.of(context).textTheme.bodyText1!.merge(
+    return Theme.of(context).textTheme.bodyLarge!.merge(
           const TextStyle(
             fontFamily: 'Lexend Deca',
             color: Color(0xFF090F13),
@@ -172,15 +172,15 @@ class _ConditionWidgetState extends State<ConditionWidget> {
         Align(
           alignment: Alignment.centerRight,
           child: Wrap(
-            children: ConditionOrder.values.map((_order) => ChoiceChip(
+            children: ConditionOrder.values.map((order) => ChoiceChip(
               padding: const EdgeInsets.all(10),
-              label: Text(_order.name),
-              selected: (_conditionModel.order != null) && (_conditionModel.order == _order),
+              label: Text(order.name),
+              selected: (_conditionModel.order != null) && (_conditionModel.order == order),
               selectedColor: Colors.lightBlue,
               onSelected: (bool selected) {
                 if (selected) {
                   setState(() {
-                    _conditionModel.order = _order;
+                    _conditionModel.order = order;
                   });
                 }
               },
@@ -232,11 +232,11 @@ class _ConditionWidgetState extends State<ConditionWidget> {
 
     return ExpansionTile(
       tilePadding: const EdgeInsets.all(0),
-      title: Text(display, style: Theme.of(context).textTheme.headline6),
-      subtitle: (coding != null) ?  Text(coding, style: Theme.of(context).textTheme.subtitle1) : null,
+      title: Text(display, style: Theme.of(context).textTheme.titleLarge),
+      subtitle: (coding != null) ?  Text(coding, style: Theme.of(context).textTheme.titleMedium) : null,
       //controlAffinity: ListTileControlAffinity.leading,
       children: <Widget>[
-        ListTile(title: Text(description, style: Theme.of(context).textTheme.caption)),
+        ListTile(title: Text(description, style: Theme.of(context).textTheme.bodySmall)),
       ],
     );
   }

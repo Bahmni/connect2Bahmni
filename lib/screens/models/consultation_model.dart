@@ -42,14 +42,14 @@ class ConsultationModel {
 
   void addCondition(ConditionModel conditionModel) {
     if (status == ConsultationStatus.finalized) return;
-    String? _id = conditionModel.code?.uuid;
-    _id ??= conditionModel.id;
-    if (_id == null) return;
+    String? conditionId = conditionModel.code?.uuid;
+    conditionId ??= conditionModel.id;
+    if (conditionId == null) return;
     var refList = conditionModel.isEncounterDiagnosis ?  diagnosisList : problemList;
     var result = refList.where((element) {
-      String? _elementId = element.code?.uuid;
-      _elementId ??= element.id;
-      return _id == _elementId;
+      String? elementId = element.code?.uuid;
+      elementId ??= element.id;
+      return conditionId == elementId;
     }).toList();
     if (result.isEmpty) {
       refList.add(conditionModel);

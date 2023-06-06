@@ -14,10 +14,10 @@ class _RegisterState extends State<Register> {
       appBar: AppBar(
         title: const Text('Please register'),
       ),
-      body: Center(
+      body: const Center(
         child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: const <Widget>[
+            children: <Widget>[
               Text('Coming soon',),
             ]
         ),

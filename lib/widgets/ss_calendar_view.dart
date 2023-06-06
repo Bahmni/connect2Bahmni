@@ -46,7 +46,6 @@ List<CalendarEventData<BahmniAppointment>> _eventList(List<BahmniAppointment>? a
 Widget _bahmniAppointmentsDayWidget(List<BahmniAppointment> eventList) {
   return Scaffold(
     floatingActionButton: FloatingActionButton(
-      child: const Icon(Icons.add),
       elevation: 8,
       onPressed: () async {
 //        final event =
@@ -56,6 +55,7 @@ Widget _bahmniAppointmentsDayWidget(List<BahmniAppointment> eventList) {
 //        if (event == null) return;
 //        CalendarControllerProvider.of<BahmniAppointment>(context).controller.add(event);
       },
+      child: const Icon(Icons.add),
     ),
     body: AppointmentsDayView(initialList: eventList),
   );
@@ -104,14 +104,14 @@ class _AppointmentsDayViewState extends State<AppointmentsDayView> {
       onEventTap: (events, date) {
         debugPrint('Event tapped : $events');
         if (events.isNotEmpty) {
-          var _event = events.single.event;
-          _showEventInfoDialog(context, _event!).then((value) async {
+          var event = events.single.event;
+          _showEventInfoDialog(context, event!).then((value) async {
             if (value == 'Charts') {
-              var patientModel = await _patientUuidFromEvent(_event);
+              var patientModel = await _patientUuidFromEvent(event);
               Navigator.pushNamed(context, AppRoutes.patients, arguments: patientModel);
             }
             if (value == 'Join') {
-              joinJitsiMeeting(_event, _user!);
+              joinJitsiMeeting(event, _user!);
               // Navigator.push(
               //   context,
               //   MaterialPageRoute(builder: (context) => LaunchMeeting(event: _event)),
@@ -124,31 +124,31 @@ class _AppointmentsDayViewState extends State<AppointmentsDayView> {
   }
 
   Future<String?> _showEventInfoDialog(BuildContext context, BahmniAppointment event) {
-    var _isTeleConsult = true;//event.teleconsultation ?? false;
-    List<Widget> _actions = [];
-    _actions.add(TextButton(
+    var isTeleConsult = true;//event.teleconsultation ?? false;
+    List<Widget> actions = [];
+    actions.add(TextButton(
       onPressed: () => Navigator.pop(context, 'OK'),
       child: const Text('OK'),
     ));
-    _actions.add(TextButton(
+    actions.add(TextButton(
       onPressed: () => Navigator.pop(context, 'Charts'),
       child: const Text('View Charts'),
     ));
-    if (_isTeleConsult) {
-      _actions.add(TextButton(
+    if (isTeleConsult) {
+      actions.add(TextButton(
         onPressed: () => Navigator.pop(context, 'Join'),
         child: const Text('Join'),
       ));
     }
-    var _starTime = formattedTime(event.startDateTime!);
-    var _endTime = formattedTime(event.endDateTime!);
-    var _description = '${event.patient.name} ($_starTime - $_endTime)';
+    var starTime = formattedTime(event.startDateTime!);
+    var endTime = formattedTime(event.endDateTime!);
+    var description = '${event.patient.name} ($starTime - $endTime)';
     return showDialog<String>(
       context: context,
       builder: (BuildContext context) => AlertDialog(
         title: const Text('Appointment'),
-        content: Text(_description),
-        actions: _actions
+        content: Text(description),
+        actions: actions
       ),
     );
   }

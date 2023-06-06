@@ -25,7 +25,7 @@ class PatientModel {
       }
       String? lastName = _patient.name?.first.family;
       if (lastName != null) {
-        fullName = fullName + ' ' + lastName;
+        fullName = '$fullName $lastName';
       }
     }
     return fullName;
@@ -36,7 +36,7 @@ class PatientModel {
     DateTime dob = _patient.birthDate?.valueDateTime ?? DateTime.now();
     PersonAge age = calculateAge(dob);
     String strAge = age.year != 0 ? '${age.year}y ${age.month}m' : '${age.month}m ${age.days}d';
-    return (_genderMap[result] ?? '') + ', $strAge' ;
+    return '${_genderMap[result] ?? ''}, $strAge' ;
   }
 
   String get location {

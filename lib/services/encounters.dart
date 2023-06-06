@@ -11,7 +11,7 @@ import '../utils/shared_preference.dart';
 
 class Encounters {
   Future<Bundle> byPatientUuid(String uuid, Future<String?> Function() fetchSessionId) async {
-    String url = AppUrls.fhir.encounter + '?patient=$uuid';
+    String url = '${AppUrls.fhir.encounter}?patient=$uuid';
     return FhirInterface().fetch(url);
   }
 

@@ -14,7 +14,7 @@ class Visits {
     if (sessionId == null) {
       throw 'Authentication Failure';
     }
-    String url = AppUrls.omrs.visit + '?patient=$patientUuid&v=full';
+    String url = '${AppUrls.omrs.visit}?patient=$patientUuid&v=full';
     Response response = await get(
       Uri.parse(url),
       headers: <String, String>{

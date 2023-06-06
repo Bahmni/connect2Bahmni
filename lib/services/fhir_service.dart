@@ -40,7 +40,7 @@ class FhirInterface {
     if (sessionId == null) {
       throw Failure('Session expired.', 401);
     }
-    String url = AppUrls.fhir.patient + '?name=$name';
+    String url = '${AppUrls.fhir.patient}?name=$name';
     Response response = await get(
       Uri.parse(url),
       headers: <String, String>{

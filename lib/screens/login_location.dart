@@ -23,11 +23,11 @@ class _LoginLocationState extends State<LoginLocation> {
   Widget build(BuildContext context) {
     _authenticator = Provider.of<AuthProvider>(context);
     Map? assignedLocations = ModalRoute.of(context)?.settings.arguments as Map?;
-    Future<List<DropdownMenuItem<String>>> _locationsFuture = (assignedLocations != null)
+    Future<List<DropdownMenuItem<String>>> locationsFuture = (assignedLocations != null)
         ? _fetchPresetLoginLocations(assignedLocations)
         : _fetchAllLoginLocations();
     return FutureBuilder<List<DropdownMenuItem<String>>>(
-        future: _locationsFuture,
+        future: locationsFuture,
         initialData: const [],
         builder: (BuildContext context, AsyncSnapshot<List<DropdownMenuItem<String>>> snapshot) {
           if (snapshot.connectionState != ConnectionState.done) {
@@ -109,7 +109,7 @@ class _LoginLocationState extends State<LoginLocation> {
   Future<List<DropdownMenuItem<String>>> _fetchPresetLoginLocations(Map locationsMap) {
     List<DropdownMenuItem<String>> locationList = [];
     for (var element in locationsMap.entries) {
-      locationList.add(DropdownMenuItem(child: Text(element.value), value: element.key));
+      locationList.add(DropdownMenuItem(value: element.key, child: Text(element.value)));
     }
     return Future.delayed(const Duration(seconds: 2), () => locationList,);
   }
@@ -117,7 +117,7 @@ class _LoginLocationState extends State<LoginLocation> {
     var completer = Completer<List<DropdownMenuItem<String>>>();
     debugPrint('Fetching all locations ... ');
     Locations().allOmrsLoginLocations().then((values) {
-      var list = List<DropdownMenuItem<String>>.of(values.map((loc) => DropdownMenuItem(child: Text(loc.name!), value: loc.uuid)));
+      var list = List<DropdownMenuItem<String>>.of(values.map((loc) => DropdownMenuItem(value: loc.uuid, child: Text(loc.name!))));
       completer.complete(list);
     });
     return completer.future;

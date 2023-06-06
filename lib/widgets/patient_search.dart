@@ -140,7 +140,7 @@ class _PatientsSearchWidgetState extends State<PatientSearch> {
                     labelStyle: Theme
                         .of(context)
                         .textTheme
-                        .bodyText1
+                        .bodyLarge
                         ?.merge(const TextStyle(
                       fontFamily: 'Lexend Deca',
                       color: Color(0xFF82878C),
@@ -148,7 +148,7 @@ class _PatientsSearchWidgetState extends State<PatientSearch> {
                       fontWeight: FontWeight.normal,
                     )),
                     hintText: 'Find patients by name or identifier',
-                    hintStyle: Theme.of(context).textTheme.bodyText1?.merge(const TextStyle(
+                    hintStyle: Theme.of(context).textTheme.bodyLarge?.merge(const TextStyle(
                       fontFamily: 'Lexend Deca',
                       color: Color(0xFF95A1AC),
                       fontSize: 14,
@@ -178,7 +178,7 @@ class _PatientsSearchWidgetState extends State<PatientSearch> {
                   style: Theme
                       .of(context)
                       .textTheme
-                      .bodyText1
+                      .bodyLarge
                       ?.merge(const TextStyle(
                     fontFamily: 'Lexend Deca',
                     color: Color(0xFF151B1E),
@@ -238,7 +238,7 @@ class _PatientsSearchWidgetState extends State<PatientSearch> {
                       children: [
                         Text(
                           patient.fullName,
-                          style: Theme.of(context).textTheme.subtitle1?.merge(const TextStyle(
+                          style: Theme.of(context).textTheme.titleMedium?.merge(const TextStyle(
                             fontFamily: 'Lexend Deca',
                             color: Color(0xFF15212B),
                             fontSize: 18,
@@ -275,10 +275,10 @@ class _PatientsSearchWidgetState extends State<PatientSearch> {
                       arguments: patient,
                     );
                   },
-                  child: Column(
+                  child: const Column(
                     mainAxisSize: MainAxisSize.max,
                     mainAxisAlignment: MainAxisAlignment.center,
-                    children: const [
+                    children: [
                       Icon(
                         Icons.chevron_right_rounded,
                         color: Color(0xFF82878C),

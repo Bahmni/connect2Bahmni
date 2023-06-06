@@ -15,13 +15,13 @@ class PatientVisitList extends StatefulWidget {
 class _PatientVisitListState extends State<PatientVisitList> {
   @override
   Widget build(BuildContext context) {
-    Future<List<OmrsVisit>> _patientVisits = Visits().visitsForPatient(widget.patientUuid);
+    Future<List<OmrsVisit>> patientVisits = Visits().visitsForPatient(widget.patientUuid);
     return FutureBuilder<List<OmrsVisit>>(
-        future: _patientVisits,
+        future: patientVisits,
         initialData: const [],
         builder: (BuildContext context, AsyncSnapshot<List<OmrsVisit>> snapshot) {
           if (snapshot.connectionState != ConnectionState.done) {
-            return const SizedBox(child: Center(child: SizedBox(child: CircularProgressIndicator(), width: 15, height: 15)), height: 40);
+            return const SizedBox(height: 40, child: Center(child: SizedBox(width: 15, height: 15, child: CircularProgressIndicator())));
           }
           if (snapshot.hasError) {
             return const Center(child: Text("Failed to load visits"),);

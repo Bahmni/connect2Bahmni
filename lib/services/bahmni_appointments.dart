@@ -16,7 +16,7 @@ class Appointments {
 
   Future<List<BahmniAppointment>> allAppointments(DateTime forDate) async {
     var searchForDate = DateTime(forDate.year, forDate.month, forDate.day).toIso8601String();
-    String url = AppUrls.bahmni.appointment + '/all?forDate=$searchForDate';
+    String url = '${AppUrls.bahmni.appointment}/all?forDate=$searchForDate';
     debugPrint('calling URL $url');
     String? sessionId = await UserPreferences().getSessionId();
     debugPrint('sessionId = $sessionId');
@@ -55,7 +55,7 @@ class Appointments {
   Future<List<BahmniAppointment>> forPractitioner(String? uuid, DateTime fromDate, DateTime tillDate) async {
     var startDate = DateTime(fromDate.year, fromDate.month, fromDate.day).toIso8601String();
     var endDate = tillDate.toIso8601String();
-    String url = AppUrls.bahmni.appointments + '/search';
+    String url = '${AppUrls.bahmni.appointments}/search';
     debugPrint('Searching appointments $url, startDate = $startDate, endDate = $endDate');
     String? sessionId = await UserPreferences().getSessionId();
     if (sessionId == null) {

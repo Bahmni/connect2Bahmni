@@ -59,7 +59,7 @@ class PatientInfo extends StatelessWidget {
                       children: [
                         Text(
                           patient.fullName,
-                          style: Theme.of(context).textTheme.subtitle1?.merge(const TextStyle(
+                          style: Theme.of(context).textTheme.titleMedium?.merge(const TextStyle(
                             fontFamily: 'Lexend Deca',
                             color: Color(0xFF15212B),
                             fontSize: 18,
@@ -103,10 +103,10 @@ class PatientInfo extends StatelessWidget {
         onTap: () {
           onSelect!(patient);
         },
-        child: Column(
+        child: const Column(
           mainAxisSize: MainAxisSize.max,
           mainAxisAlignment: MainAxisAlignment.center,
-          children: const [
+          children: [
             Icon(
               Icons.chevron_right_rounded,
               color: Color(0xFF82878C),

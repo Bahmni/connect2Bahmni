@@ -19,10 +19,10 @@ class _AppointmentsListViewState extends State<AppointmentsListView> {
   void initState() {
     super.initState();
     final DateTime current = DateTime.now();
-    final DateTime _fromDate = DateTime(current.year, current.month, current.day);
-    final DateTime _tillDate = _fromDate.add(const Duration(days: 1)).subtract(const Duration(seconds: 1));
-    debugPrint('fetching from date: $_fromDate till date: $_tillDate');
-    _futureAppointments = Appointments().forPractitioner(widget.practitionerUuid, _fromDate, _tillDate);
+    final DateTime fromDate = DateTime(current.year, current.month, current.day);
+    final DateTime tillDate = fromDate.add(const Duration(days: 1)).subtract(const Duration(seconds: 1));
+    debugPrint('fetching from date: $fromDate till date: $tillDate');
+    _futureAppointments = Appointments().forPractitioner(widget.practitionerUuid, fromDate, tillDate);
   }
 
   @override
@@ -92,7 +92,7 @@ class _AppointmentsListViewState extends State<AppointmentsListView> {
                   children: [
                     Text(
                       appointment.patient.name,
-                      style: Theme.of(context).textTheme.subtitle1?.merge(const TextStyle(
+                      style: Theme.of(context).textTheme.titleMedium?.merge(const TextStyle(
                         fontFamily: 'Lexend Deca',
                         color: Color(0xFF1E2429),
                         fontSize: 18,
@@ -102,7 +102,7 @@ class _AppointmentsListViewState extends State<AppointmentsListView> {
                     Padding(
                       padding: const EdgeInsetsDirectional.fromSTEB(0, 4, 0, 0),
                       child: Text(formattedTime(appointment.startDateTime!),
-                        style: Theme.of(context).textTheme.bodyText1?.merge(const TextStyle(
+                        style: Theme.of(context).textTheme.bodyLarge?.merge(const TextStyle(
                           fontFamily: 'Lexend Deca',
                           color: Color(0xFF090F13),
                           fontSize: 14,
@@ -124,7 +124,7 @@ class _AppointmentsListViewState extends State<AppointmentsListView> {
                   Text(
                     'M 22',
                     textAlign: TextAlign.end,
-                    style: Theme.of(context).textTheme.subtitle2?.merge(const TextStyle(
+                    style: Theme.of(context).textTheme.titleSmall?.merge(const TextStyle(
                       fontFamily: 'Lexend Deca',
                       color: Color(0xFF39D2C0),
                       fontSize: 16,
@@ -136,7 +136,7 @@ class _AppointmentsListViewState extends State<AppointmentsListView> {
                     child: Text(
                       'Appointment',
                       textAlign: TextAlign.end,
-                      style: Theme.of(context).textTheme.bodyText1?.merge(const TextStyle(
+                      style: Theme.of(context).textTheme.bodyLarge?.merge(const TextStyle(
                         fontFamily: 'Lexend Deca',
                         color: Color(0xFF090F13),
                         fontSize: 12,
