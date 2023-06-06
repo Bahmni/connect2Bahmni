@@ -14,7 +14,7 @@ class EmrApiService {
     if (sessionId == null) {
       throw 'Authentication Failure';
     }
-    String url = AppUrls.bahmni.diagnosis + '?patientUuid=${patient.uuid}';
+    String url = '${AppUrls.bahmni.diagnosis}?patientUuid=${patient.uuid}';
     var response = await http.get(
       Uri.parse(url),
       headers: <String, String>{

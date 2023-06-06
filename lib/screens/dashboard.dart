@@ -477,8 +477,8 @@ class _DashboardWidgetState extends State<DashboardWidget> {
 
   List<Container> _recentPatients(User user) {
     var recentlyViewedPatients = user.recentlyViewedPatients();
-    int _limit = recentlyViewedPatients.length < 3 ? recentlyViewedPatients.length : 3;
-    var subList = recentlyViewedPatients.isNotEmpty ? recentlyViewedPatients.sublist(0,_limit) : [];
+    int limit = recentlyViewedPatients.length < 3 ? recentlyViewedPatients.length : 3;
+    var subList = recentlyViewedPatients.isNotEmpty ? recentlyViewedPatients.sublist(0,limit) : [];
     List<Container> recentList =
       List<Container>.of(subList.map((person) {
         return _recentPatient(person);

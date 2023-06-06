@@ -66,8 +66,7 @@ Widget customEventTextBuilder(FlutterWeekViewEvent event, BuildContext context, 
       style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 10.0),
     ),
       TextSpan(
-        text: ' ' +  dayView.hoursColumnStyle.timeFormatter(HourMinute.fromDateTime(dateTime: event.start))
-            + ' - ' + dayView.hoursColumnStyle.timeFormatter(HourMinute.fromDateTime(dateTime: event.end)) + '\n\n',
+        text: ' ${dayView.hoursColumnStyle.timeFormatter(HourMinute.fromDateTime(dateTime: event.start))} - ${dayView.hoursColumnStyle.timeFormatter(HourMinute.fromDateTime(dateTime: event.end))}\n\n',
       ),
 //      TextSpan(
 //        text: event.description,

@@ -20,7 +20,7 @@ void main() {
     expect(consultation.status, ConsultationStatus.none);
     consultation.initialize(
       PatientModel(
-        r4.Patient(name: [r4.HumanName(family: 'LastName', given: ['FirstName'])])
+        const r4.Patient(name: [r4.HumanName(family: 'LastName', given: ['FirstName'])])
       ));
     expect(consultation.status, ConsultationStatus.draft);
   });

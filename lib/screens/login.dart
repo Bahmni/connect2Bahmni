@@ -79,9 +79,9 @@ class _LoginState extends State<Login> {
   }
 
   Row _showLoading() {
-    return Row(
+    return const Row(
       mainAxisAlignment: MainAxisAlignment.center,
-      children: const <Widget>[
+      children: <Widget>[
         CircularProgressIndicator(),
         Text(" Authenticating ... Please wait")
       ],
@@ -170,16 +170,16 @@ class _LoginState extends State<Login> {
   }
 
   List<Widget> _formWidgets(String? serverInfo) {
-    List<Widget> _formElements = [];
+    List<Widget> formElements = [];
     if (serverInfo == null) {
-      _formElements.addAll([
+      formElements.addAll([
         const SizedBox(height: 5.0),
         const SizedBox(height: 5.0),
         const Text('Server'),
         _serverUrlField()
       ]);
     }
-    _formElements.addAll([
+    formElements.addAll([
       const SizedBox(height: 5.0),
       const SizedBox(height: 5.0),
       const Text('User'),
@@ -195,7 +195,7 @@ class _LoginState extends State<Login> {
       const SizedBox(height: 5.0),
       _forgotLabel()
     ]);
-    return _formElements;
+    return formElements;
   }
 
   void showLoginFailure(BuildContext context) {

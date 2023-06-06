@@ -28,9 +28,9 @@ class _ConsultationContextState extends State<ConsultationContext> {
   @override
   void initState() {
     super.initState();
-    var _metaProvider = Provider.of<MetaProvider>(context, listen: false);
-    _allowedVisitTypes = _metaProvider.allowedVisitTypes;
-    _allowedEncTypes = _metaProvider.allowedEncTypes;
+    var metaProvider = Provider.of<MetaProvider>(context, listen: false);
+    _allowedVisitTypes = metaProvider.allowedVisitTypes;
+    _allowedEncTypes = metaProvider.allowedEncTypes;
     if (widget.visitTypeUuid != null) {
       var matchingVisitTypes = _allowedVisitTypes!.where((element) => element.uuid == widget.visitTypeUuid);
       if (matchingVisitTypes.isNotEmpty) {
@@ -102,7 +102,7 @@ class _ConsultationContextState extends State<ConsultationContext> {
                 });
               },
               items: (_allowedVisitTypes ?? [])
-                  .map<DropdownMenuItem<OmrsVisitType>>((vt) => DropdownMenuItem(child: Text(vt.display ?? 'unknown'), value: vt)).toList()
+                  .map<DropdownMenuItem<OmrsVisitType>>((vt) => DropdownMenuItem(value: vt, child: Text(vt.display ?? 'unknown'))).toList()
           ),
         ),
       ],
@@ -125,7 +125,7 @@ class _ConsultationContextState extends State<ConsultationContext> {
                 });
               },
               items: (_allowedEncTypes ?? [])
-                  .map<DropdownMenuItem<OmrsEncounterType>>((et) => DropdownMenuItem(child: Text(et.display ?? 'unknown'), value: et)).toList()
+                  .map<DropdownMenuItem<OmrsEncounterType>>((et) => DropdownMenuItem(value: et, child: Text(et.display ?? 'unknown'))).toList()
           ),
         ),
       ],

@@ -36,12 +36,11 @@ class AuthProvider with ChangeNotifier {
   Future<AuthResponse> authenticate(String username, String password) async {
     _loggedInStatus = Status.authenticating;
     notifyListeners();
-    var _client = _httpClient();
+    var client = _httpClient();
     try {
-        var response = await _client.get(Uri.parse(AppUrls.omrs.session),
+        var response = await client.get(Uri.parse(AppUrls.omrs.session),
             headers: <String, String>{
-              'authorization': 'Basic ' +
-                  base64Encode(utf8.encode('$username:$password')),
+              'authorization': 'Basic ${base64Encode(utf8.encode('$username:$password'))}',
               'Content-Type': 'application/json'
             });
         if (response.statusCode == 200) {
@@ -76,7 +75,7 @@ class AuthProvider with ChangeNotifier {
               status: false, message: json.decode(response.body)['error']);
         }
     } finally {
-        _client.close();
+        client.close();
     }
   }
 
@@ -89,7 +88,7 @@ class AuthProvider with ChangeNotifier {
     if (sessionId == null) {
       throw 'Logged out already!';
     }
-    var _client = _httpClient();
+    var httpClient = _httpClient();
     try  {
       await http.delete(
         Uri.parse(AppUrls.omrs.session),
@@ -101,7 +100,7 @@ class AuthProvider with ChangeNotifier {
       );
       return 'Logged out';
     } finally {
-      _client.close();
+      httpClient.close();
     }
   }
 
@@ -112,9 +111,9 @@ class AuthProvider with ChangeNotifier {
     }
     debugPrint('updateSessionLocation: updating session $sessionId');
     debugPrint('calling URL ${AppUrls.omrs.session}');
-    var _client = _httpClient();
+    var httpClient = _httpClient();
     try {
-        var response = await _client.post(
+        var response = await httpClient.post(
           Uri.parse(AppUrls.omrs.session),
           headers: <String, String>{
             'Content-Type': 'application/json',
@@ -146,7 +145,7 @@ class AuthProvider with ChangeNotifier {
             }
         }
     } finally {
-        _client.close();
+        httpClient.close();
     }
   }
 

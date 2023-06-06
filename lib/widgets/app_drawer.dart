@@ -10,10 +10,10 @@ Drawer appDrawer(BuildContext context) {
           const SizedBox(
             height: 80.0,
             child: DrawerHeader(
-                child: Text('', style: TextStyle(color: Colors.white,fontSize: 24,),),
                 decoration: BoxDecoration(color: Colors.blue,),
                 margin: EdgeInsets.all(0.0),
-                padding: EdgeInsets.all(0.0)
+                padding: EdgeInsets.all(0.0),
+                child: Text('', style: TextStyle(color: Colors.white,fontSize: 24,),)
             ),
           ),
           ListTile(leading: const Icon(Icons.message),

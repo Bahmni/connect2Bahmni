@@ -11,7 +11,7 @@ class Locations {
   /// This currently fails because FHIR module sends provenance resources as well
   /// and  provenance.target which is a mandatory field is not passed
   Future<List<Location>> allLoginLocations() async {
-    String url = AppUrls.fhir.location + '?_tag=Login Location';
+    String url = '${AppUrls.fhir.location}?_tag=Login Location';
     var result = await FhirInterface().fetch(url);
     return result.entry != null ? List<Location>.from(result.entry!.map((e) => e.resource)) : [];
   }
@@ -21,7 +21,7 @@ class Locations {
     if (sessionId == null) {
       throw 'Authentication Failure';
     }
-    String url = AppUrls.omrs.location + '?tag=Login Location&v=custom:(uuid,name)';
+    String url = '${AppUrls.omrs.location}?tag=Login Location&v=custom:(uuid,name)';
     Response response = await get(
       Uri.parse(url),
       headers: <String, String>{

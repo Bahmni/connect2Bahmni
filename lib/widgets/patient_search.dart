@@ -275,10 +275,10 @@ class _PatientsSearchWidgetState extends State<PatientSearch> {
                       arguments: patient,
                     );
                   },
-                  child: Column(
+                  child: const Column(
                     mainAxisSize: MainAxisSize.max,
                     mainAxisAlignment: MainAxisAlignment.center,
-                    children: const [
+                    children: [
                       Icon(
                         Icons.chevron_right_rounded,
                         color: Color(0xFF82878C),

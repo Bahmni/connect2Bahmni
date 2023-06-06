@@ -35,7 +35,7 @@ class _ConditionWidgetState extends State<ConditionWidget> {
 
   @override
   Widget build(BuildContext context) {
-    var _currentUser = Provider.of<UserProvider>(context).user;
+    var currentUser = Provider.of<UserProvider>(context).user;
     var arg = ModalRoute.of(context)!.settings.arguments;
     if (arg is ConditionModel) {
       _conditionModel = arg;
@@ -43,7 +43,7 @@ class _ConditionWidgetState extends State<ConditionWidget> {
       _conditionModel = widget.condition!;
     }
 
-    _conditionModel.recorder = _currentUser?.provider;
+    _conditionModel.recorder = currentUser?.provider;
     return Scaffold(
       appBar: AppBar(title: const Text('Add Condition'),),
       body: Container(
@@ -172,15 +172,15 @@ class _ConditionWidgetState extends State<ConditionWidget> {
         Align(
           alignment: Alignment.centerRight,
           child: Wrap(
-            children: ConditionOrder.values.map((_order) => ChoiceChip(
+            children: ConditionOrder.values.map((order) => ChoiceChip(
               padding: const EdgeInsets.all(10),
-              label: Text(_order.name),
-              selected: (_conditionModel.order != null) && (_conditionModel.order == _order),
+              label: Text(order.name),
+              selected: (_conditionModel.order != null) && (_conditionModel.order == order),
               selectedColor: Colors.lightBlue,
               onSelected: (bool selected) {
                 if (selected) {
                   setState(() {
-                    _conditionModel.order = _order;
+                    _conditionModel.order = order;
                   });
                 }
               },

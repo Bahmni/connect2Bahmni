@@ -11,7 +11,7 @@ import '../utils/shared_preference.dart';
 
 class Patients {
   Future<Bundle> searchByName(String name) async {
-    String url = AppUrls.fhir.patient + '?name=$name';
+    String url = '${AppUrls.fhir.patient}?name=$name';
     return FhirInterface().fetch(url);
   }
 
@@ -29,7 +29,7 @@ class Patients {
     if (sessionId == null) {
       throw 'Authentication Failure';
     }
-    String url = AppUrls.omrs.patient + '/$uuid?v=full';
+    String url = '${AppUrls.omrs.patient}/$uuid?v=full';
     var response = await http.get(
       Uri.parse(url),
       headers: <String, String>{

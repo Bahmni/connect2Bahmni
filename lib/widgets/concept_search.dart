@@ -269,10 +269,10 @@ class _ConceptSearchWidgetState extends State<ConceptSearch> {
                     _debouncer.stop();
                     Navigator.pop(context, concept);
                   },
-                  child: Column(
+                  child: const Column(
                     mainAxisSize: MainAxisSize.max,
                     mainAxisAlignment: MainAxisAlignment.center,
-                    children: const [
+                    children: [
                       Icon(
                         Icons.chevron_right_rounded,
                         color: Color(0xFF82878C),

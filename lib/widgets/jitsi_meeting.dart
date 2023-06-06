@@ -49,10 +49,10 @@ class _LaunchMeetingState extends State<LaunchMeeting> {
 
   @override
   Widget build(BuildContext context) {
-    var _userProvider = Provider.of<UserProvider>(context, listen: false);
+    var userProvider = Provider.of<UserProvider>(context, listen: false);
     roomIdentifier.text = widget.event?.uuid ?? const Uuid().v4();
     titleText.text = defaultTitleText;
-    nameText.text = _userProvider.user!.person.display;
+    nameText.text = userProvider.user!.person.display;
 
     double width = MediaQuery.of(context).size.width;
     return MaterialApp(
@@ -197,13 +197,13 @@ class _LaunchMeetingState extends State<LaunchMeeting> {
               onPressed: () {
                 _joinMeeting();
               },
+              style: ButtonStyle(
+                  backgroundColor:
+                  MaterialStateColor.resolveWith((states) => Colors.blue)),
               child: const Text(
                 "Join Meeting",
                 style: TextStyle(color: Colors.white),
               ),
-              style: ButtonStyle(
-                  backgroundColor:
-                  MaterialStateColor.resolveWith((states) => Colors.blue)),
             ),
           ),
           const SizedBox(

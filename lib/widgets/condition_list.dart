@@ -16,20 +16,20 @@ class PatientConditionList extends StatefulWidget {
 class _PatientConditionListState extends State<PatientConditionList> {
   @override
   Widget build(BuildContext context) {
-    Future<List<ConditionModel>> _futureDiagnoses = EmrApiService().searchCondition(OmrsPatient(uuid: widget.patientUuid));
+    Future<List<ConditionModel>> futureDiagnoses = EmrApiService().searchCondition(OmrsPatient(uuid: widget.patientUuid));
     return FutureBuilder<List<ConditionModel>>(
-        future: _futureDiagnoses,
+        future: futureDiagnoses,
         initialData: const [],
         builder: (BuildContext context, AsyncSnapshot<List<ConditionModel>> snapshot) {
           if (snapshot.connectionState != ConnectionState.done) {
-            return const SizedBox(child: Center(child: SizedBox(child: CircularProgressIndicator(), width: 15, height: 15)), height: 40);
+            return const SizedBox(height: 40, child: Center(child: SizedBox(width: 15, height: 15, child: CircularProgressIndicator())));
           }
           if (snapshot.hasError) {
             return const Center(child: Text("Failed to fetch Diagnoses"),);
           }
-          List<ConditionModel> _diagnoses = [];
+          List<ConditionModel> diagnoses = [];
           if (snapshot.hasData) {
-            _diagnoses = snapshot.data ?? [];
+            diagnoses = snapshot.data ?? [];
           }
           return Column(
             children: [
@@ -44,7 +44,7 @@ class _PatientConditionListState extends State<PatientConditionList> {
                   ),
                 ),
               ),
-              ..._encounterDiagnoses(_diagnoses),
+              ..._encounterDiagnoses(diagnoses),
             ],
             // initiallyExpanded: true,
           );

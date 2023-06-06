@@ -13,7 +13,7 @@ class PatientModel {
   }
 
   String get uuid {
-    return _patient.id?.value ?? '';
+    return _patient.fhirId ?? '';
   }
 
   String get fullName {
@@ -25,18 +25,18 @@ class PatientModel {
       }
       String? lastName = _patient.name?.first.family;
       if (lastName != null) {
-        fullName = fullName + ' ' + lastName;
+        fullName = '$fullName $lastName';
       }
     }
     return fullName;
   }
 
   String get genderAndAge {
-    String result = _patient.gender?.name ?? '';
+    String result = _patient.gender?.value ?? '';
     DateTime dob = _patient.birthDate?.valueDateTime ?? DateTime.now();
     PersonAge age = calculateAge(dob);
     String strAge = age.year != 0 ? '${age.year}y ${age.month}m' : '${age.month}m ${age.days}d';
-    return (_genderMap[result] ?? '') + ', $strAge' ;
+    return '${_genderMap[result] ?? ''}, $strAge' ;
   }
 
   String get location {

@@ -33,8 +33,8 @@ class _TaskNotificationWidgetState extends State<TaskNotificationWidget> {
   Widget build(BuildContext context) {
     return StreamBuilder(
       stream: notifications.stream,
-      builder: (BuildContext _context, AsyncSnapshot _snapshot) {
-        if(!_snapshot.hasData){
+      builder: (BuildContext context, AsyncSnapshot snapshot) {
+        if(!snapshot.hasData){
           return const Center(child: CircularProgressIndicator());
         } else {
           return RefreshIndicator(
@@ -43,10 +43,10 @@ class _TaskNotificationWidgetState extends State<TaskNotificationWidget> {
               padding: const EdgeInsets.symmetric(vertical: 8.0),
               controller: scrollController,
               separatorBuilder: (context, index) => const Divider(),
-              itemCount: _snapshot.data.length + 1,
-              itemBuilder: (BuildContext _context, int index) {
-                if(index < _snapshot.data.length){
-                  return Task(taskNotification: _snapshot.data[index]);
+              itemCount: snapshot.data.length + 1,
+              itemBuilder: (BuildContext context, int index) {
+                if(index < snapshot.data.length){
+                  return Task(taskNotification: snapshot.data[index]);
                 } else if(notifications.hasMore){
                   return const Padding(
                     padding: EdgeInsets.symmetric(vertical: 32.0),

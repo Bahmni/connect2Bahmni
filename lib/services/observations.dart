@@ -7,7 +7,7 @@ import 'fhir_service.dart';
 
 class Observations {
   Future<Bundle> forConcept(String patientUuid, String conceptUuid) async {
-    String url = AppUrls.fhir.observation + '?subject=$patientUuid&code=$conceptUuid';
+    String url = '${AppUrls.fhir.observation}?subject=$patientUuid&code=$conceptUuid';
     return FhirInterface().fetch(url);
   }
 

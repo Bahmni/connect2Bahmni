@@ -13,7 +13,7 @@ class ConceptDictionary {
     if (sessionId == null) {
       throw 'Authentication Failure';
     }
-    String url = AppUrls.emrApi.concept + '?limit=20&term=$term';
+    String url = '${AppUrls.emrApi.concept}?limit=20&term=$term';
     var response = await http.get(
       Uri.parse(url),
       headers: <String, String>{
@@ -37,7 +37,7 @@ class ConceptDictionary {
     if (sessionId == null) {
       throw 'Authentication Failure';
     }
-    String url = AppUrls.omrs.concept + '?q=$term&v=full';
+    String url = '${AppUrls.omrs.concept}?q=$term&v=full';
     var response = await http.get(
       Uri.parse(url),
       headers: <String, String>{
@@ -99,7 +99,7 @@ class ConceptDictionary {
         throw 'Authentication Failure';
       }
       return http.get(
-        Uri.parse(AppUrls.omrs.concept + '/$uuid'),
+        Uri.parse('${AppUrls.omrs.concept}/$uuid'),
         headers: <String, String>{
           'Content-Type': 'application/json',
           'Accept': 'application/json',

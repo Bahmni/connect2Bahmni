@@ -10,7 +10,7 @@ import '../utils/app_failures.dart';
 
 class Providers {
   Future<Practitioner?> practitionerByUserId(String uuid, Future<String?> Function() fetchSessionId) async {
-    String url = AppUrls.omrs.provider + '?user=$uuid&v=custom:(uuid,identifier,attributes)';
+    String url = '${AppUrls.omrs.provider}?user=$uuid&v=custom:(uuid,identifier,attributes)';
     String? sessionId = await fetchSessionId();
     if (sessionId == null) {
       throw Failure('Session expired.', 401);
@@ -37,7 +37,7 @@ class Providers {
   }
 
   Future<OmrsProvider?> omrsProviderForUser(String uuid, Future<String?> Function() fetchSessionId) async {
-    String url = AppUrls.omrs.provider + '?user=$uuid&v=custom:(uuid,identifier,attributes)';
+    String url = '${AppUrls.omrs.provider}?user=$uuid&v=custom:(uuid,identifier,attributes)';
     String? sessionId = await fetchSessionId();
     if (sessionId == null) {
       throw Failure('Session expired.', 401);
@@ -64,7 +64,7 @@ class Providers {
   }
 
   Practitioner fromOmrsProvider(providerJson) {
-    return Practitioner(id: Id(providerJson['uuid']),
+    return Practitioner(fhirId: providerJson['uuid'],
         identifier: [Identifier(system: FhirUri(AppUrls.omrs.provider), value: providerJson['identifier'])],
     );
   }
