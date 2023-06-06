@@ -45,7 +45,11 @@ class PatientModel {
   }
 
   String get minimalInfo {
-    return '$genderAndAge,  $location';
+    return '$identifier, $genderAndAge,  $location';
+  }
+
+  String? get identifier {
+    return _patient.identifier?.first.value;
   }
 
   Patient toFhirPatient() {

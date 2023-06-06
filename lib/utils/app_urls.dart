@@ -30,6 +30,7 @@ class FHIRUrls {
   String get patient => '$base/Patient';
   String get encounter => '$base/Encounter';
   String get location => '$base/Location';
+  String get observation => '$base/Observation';
 }
 
 class BahmniRestUrls {

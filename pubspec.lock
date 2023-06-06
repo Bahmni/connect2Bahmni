@@ -375,15 +375,14 @@ packages:
       sha256: "2ec25704aba361659e10e3e5f5d672068d332fc8ac516421d483a11e5cbd061e"
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.4"
-  jitsi_meet:
+    version: "1.0.3"
+  jitsi_meet_fix:
     dependency: "direct main"
     description:
-      name: jitsi_meet
-      sha256: bd5f68181ba27543b30a1056ec798c8e949ba0e18f2c0a6aa87e83c72c4b59bf
-      url: "https://pub.dev"
+      name: jitsi_meet_fix
+      url: "https://pub.dartlang.org"
     source: hosted
-    version: "4.0.0"
+    version: "4.0.5"
   jitsi_meet_platform_interface:
     dependency: transitive
     description:
@@ -392,14 +391,13 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.0"
-  jitsi_meet_web_plugin:
+  jitsi_meet_web_plugin_fix:
     dependency: transitive
     description:
-      name: jitsi_meet_web_plugin
-      sha256: "68bb307bcb09790b25c841bdd84f0894c97cf09d2b8c641872f5e53021caba67"
-      url: "https://pub.dev"
+      name: jitsi_meet_web_plugin_fix
+      url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.0.0"
+    version: "2.0.2"
   js:
     dependency: transitive
     description:
