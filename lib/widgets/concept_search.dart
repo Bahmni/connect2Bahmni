@@ -138,7 +138,7 @@ class _ConceptSearchWidgetState extends State<ConceptSearch> {
                     labelStyle: Theme
                         .of(context)
                         .textTheme
-                        .bodyText1
+                        .bodyLarge
                         ?.merge(const TextStyle(
                       fontFamily: 'Lexend Deca',
                       color: Color(0xFF82878C),
@@ -146,7 +146,7 @@ class _ConceptSearchWidgetState extends State<ConceptSearch> {
                       fontWeight: FontWeight.normal,
                     )),
                     hintText: 'Find concepts',
-                    hintStyle: Theme.of(context).textTheme.bodyText1?.merge(const TextStyle(
+                    hintStyle: Theme.of(context).textTheme.bodyLarge?.merge(const TextStyle(
                       fontFamily: 'Lexend Deca',
                       color: Color(0xFF95A1AC),
                       fontSize: 14,
@@ -176,7 +176,7 @@ class _ConceptSearchWidgetState extends State<ConceptSearch> {
                   style: Theme
                       .of(context)
                       .textTheme
-                      .bodyText1
+                      .bodyLarge
                       ?.merge(const TextStyle(
                     fontFamily: 'Lexend Deca',
                     color: Color(0xFF151B1E),
@@ -236,7 +236,7 @@ class _ConceptSearchWidgetState extends State<ConceptSearch> {
                       children: [
                         Text(
                           concept.display ?? 'unknown',
-                          style: Theme.of(context).textTheme.subtitle1?.merge(const TextStyle(
+                          style: Theme.of(context).textTheme.titleMedium?.merge(const TextStyle(
                             fontFamily: 'Lexend Deca',
                             color: Color(0xFF15212B),
                             fontSize: 18,

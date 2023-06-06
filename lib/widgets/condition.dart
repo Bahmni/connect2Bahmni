@@ -106,7 +106,7 @@ class _ConditionWidgetState extends State<ConditionWidget> {
             ),
             contentPadding: const EdgeInsetsDirectional.fromSTEB(20, 40, 24, 0),
           ),
-          style: Theme.of(context).textTheme.bodyText1!.merge(
+          style: Theme.of(context).textTheme.bodyLarge!.merge(
             const TextStyle(
               fontFamily: 'Lexend Deca',
               color: Color(0xFF1E2429),
@@ -121,7 +121,7 @@ class _ConditionWidgetState extends State<ConditionWidget> {
   }
 
   TextStyle _labelStyle(BuildContext context) {
-    return Theme.of(context).textTheme.bodyText1!.merge(
+    return Theme.of(context).textTheme.bodyLarge!.merge(
           const TextStyle(
             fontFamily: 'Lexend Deca',
             color: Color(0xFF090F13),
@@ -232,11 +232,11 @@ class _ConditionWidgetState extends State<ConditionWidget> {
 
     return ExpansionTile(
       tilePadding: const EdgeInsets.all(0),
-      title: Text(display, style: Theme.of(context).textTheme.headline6),
-      subtitle: (coding != null) ?  Text(coding, style: Theme.of(context).textTheme.subtitle1) : null,
+      title: Text(display, style: Theme.of(context).textTheme.titleLarge),
+      subtitle: (coding != null) ?  Text(coding, style: Theme.of(context).textTheme.titleMedium) : null,
       //controlAffinity: ListTileControlAffinity.leading,
       children: <Widget>[
-        ListTile(title: Text(description, style: Theme.of(context).textTheme.caption)),
+        ListTile(title: Text(description, style: Theme.of(context).textTheme.bodySmall)),
       ],
     );
   }

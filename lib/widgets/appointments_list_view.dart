@@ -92,7 +92,7 @@ class _AppointmentsListViewState extends State<AppointmentsListView> {
                   children: [
                     Text(
                       appointment.patient.name,
-                      style: Theme.of(context).textTheme.subtitle1?.merge(const TextStyle(
+                      style: Theme.of(context).textTheme.titleMedium?.merge(const TextStyle(
                         fontFamily: 'Lexend Deca',
                         color: Color(0xFF1E2429),
                         fontSize: 18,
@@ -102,7 +102,7 @@ class _AppointmentsListViewState extends State<AppointmentsListView> {
                     Padding(
                       padding: const EdgeInsetsDirectional.fromSTEB(0, 4, 0, 0),
                       child: Text(formattedTime(appointment.startDateTime!),
-                        style: Theme.of(context).textTheme.bodyText1?.merge(const TextStyle(
+                        style: Theme.of(context).textTheme.bodyLarge?.merge(const TextStyle(
                           fontFamily: 'Lexend Deca',
                           color: Color(0xFF090F13),
                           fontSize: 14,
@@ -124,7 +124,7 @@ class _AppointmentsListViewState extends State<AppointmentsListView> {
                   Text(
                     'M 22',
                     textAlign: TextAlign.end,
-                    style: Theme.of(context).textTheme.subtitle2?.merge(const TextStyle(
+                    style: Theme.of(context).textTheme.titleSmall?.merge(const TextStyle(
                       fontFamily: 'Lexend Deca',
                       color: Color(0xFF39D2C0),
                       fontSize: 16,
@@ -136,7 +136,7 @@ class _AppointmentsListViewState extends State<AppointmentsListView> {
                     child: Text(
                       'Appointment',
                       textAlign: TextAlign.end,
-                      style: Theme.of(context).textTheme.bodyText1?.merge(const TextStyle(
+                      style: Theme.of(context).textTheme.bodyLarge?.merge(const TextStyle(
                         fontFamily: 'Lexend Deca',
                         color: Color(0xFF090F13),
                         fontSize: 12,

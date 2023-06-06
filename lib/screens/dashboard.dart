@@ -102,14 +102,14 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                   children: [
                     Text(
                       'Welcome,',
-                      style: Theme.of(context).textTheme.subtitle1,
+                      style: Theme.of(context).textTheme.titleMedium,
                     ),
                     Padding(
                       padding:
                       const EdgeInsetsDirectional.fromSTEB(4, 0, 0, 0),
                       child: Text(
                         (user as User).username,
-                        style: Theme.of(context).textTheme.subtitle2?.merge(const TextStyle(
+                        style: Theme.of(context).textTheme.titleSmall?.merge(const TextStyle(
                             fontFamily: 'Lexend Deca',
                             color: Color(0xFF00968A),
                             fontSize: 20,
@@ -123,7 +123,7 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                   padding: const EdgeInsetsDirectional.fromSTEB(0, 4, 0, 0),
                   child: Text(
                     'Your latest updates are below.',
-                    style: Theme.of(context).textTheme.bodyText1?.merge(const TextStyle(
+                    style: Theme.of(context).textTheme.bodyLarge?.merge(const TextStyle(
                       fontFamily: 'Lexend Deca',
                       color: Color(0xFF090F13),
                       fontSize: 14,
@@ -170,7 +170,7 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                 children: [
                   Text(
                     'Quick Service',
-                    style: Theme.of(context).textTheme.bodyText1?.merge(const TextStyle(
+                    style: Theme.of(context).textTheme.bodyLarge?.merge(const TextStyle(
                       fontFamily: 'Lexend Deca',
                       color: Color(0xFF090F13),
                       fontSize: 14,
@@ -199,7 +199,7 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                 children: [
                   Text(
                     'Quick View',
-                    style: Theme.of(context).textTheme.bodyText1?.merge(const TextStyle(
+                    style: Theme.of(context).textTheme.bodyLarge?.merge(const TextStyle(
                       fontFamily: 'Lexend Deca',
                       color: Color(0xFF090F13),
                       fontSize: 14,
@@ -248,7 +248,7 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                 padding: const EdgeInsetsDirectional.fromSTEB(0, 8, 0, 0),
                 child: Text(
                   'Patients',
-                  style: Theme.of(context).textTheme.bodyText2?.merge(const TextStyle(
+                  style: Theme.of(context).textTheme.bodyMedium?.merge(const TextStyle(
                     fontFamily: 'Lexend Deca',
                     color: Color(0xFF090F13),
                     fontSize: 14,
@@ -296,7 +296,7 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                     0, 8, 0, 0),
                 child: Text(
                   'Appointments',
-                  style: Theme.of(context).textTheme.bodyText1?.merge(const TextStyle(
+                  style: Theme.of(context).textTheme.bodyLarge?.merge(const TextStyle(
                     fontFamily: 'Lexend Deca',
                     color: Color(0xFF090F13),
                     fontSize: 14,
@@ -344,7 +344,7 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                     0, 8, 0, 0),
                 child: Text(
                   'Notifications',
-                  style: Theme.of(context).textTheme.bodyText1?.merge(const TextStyle(
+                  style: Theme.of(context).textTheme.bodyLarge?.merge(const TextStyle(
                     fontFamily: 'Lexend Deca',
                     color: Color(0xFF090F13),
                     fontSize: 14,
@@ -412,7 +412,7 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                       children: [
                         Text(
                           'Hina Patel (Example)',
-                          style: Theme.of(context).textTheme.subtitle1?.merge(const TextStyle(
+                          style: Theme.of(context).textTheme.titleMedium?.merge(const TextStyle(
                             fontFamily: 'Lexend Deca',
                             color: Color(0xFF1E2429),
                             fontSize: 18,
@@ -423,7 +423,7 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                           padding: const EdgeInsetsDirectional.fromSTEB(0, 4, 0, 0),
                           child: Text(
                             'New Health Record',
-                            style: Theme.of(context).textTheme.bodyText1?.merge(const TextStyle(
+                            style: Theme.of(context).textTheme.bodyLarge?.merge(const TextStyle(
                               fontFamily: 'Lexend Deca',
                               color: Color(0xFF090F13),
                               fontSize: 14,
@@ -446,7 +446,7 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                       Text(
                         'F 26',
                         textAlign: TextAlign.end,
-                        style: Theme.of(context).textTheme.subtitle2?.merge(const TextStyle(
+                        style: Theme.of(context).textTheme.titleSmall?.merge(const TextStyle(
                           fontFamily: 'Lexend Deca',
                           color: Color(0xFF39D2C0),
                           fontSize: 16,
@@ -458,7 +458,7 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                         child: Text(
                           'Diagnostic Report',
                           textAlign: TextAlign.end,
-                          style: Theme.of(context).textTheme.bodyText1?.merge(const TextStyle(
+                          style: Theme.of(context).textTheme.bodyLarge?.merge(const TextStyle(
                               fontFamily: 'Lexend Deca',
                               color: Color(0xFF090F13),
                               fontSize: 12,
@@ -525,7 +525,7 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                   children: [
                     Text(
                       'Rutgar Ragos (Example)',
-                      style: Theme.of(context).textTheme.subtitle1?.merge(const TextStyle(
+                      style: Theme.of(context).textTheme.titleMedium?.merge(const TextStyle(
                         fontFamily: 'Lexend Deca',
                         color: Color(0xFF1E2429),
                         fontSize: 18,
@@ -536,7 +536,7 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                       padding: const EdgeInsetsDirectional.fromSTEB(0, 4, 0, 0),
                       child: Text(
                         'Recently visited',
-                        style: Theme.of(context).textTheme.bodyText1?.merge(const TextStyle(
+                        style: Theme.of(context).textTheme.bodyLarge?.merge(const TextStyle(
                           fontFamily: 'Lexend Deca',
                           color: Color(0xFF090F13),
                           fontSize: 14,
@@ -559,7 +559,7 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                   Text(
                     'M 87',
                     textAlign: TextAlign.end,
-                    style: Theme.of(context).textTheme.subtitle2?.merge(const TextStyle(
+                    style: Theme.of(context).textTheme.titleSmall?.merge(const TextStyle(
                       fontFamily: 'Lexend Deca',
                       color: Color(0xFF39D2C0),
                       fontSize: 16,
@@ -571,7 +571,7 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                     child: Text(
                       'Favorite',
                       textAlign: TextAlign.end,
-                      style: Theme.of(context).textTheme.bodyText1?.merge(const TextStyle(
+                      style: Theme.of(context).textTheme.bodyLarge?.merge(const TextStyle(
                         fontFamily: 'Lexend Deca',
                         color: Color(0xFF090F13),
                         fontSize: 12,
@@ -623,7 +623,7 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                 children: [
                   Text(
                     person.display,
-                    style: Theme.of(context).textTheme.subtitle1?.merge(const TextStyle(
+                    style: Theme.of(context).textTheme.titleMedium?.merge(const TextStyle(
                       fontFamily: 'Lexend Deca',
                       color: Color(0xFF1E2429),
                       fontSize: 18,
@@ -634,7 +634,7 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                     padding: const EdgeInsetsDirectional.fromSTEB(0, 4, 0, 0),
                     child: Text(
                       'Recently visited',
-                      style: Theme.of(context).textTheme.bodyText1?.merge(const TextStyle(
+                      style: Theme.of(context).textTheme.bodyLarge?.merge(const TextStyle(
                         fontFamily: 'Lexend Deca',
                         color: Color(0xFF090F13),
                         fontSize: 14,
