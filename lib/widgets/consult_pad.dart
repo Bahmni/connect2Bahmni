@@ -254,7 +254,7 @@ class _ConsultPadWidgetState extends State<ConsultPadWidget> {
             MaterialPageRoute(
               builder: (context) => ConditionWidget(condition: aCondition),
             ));
-        if (edited != null) {
+        if (edited != null && context.mounted) {
           var board = Provider.of<ConsultationBoard>(context, listen: false);
           board.addCondition(edited as ConditionModel);
         }
