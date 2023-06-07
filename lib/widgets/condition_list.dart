@@ -10,7 +10,7 @@ class PatientConditionList extends StatefulWidget {
   const PatientConditionList({Key? key, required this.patientUuid}) : super(key: key);
 
   @override
-  _PatientConditionListState createState() => _PatientConditionListState();
+  State<PatientConditionList> createState() => _PatientConditionListState();
 }
 
 class _PatientConditionListState extends State<PatientConditionList> {

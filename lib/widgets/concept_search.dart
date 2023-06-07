@@ -12,7 +12,7 @@ class ConceptSearch extends StatefulWidget {
   const ConceptSearch({Key? key, this.searchType, this.onSelect}) : super(key: key);
 
   @override
-  _ConceptSearchWidgetState createState() => _ConceptSearchWidgetState();
+  State<ConceptSearch> createState() => _ConceptSearchWidgetState();
 }
 
 class _ConceptSearchWidgetState extends State<ConceptSearch> {

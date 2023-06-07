@@ -13,7 +13,7 @@ class AppointmentsCalendar extends StatefulWidget {
   const AppointmentsCalendar({Key? key}) : super(key: key);
 
   @override
-  _AppointmentsCalendarState createState() => _AppointmentsCalendarState();
+  State<AppointmentsCalendar> createState() => _AppointmentsCalendarState();
 }
 
 class _AppointmentsCalendarState extends State<AppointmentsCalendar> {

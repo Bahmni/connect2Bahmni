@@ -5,7 +5,7 @@ import '../screens/dashboard.dart';
 class UserDashBoard extends StatefulWidget {
   const UserDashBoard({Key? key}) : super(key: key);
   @override
-  _UserDashBoardState createState() => _UserDashBoardState();
+  State<UserDashBoard> createState() => _UserDashBoardState();
 }
 
 class _UserDashBoardState extends State<UserDashBoard> {

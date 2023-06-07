@@ -5,7 +5,7 @@ class TaskNotificationWidget extends StatefulWidget {
   const TaskNotificationWidget({Key? key}) : super(key: key);
 
   @override
-  _TaskNotificationWidgetState createState() => _TaskNotificationWidgetState();
+  State<TaskNotificationWidget> createState() => _TaskNotificationWidgetState();
 }
 
 class _TaskNotificationWidgetState extends State<TaskNotificationWidget> {

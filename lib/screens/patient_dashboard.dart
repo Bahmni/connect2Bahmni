@@ -26,7 +26,7 @@ class PatientDashboard extends StatefulWidget {
   const PatientDashboard({Key? key}) : super(key: key);
 
   @override
-  _PatientDashboardWidgetState createState() => _PatientDashboardWidgetState();
+  State<PatientDashboard> createState() => _PatientDashboardWidgetState();
 }
 
 class _PatientDashboardWidgetState extends State<PatientDashboard> {
