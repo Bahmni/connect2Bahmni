@@ -658,8 +658,11 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                   icon: const Icon(Icons.arrow_right_outlined),
                   highlightColor: Colors.pink,
                   onPressed: () async {
-                    var patientModel = await _patientDetails(person.uuid);
-                    Navigator.pushNamed(context, AppRoutes.patients, arguments: patientModel);
+                    final navigator = Navigator.of(context);
+                    PatientModel? patientModel = await _patientDetails(person.uuid);
+                    if (patientModel != null) {
+                      navigator.pushNamed(AppRoutes.patients, arguments: patientModel);
+                    }
                   },
                 ),
               ],
