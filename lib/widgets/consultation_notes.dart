@@ -5,7 +5,7 @@ class ConsultationNotesWidget extends StatefulWidget {
   const ConsultationNotesWidget({Key? key, this.notes}) : super(key: key);
 
   @override
-  _ConsultationNotesWidgetState createState() => _ConsultationNotesWidgetState();
+  State<ConsultationNotesWidget> createState() => _ConsultationNotesWidgetState();
 }
 
 class _ConsultationNotesWidgetState extends State<ConsultationNotesWidget> {

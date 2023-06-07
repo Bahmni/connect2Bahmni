@@ -26,7 +26,7 @@ void main() async {
     }));
 
     expect(providerList.isNotEmpty, true);
-    expect(providerList.single.id, Id('c1c26908-3f10-11e4-adec-0800271c1b75'));
+    expect(providerList.single.fhirId, 'c1c26908-3f10-11e4-adec-0800271c1b75');
     expect(providerList.single.identifier!.first.value, 'superman');
   });
 

@@ -9,7 +9,7 @@ class PatientVisitList extends StatefulWidget {
   const PatientVisitList({Key? key, required this.patientUuid}) : super(key: key);
 
   @override
-  _PatientVisitListState createState() => _PatientVisitListState();
+  State<PatientVisitList> createState() => _PatientVisitListState();
 }
 
 class _PatientVisitListState extends State<PatientVisitList> {

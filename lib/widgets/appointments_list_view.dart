@@ -8,7 +8,7 @@ class AppointmentsListView extends StatefulWidget {
   const AppointmentsListView({Key? key, this.practitionerUuid}) : super(key: key);
 
   @override
-  _AppointmentsListViewState createState() => _AppointmentsListViewState();
+  State<AppointmentsListView> createState() => _AppointmentsListViewState();
 }
 
 class _AppointmentsListViewState extends State<AppointmentsListView> {

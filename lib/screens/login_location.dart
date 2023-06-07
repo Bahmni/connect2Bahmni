@@ -11,7 +11,7 @@ class LoginLocation extends StatefulWidget {
   const LoginLocation({Key? key}) : super(key: key);
 
   @override
-  _LoginLocationState createState() => _LoginLocationState();
+  State<LoginLocation> createState() => _LoginLocationState();
 }
 
 class _LoginLocationState extends State<LoginLocation> {

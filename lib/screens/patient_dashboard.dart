@@ -26,7 +26,7 @@ class PatientDashboard extends StatefulWidget {
   const PatientDashboard({Key? key}) : super(key: key);
 
   @override
-  _PatientDashboardWidgetState createState() => _PatientDashboardWidgetState();
+  State<PatientDashboard> createState() => _PatientDashboardWidgetState();
 }
 
 class _PatientDashboardWidgetState extends State<PatientDashboard> {
@@ -281,21 +281,23 @@ class ConsultationActions extends StatelessWidget {
     );
   }
 
-  void _addConditionToConsultation(BuildContext context) async {
+  Future<void> _addConditionToConsultation(BuildContext context) async {
     var board = _activeBoardToUpdate(context);
     if (board == null) return;
 
-    final concept = await Navigator.push(context,
+    OmrsConcept? concept = await Navigator.push(context,
       MaterialPageRoute(builder: (context) => const ConceptSearch(searchType: 'Condition')),
     );
 
     if (concept != null) {
-      var newCondition = ConditionModel(code: concept as OmrsConcept);
-      final condition = await Navigator.push(context,
-        MaterialPageRoute(builder: (context) => ConditionWidget(condition: newCondition)),
-      );
-      if (condition != null) {
-        board.addCondition(condition as ConditionModel);
+      if (context.mounted) {
+        var newCondition = ConditionModel(code: concept);
+        ConditionModel? condition = await Navigator.push(context,
+          MaterialPageRoute(builder: (context) => ConditionWidget(condition: newCondition)),
+        );
+        if (condition != null) {
+          board.addCondition(condition);
+        }
       }
     }
   }
@@ -308,7 +310,7 @@ class ConsultationActions extends StatelessWidget {
         builder: (BuildContext context) => ConsultationNotesWidget(
             notes: board.currentConsultation?.consultationNotes)
     );
-    if (notes != null) {
+    if (notes != null && ctx.mounted) {
       var consultNoteConcept = Provider.of<MetaProvider>(ctx, listen: false).consultNoteConcept;
       board.addConsultationNotes(notes, consultNoteConcept);
     }

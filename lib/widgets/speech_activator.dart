@@ -6,7 +6,7 @@ class SpeechEg extends StatefulWidget {
   const SpeechEg({Key? key}) : super(key: key);
 
   @override
-  _SpeechEgState createState() => _SpeechEgState();
+  State<SpeechEg> createState() => _SpeechEgState();
 }
 
 class _SpeechEgState extends State<SpeechEg> {

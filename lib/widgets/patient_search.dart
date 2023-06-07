@@ -14,7 +14,7 @@ class PatientSearch extends StatefulWidget {
   const PatientSearch({Key? key, this.onSelect}) : super(key: key);
 
   @override
-  _PatientsSearchWidgetState createState() => _PatientsSearchWidgetState();
+  State<PatientSearch> createState() => _PatientsSearchWidgetState();
 }
 
 class _PatientsSearchWidgetState extends State<PatientSearch> {

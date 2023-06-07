@@ -11,7 +11,7 @@ class ConditionWidget extends StatefulWidget {
   const ConditionWidget({Key? key, this.condition}) : super(key: key);
 
   @override
-  _ConditionWidgetState createState() => _ConditionWidgetState();
+  State<ConditionWidget> createState() => _ConditionWidgetState();
 }
 
 class _ConditionWidgetState extends State<ConditionWidget> {

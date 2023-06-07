@@ -15,7 +15,7 @@ class LaunchMeeting extends StatefulWidget {
   const LaunchMeeting({Key? key, this.event}) : super(key: key);
 
   @override
-  _LaunchMeetingState createState() => _LaunchMeetingState();
+  State<LaunchMeeting> createState() => _LaunchMeetingState();
 }
 
 const String defaultTitleText = "Consultation";

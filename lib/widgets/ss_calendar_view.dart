@@ -107,8 +107,10 @@ class _AppointmentsDayViewState extends State<AppointmentsDayView> {
           var event = events.single.event;
           _showEventInfoDialog(context, event!).then((value) async {
             if (value == 'Charts') {
+              final navigator = Navigator.of(context);
               var patientModel = await _patientUuidFromEvent(event);
-              Navigator.pushNamed(context, AppRoutes.patients, arguments: patientModel);
+              navigator.pushNamed(AppRoutes.patients, arguments: patientModel);
+              //Navigator.pushNamed(context, AppRoutes.patients, arguments: patientModel);
             }
             if (value == 'Join') {
               joinJitsiMeeting(event, _user!);
