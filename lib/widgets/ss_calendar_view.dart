@@ -13,6 +13,7 @@ import '../screens/models/patient_view.dart';
 import '../services/patients.dart';
 import '../utils/app_routes.dart';
 import '../utils/date_time.dart';
+import 'jitsi_wrapper_meeting.dart';
 
 CalendarControllerProvider calendarProvider(BuildContext context, AsyncSnapshot<List<BahmniAppointment>> snapshot) {
   return CalendarControllerProvider<BahmniAppointment>(
@@ -113,7 +114,8 @@ class _AppointmentsDayViewState extends State<AppointmentsDayView> {
               //Navigator.pushNamed(context, AppRoutes.patients, arguments: patientModel);
             }
             if (value == 'Join') {
-              joinJitsiMeeting(event, _user!);
+              //joinJitsiMeeting(event, _user!);
+              joinJitsiWrapperMeeting(event, _user!);
               // Navigator.push(
               //   context,
               //   MaterialPageRoute(builder: (context) => LaunchMeeting(event: _event)),

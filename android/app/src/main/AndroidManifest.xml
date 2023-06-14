@@ -6,6 +6,17 @@
         android:label="connect2bahmni"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
+        <meta-data
+           android:name="com.google.firebase.messaging.default_notification_icon"
+           android:resource="@drawable/ic_notification" />
+       <service
+           android:name="org.jitsi.meet.sdk.ConnectionService"
+           android:exported="true"
+           android:permission="android.permission.BIND_TELECOM_CONNECTION_SERVICE">
+           <intent-filter>
+               <action android:name="android.telecom.ConnectionService" />
+           </intent-filter>
+       </service>
         <activity
             android:name="org.bahmni.connect2bahmni.MainActivity"
             android:exported="true"

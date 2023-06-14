@@ -44,7 +44,7 @@ dependencies:
   google_fonts: ^5.0.0
   http: ^1.0.0
   intl: ^0.18.1
-  jitsi_meet_fix: ^4.0.5
+  jitsi_meet_wrapper: ^0.0.6
   json_annotation: ^4.4.0
   provider: ^6.0.5
   shared_preferences: ^2.1.1
