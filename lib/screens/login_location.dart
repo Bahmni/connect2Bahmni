@@ -115,7 +115,6 @@ class _LoginLocationState extends State<LoginLocation> {
   }
   Future<List<DropdownMenuItem<String>>> _fetchAllLoginLocations() {
     var completer = Completer<List<DropdownMenuItem<String>>>();
-    debugPrint('Fetching all locations ... ');
     Locations().allOmrsLoginLocations().then((values) {
       var list = List<DropdownMenuItem<String>>.of(values.map((loc) => DropdownMenuItem(value: loc.uuid, child: Text(loc.name!))));
       completer.complete(list);

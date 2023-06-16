@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import '../domain/models/omrs_encounter_type.dart';
 import '../domain/models/omrs_visit_type.dart';
 import '../providers/meta_provider.dart';
-import '../screens/models/patient_view.dart';
+import '../screens/models/patient_model.dart';
 import '../widgets/patient_info.dart';
 
 class ConsultationContext extends StatefulWidget {

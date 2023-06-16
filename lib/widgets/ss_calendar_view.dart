@@ -8,8 +8,7 @@ import '../services/bahmni_appointments.dart';
 import '../utils/debouncer.dart';
 import '../providers/user_provider.dart';
 import '../domain/models/user.dart';
-import '../widgets/jitsi_meeting.dart';
-import '../screens/models/patient_view.dart';
+import '../screens/models/patient_model.dart';
 import '../services/patients.dart';
 import '../utils/app_routes.dart';
 import '../utils/date_time.dart';
@@ -32,7 +31,6 @@ List<CalendarEventData<BahmniAppointment>> _eventList(List<BahmniAppointment>? a
     return [];
   }
   return appointmentList.map((event) {
-    debugPrint('appointment found. name = ${event.patient.name}, start = ${event.startDateTime}, end = ${event.endDateTime}');
     return CalendarEventData(
       date: event.startDateTime!,
       event: event,
@@ -103,7 +101,6 @@ class _AppointmentsDayViewState extends State<AppointmentsDayView> {
       heightPerMinute: 1.7,
       eventTileBuilder: _defaultEventTileBuilder,
       onEventTap: (events, date) {
-        debugPrint('Event tapped : $events');
         if (events.isNotEmpty) {
           var event = events.single.event;
           _showEventInfoDialog(context, event!).then((value) async {

@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:connect2bahmni/screens/registration/patient_registration.dart';
+import 'package:connect2bahmni/screens/registration_page.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
@@ -69,6 +71,8 @@ class MyApp extends StatelessWidget {
             AppRoutes.searchPatients: (context) => const PatientSearch(),
             AppRoutes.patients: (context) => const PatientDashboard(),
             AppRoutes.loginLocations: (context) => const LoginLocation(),
+            AppRoutes.registerPatient: (context) => const PatientRegistration(),
+            'registerNewPatient': (context) => const RegistrationPage(),
           }),
     );
   }

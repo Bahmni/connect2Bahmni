@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'visit_list.dart';
-import '../screens/models/patient_view.dart';
+import '../screens/models/patient_model.dart';
 import 'condition_list.dart';
 import 'patient_info.dart';
 

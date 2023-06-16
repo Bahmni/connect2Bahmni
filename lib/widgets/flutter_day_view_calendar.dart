@@ -59,7 +59,6 @@ bool ellipsize(List<TextSpan> input, [String ellipse = '…']) {
 }
 
 Widget customEventTextBuilder(FlutterWeekViewEvent event, BuildContext context, DayView dayView, double height, double width) {
-  debugPrint('Building event title: ${event.title}');
   List<TextSpan> text = [
     TextSpan(
       text: event.title,
@@ -105,7 +104,7 @@ FlutterWeekViewEvent flutterWeekViewEvent(BahmniAppointment event) {
       textStyle: const TextStyle(color: Colors.white, height: 0.5),
       eventTextBuilder:(event, context, dayView, height, width) => customEventTextBuilder(event, context, dayView, height, width) ,
       onTap: () {
-        debugPrint('event. name = ${event.patient.name}, start = ${event.startDateTime}, end = ${event.endDateTime}');
+        //debugPrint('event. name = ${event.patient.name}, start = ${event.startDateTime}, end = ${event.endDateTime}');
       }
   );
 }
@@ -127,12 +126,10 @@ String _formatDate (int year, int month, int day) {
 }
 
 List<FlutterWeekViewEvent> _eventList(List<BahmniAppointment>? appointmentList) {
-  debugPrint('eventList called .... ');
   if (appointmentList == null) {
     return [];
   }
   return appointmentList.map((event) {
-    debugPrint('appointment found. name = ${event.patient.name}, start = ${event.startDateTime}, end = ${event.endDateTime}');
     return flutterWeekViewEvent(event);
   }).toList();
 }

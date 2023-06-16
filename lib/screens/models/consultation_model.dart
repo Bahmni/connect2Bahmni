@@ -2,7 +2,7 @@ import 'package:uuid/uuid.dart';
 
 import '../../domain/models/omrs_location.dart';
 import '../../domain/condition_model.dart';
-import '../../screens/models/patient_view.dart';
+import '../../screens/models/patient_model.dart';
 
 import '../../domain/models/user.dart';
 import '../../domain/models/omrs_encounter_type.dart';

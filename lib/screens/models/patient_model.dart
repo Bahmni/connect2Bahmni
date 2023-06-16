@@ -1,3 +1,4 @@
+import 'package:connect2bahmni/utils/model_extn.dart';
 import 'package:fhir/r4.dart';
 import '../../utils/date_time.dart';
 import 'person_age.dart';
@@ -54,6 +55,11 @@ class PatientModel {
 
   Patient toFhirPatient() {
     return _patient;
+  }
+
+  String? getVisitDrugIds() {
+    var visitDrugOrderIds = _patient.extension_?.where((element) => element.url.toString() == ModelExtensions.patientVisitDrugOrderIds).first;
+    return visitDrugOrderIds != null ? (visitDrugOrderIds.valueString ?? '') : '';
   }
 
 }

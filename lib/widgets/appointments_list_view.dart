@@ -21,7 +21,6 @@ class _AppointmentsListViewState extends State<AppointmentsListView> {
     final DateTime current = DateTime.now();
     final DateTime fromDate = DateTime(current.year, current.month, current.day);
     final DateTime tillDate = fromDate.add(const Duration(days: 1)).subtract(const Duration(seconds: 1));
-    debugPrint('fetching from date: $fromDate till date: $tillDate');
     _futureAppointments = Appointments().forPractitioner(widget.practitionerUuid, fromDate, tillDate);
   }
 

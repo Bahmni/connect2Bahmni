@@ -1,17 +1,17 @@
+import 'package:connect2bahmni/widgets/patient_list.dart';
 import 'package:fhir/r4.dart';
 import 'package:flutter/material.dart';
 
 import '../services/patients.dart';
 import '../utils/debouncer.dart';
-import '../screens/models/patient_view.dart';
+import '../screens/models/patient_model.dart';
 import '../utils/app_routes.dart';
 import '../utils/app_failures.dart';
-import '../widgets/patient_info.dart';
 
 
 class PatientSearch extends StatefulWidget {
-  final OnSelectPatient? onSelect;
-  const PatientSearch({Key? key, this.onSelect}) : super(key: key);
+  final PatientSearchType searchType;
+  const PatientSearch({Key? key, this.searchType = PatientSearchType.all}) : super(key: key);
 
   @override
   State<PatientSearch> createState() => _PatientsSearchWidgetState();
@@ -19,26 +19,64 @@ class PatientSearch extends StatefulWidget {
 
 class _PatientsSearchWidgetState extends State<PatientSearch> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
-  TextEditingController searchController = TextEditingController();
+  final TextEditingController searchController = TextEditingController();
   final Debouncer _debouncer = Debouncer();
-  List<PatientModel> patientList = [];
-
-  @override
-  void dispose() {
-    searchController.dispose();
-    super.dispose();
-  }
+  late List<PatientModel> _initialPatientList;
+  final ValueNotifier<List<PatientModel>> patientListNotifier = ValueNotifier<List<PatientModel>>([]);
 
   @override
   void initState() {
     super.initState();
+    _fetchPatientList();
     searchController.addListener(_searchForPatients);
   }
 
   @override
+  void dispose() {
+    searchController.removeListener(_searchForPatients);
+    searchController.dispose();
+    patientListNotifier.dispose();
+    super.dispose();
+  }
+
+  void _fetchPatientList() {
+    if (widget.searchType == PatientSearchType.all) {
+      _initialPatientList = [];
+      patientListNotifier.value = [];
+      return;
+    }
+
+    var fetchResults = widget.searchType == PatientSearchType.activePatients ? Patients().getActivePatients() : Patients().getDispensingPatients();
+    fetchResults.then((result) {
+      List<PatientModel> patients = result.entry != null ? List<PatientModel>.from(result.entry!.map((e) => PatientModel(e.resource as Patient))) : [];
+      _initialPatientList = patients;
+      patientListNotifier.value = patients;
+    }).onError((error, stackTrace) {
+      String errorMsg = error is Failure ? error.message : '';
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error. $errorMsg')),
+      );
+      _initialPatientList = [];
+      patientListNotifier.value = [];
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    String headingText = widget.searchType.display;
     return Scaffold(
-      appBar: AppBar(title: const Text('Search Patients'),),
+      appBar: AppBar(
+        title: Text(headingText),
+        actions: [IconButton(
+          tooltip: 'New Patient',
+          icon: const Icon(
+            Icons.add,
+          ),
+          onPressed: () async {
+            _primaryAction();
+          },
+        )],
+      ),
       body: Column(
         children: [
           Container(
@@ -64,51 +102,81 @@ class _PatientsSearchWidgetState extends State<PatientSearch> {
             ),
           ),
           Expanded(
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  for (var p in patientList) _patientRow(p)
-                ],
-              ),
+            child: ValueListenableBuilder<List<PatientModel>>(
+              valueListenable: patientListNotifier,
+              builder: (context, patients, child) {
+                return PatientListWidget(
+                  patientList: patients,
+                  onSelect: _onSelectPatient,
+                );
+              },
             ),
           ),
         ],
       ),
+    );
+  }
 
+  void _primaryAction() async {
+    Navigator.of(context).pushReplacementNamed(AppRoutes.registerPatient);
+    //Navigator.of(context).pushReplacementNamed('registerNewPatient');
+  }
+
+  void _onSelectPatient(PatientModel patient) async {
+    _debouncer.stop();
+    await Navigator.pushNamed(
+      context,
+      AppRoutes.patients,
+      arguments: patient,
     );
   }
 
   void _searchForPatients() {
-    if (searchController.text.trim().isEmpty) return;
-    if (searchController.text.trim().length < 3) return;
-    _debouncer.run(() {
-      if (searchController.text.isEmpty) {
-        setState(() {
-          patientList.clear();
-        });
+      var searchInList = widget.searchType != PatientSearchType.all;
+      if (searchController.text.trim().isEmpty) {
+        patientListNotifier.value = searchInList ? _initialPatientList : [];
         return;
       }
-      Patients().searchByName(searchController.text).then((result) {
-        List<PatientModel> patients = result.entry != null
-            ? List<PatientModel>.from(result.entry!.map((e) => PatientModel(e.resource as Patient)))
-            : [];
-        setState(() {
-          patientList.clear();
-          patientList.addAll(patients);
-        });
-      },
-      onError: (err) {
-        debugPrint(err.toString());
-        String errorMsg = err is Failure ? err.message : '';
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Search failed. $errorMsg')),
-        );
+
+      if (searchInList && searchController.text.trim().length < 2) {
+        var matching = _initialPatientList.where((element) => element.fullName.toUpperCase().contains(searchController.text.toUpperCase())).toList();
+        patientListNotifier.value = matching;
+        return;
+      }
+
+      if (searchController.text.trim().length < 3) {
+        return;
+      }
+
+      _debouncer.run(() {
+          if (searchController.text.isEmpty) {
+            _debouncer.stop();
+            return;
+          }
+          if (searchInList) {
+            _debouncer.stop();
+            if (patientListNotifier.hasListeners) {
+              var matching = _initialPatientList.where((element) => element.fullName.toUpperCase().contains(searchController.text.toUpperCase())).toList();
+              patientListNotifier.value = matching;
+            }
+            return;
+          }
+          Patients().searchByName(searchController.text).then((result) {
+            List<PatientModel> patients = result.entry != null
+                ? List<PatientModel>.from(result.entry!.map((e) => PatientModel(e.resource as Patient)))
+                : [];
+            _debouncer.stop();
+            patientListNotifier.value = patients;
+          },
+          onError: (err) {
+            String errorMsg = err is Failure ? err.message : '';
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Search failed. $errorMsg')),
+            );
+          });
       });
-    });
   }
+
 
   Card _searchPatientsView() {
     return Card(
@@ -147,7 +215,7 @@ class _PatientsSearchWidgetState extends State<PatientSearch> {
                       fontSize: 14,
                       fontWeight: FontWeight.normal,
                     )),
-                    hintText: 'Find patients by name or identifier',
+                    hintText: 'Name or Identifier',
                     hintStyle: Theme.of(context).textTheme.bodyLarge?.merge(const TextStyle(
                       fontFamily: 'Lexend Deca',
                       color: Color(0xFF95A1AC),
@@ -194,106 +262,12 @@ class _PatientsSearchWidgetState extends State<PatientSearch> {
       ),
     );
   }
+}
+enum PatientSearchType {
+  all('Patients'), activePatients('Active Patients'), dispensingPatients('Dispense');
 
-  Row _patientRow(PatientModel patient) {
-    return Row(
-      mainAxisSize: MainAxisSize.max,
-      children: [
-        Container(
-          width: MediaQuery.of(context).size.width,
-          height: 80,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            border: Border.all(
-              color: const Color(0xFFC8CED5),
-              width: 1,
-            ),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.max,
-            children: [
-              Padding(
-                padding: const EdgeInsetsDirectional.fromSTEB(8, 0, 8, 0),
-                child: Column(
-                  mainAxisSize: MainAxisSize.max,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      width: 60,
-                      height: 60,
-                      clipBehavior: Clip.antiAlias,
-                      decoration: const BoxDecoration(shape: BoxShape.circle,),
-                      child: const Icon(Icons.person_rounded, size: 24,),
-                    ),
-                  ],
-                ),
-              ),
-              Expanded(
-                child: Column(
-                  mainAxisSize: MainAxisSize.max,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Row(
-                      mainAxisSize: MainAxisSize.max,
-                      children: [
-                        Text(
-                          patient.fullName,
-                          style: Theme.of(context).textTheme.titleMedium?.merge(const TextStyle(
-                            fontFamily: 'Lexend Deca',
-                            color: Color(0xFF15212B),
-                            fontSize: 18,
-                            fontWeight: FontWeight.w500,
-                          )),
-                        ),
-                      ],
-                    ),
-                    Row(
-                      mainAxisSize: MainAxisSize.max,
-                      children: [
-                        Flexible(
-                          child: RichText(
-                            overflow: TextOverflow.ellipsis,
-                            strutStyle: const StrutStyle(fontSize: 12.0),
-                            text: TextSpan(
-                                style: const TextStyle(color: Colors.black),
-                                  text: patient.minimalInfo,),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 8, 0),
-                child: InkWell(
-                  onTap: () async {
-                    _debouncer.stop();
-                    await Navigator.pushNamed(
-                      context,
-                      AppRoutes.patients,
-                      arguments: patient,
-                    );
-                  },
-                  child: const Column(
-                    mainAxisSize: MainAxisSize.max,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.chevron_right_rounded,
-                        color: Color(0xFF82878C),
-                        size: 24,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
+  final String display;
+  const PatientSearchType(this.display);
 }
 
 
