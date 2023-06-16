@@ -1,8 +1,115 @@
 
+import 'package:connect2bahmni/domain/models/omrs_identifier_type.dart';
 import 'package:connect2bahmni/domain/models/omrs_patient.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
+  test('deserialize primary identifier types with sources', () {
+    var identifierType = OmrsIdentifierType.fromJson(
+        {
+          "uuid": "712c108d-00f2-11ee-bbc6-0242c0a86002",
+          "name": "Patient Identifier",
+          "description": "New patient identifier type created for use by the Bahmni Registration System",
+          "format": null,
+          "required": true,
+          "primary": true,
+          "identifierSources": [
+            {
+              "uuid": "c5cf4b68-6529-43fc-a644-c775ae73745e",
+              "name": "ABC",
+              "prefix": "ABC"
+            }
+          ]
+        }
+    );
+    expect(identifierType.name, 'Patient Identifier');
+    expect(identifierType.identifierSources!.length, 1);
+  });
+
+  test('deserialize other identifier without source', () {
+      var identifierType = OmrsIdentifierType.fromJson(
+          {
+            "uuid": "77d2dd54-00f2-11ee-bbc6-0242c0a86002",
+            "name": "ABHA Address",
+            "description": "PHR Address identifier type",
+            "format": null,
+            "required": false,
+            "primary": false,
+            "identifierSources": [
+
+            ]
+          }
+      );
+      expect(identifierType.name, 'ABHA Address');
+  });
+
+  test('deserialize list of identifier types', () {
+    var jsonList = [
+      {
+        "uuid": "712c108d-00f2-11ee-bbc6-0242c0a86002",
+        "name": "Patient Identifier",
+        "description": "New patient identifier type created for use by the Bahmni Registration System",
+        "format": null,
+        "required": true,
+        "primary": true,
+        "identifierSources": [
+          {
+            "uuid": "c5cf4b68-6529-43fc-a644-c775ae73745e",
+            "name": "ABC",
+            "prefix": "ABC"
+          }
+        ]
+      },
+      {
+        "uuid": "77d2dd54-00f2-11ee-bbc6-0242c0a86002",
+        "name": "ABHA Address",
+        "description": "PHR Address identifier type",
+        "format": null,
+        "required": false,
+        "primary": false,
+        "identifierSources": [
+
+        ]
+      },
+      {
+        "uuid": "77ccbba2-00f2-11ee-bbc6-0242c0a86002",
+        "name": "ABHA Number",
+        "description": "Health Id identifier type",
+        "format": null,
+        "required": false,
+        "primary": false,
+        "identifierSources": [
+
+        ]
+      },
+      {
+        "uuid": "68490aec-35e8-49c8-893b-e7c70b322729",
+        "name": "NIKSHAY_ID",
+        "description": null,
+        "format": null,
+        "required": false,
+        "primary": false,
+        "identifierSources": [
+
+        ]
+      },
+      {
+        "uuid": "69321f53-ad9b-46c8-8b20-a1ec575bc21e",
+        "name": "RCH_ID",
+        "description": null,
+        "format": null,
+        "required": false,
+        "primary": false,
+        "identifierSources": [
+
+        ]
+      }
+    ];
+    var list = List<OmrsIdentifierType>.from(jsonList.map((v) => OmrsIdentifierType.fromJson(v)));
+    expect(list.length, 5);
+    expect(list.first.identifierSources?.first.prefix, 'ABC');
+  });
+
   test('OMRS Patient model de-serialization test', ()
   {
       var patient = OmrsPatient.fromJson  (

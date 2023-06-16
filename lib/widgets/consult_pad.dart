@@ -117,7 +117,6 @@ class _ConsultPadWidgetState extends State<ConsultPadWidget> {
   Widget _editContextButton(ConsultationStatus status) {
     return OutlinedButton(
           onPressed: () async {
-            debugPrint('Edit Context');
             if (status == ConsultationStatus.finalized) {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text("Already saved!")),
@@ -314,7 +313,7 @@ class _ObsListItem extends StatelessWidget {
         children: [
           SlidableAction(
             onPressed: (_) async {
-              debugPrint('Edit note slide');
+              //debugPrint('Edit note slide');
             },
             backgroundColor: Colors.green,
             foregroundColor: Colors.white,
@@ -338,7 +337,7 @@ class _ObsListItem extends StatelessWidget {
       const Expanded(child: Text('Consultation Notes')),
       OutlinedButton(
         onPressed: () async {
-          debugPrint('Edit note row');
+          //debugPrint('Edit note row');
         },
         child: const Text('edit'),
       )

@@ -14,7 +14,7 @@ import '../domain/condition_model.dart';
 import '../domain/models/omrs_concept.dart';
 import '../widgets/concept_search.dart';
 import '../screens/models/consultation_board.dart';
-import '../screens/models/patient_view.dart';
+import '../screens/models/patient_model.dart';
 import '../utils/app_routes.dart';
 import '../domain/models/omrs_location.dart';
 import '../providers/auth.dart';

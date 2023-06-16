@@ -98,7 +98,6 @@ class _ConceptSearchWidgetState extends State<ConceptSearch> {
             });
           },
           onError: (err) {
-            debugPrint(err.toString());
             String errorMsg = err is Failure ? err.message : '';
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text('Search failed. $errorMsg')),

@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 
 import 'consultation_model.dart';
-import 'patient_view.dart';
+import 'patient_model.dart';
 
 import '../../domain/condition_model.dart';
 import '../../domain/models/omrs_encounter_type.dart';

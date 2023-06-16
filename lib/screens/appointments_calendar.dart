@@ -24,13 +24,11 @@ class _AppointmentsCalendarState extends State<AppointmentsCalendar> {
   @override
   void initState() {
     super.initState();
-    debugPrint('fetching for date: $_forDate');
     _futureAppointments = fetchAppointments();
   }
 
   @override
   Widget build(BuildContext context) {
-    debugPrint('Building appointments widget');
     return Scaffold(
         key: scaffoldKey,
         appBar: AppBar(
@@ -80,7 +78,6 @@ class _AppointmentsCalendarState extends State<AppointmentsCalendar> {
 
   // ignore: unused_element
   void _navigate(DateTime date) {
-    debugPrint('fetching for date: ${date.add(const Duration(days: 1))}');
     setState(() {
       _forDate = date.add(const Duration(days: 1));
       _futureAppointments = fetchAppointments();

@@ -1,29 +1,38 @@
 import 'package:flutter/material.dart';
+
 import '../screens/models/patient_model.dart';
 import '../utils/app_type_def.dart';
 
-class PatientInfo extends StatelessWidget {
-  const PatientInfo({
-    Key? key,
-    required this.patient,
-    this.onSelect
-  }) : super(key: key);
-
-  final PatientModel patient;
+class PatientListWidget extends StatelessWidget {
+  final List<PatientModel> patientList;
   final OnSelectPatient? onSelect;
+  const PatientListWidget({Key? key, required this.patientList, this.onSelect}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return _patientRow(patient, context);
+    return SingleChildScrollView(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          for (var p in patientList) _patientRow(context, p)
+        ],
+      ),
+    );
   }
 
-  Row _patientRow(PatientModel patient, BuildContext context) {
+  Row _patientRow(BuildContext context, PatientModel patient) {
+    var drugOrderIndicator = patient.getVisitDrugIds() != ''? '*' : '';
     return Row(
       mainAxisSize: MainAxisSize.max,
       children: [
-        Flexible(child: Container(
-          width: MediaQuery.of(context).size.width,
-          height: 65,
+        Container(
+          width: MediaQuery
+              .of(context)
+              .size
+              .width,
+          height: 80,
           decoration: BoxDecoration(
             color: Colors.white,
             border: Border.all(
@@ -32,7 +41,7 @@ class PatientInfo extends StatelessWidget {
             ),
           ),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
+            mainAxisSize: MainAxisSize.max,
             children: [
               Padding(
                 padding: const EdgeInsetsDirectional.fromSTEB(8, 0, 8, 0),
@@ -41,8 +50,8 @@ class PatientInfo extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Container(
-                      width: 50,
-                      height: 50,
+                      width: 60,
+                      height: 60,
                       clipBehavior: Clip.antiAlias,
                       decoration: const BoxDecoration(shape: BoxShape.circle,),
                       child: const Icon(Icons.person_rounded, size: 24,),
@@ -59,8 +68,12 @@ class PatientInfo extends StatelessWidget {
                       mainAxisSize: MainAxisSize.max,
                       children: [
                         Text(
-                          patient.fullName,
-                          style: Theme.of(context).textTheme.titleMedium?.merge(const TextStyle(
+                          '${patient.fullName} $drugOrderIndicator',
+                          style: Theme
+                              .of(context)
+                              .textTheme
+                              .titleMedium
+                              ?.merge(const TextStyle(
                             fontFamily: 'Lexend Deca',
                             color: Color(0xFF15212B),
                             fontSize: 18,
@@ -86,37 +99,37 @@ class PatientInfo extends StatelessWidget {
                   ],
                 ),
               ),
-              _selectOption(),
+              Padding(
+                padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 8, 0),
+                child: InkWell(
+                  onTap: () async {
+                    //_debouncer.stop();
+                    // await Navigator.pushNamed(
+                    //   context,
+                    //   AppRoutes.patients,
+                    //   arguments: patient,
+                    // );
+                    if (onSelect != null) {
+                      onSelect!(patient);
+                    }
+                  },
+                  child: const Column(
+                    mainAxisSize: MainAxisSize.max,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.chevron_right_rounded,
+                        color: Color(0xFF82878C),
+                        size: 24,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ],
           ),
-        )),
+        ),
       ],
     );
   }
-
-  Widget _selectOption() {
-    if (onSelect == null) {
-      return const SizedBox(width: 1);
-    }
-    return Padding(
-      padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 8, 0),
-      child: InkWell(
-        onTap: () {
-          onSelect!(patient);
-        },
-        child: const Column(
-          mainAxisSize: MainAxisSize.max,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.chevron_right_rounded,
-              color: Color(0xFF82878C),
-              size: 24,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
 }

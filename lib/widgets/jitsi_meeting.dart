@@ -253,9 +253,7 @@ class _LaunchMeetingState extends State<LaunchMeeting> {
         featureFlags: featureFlags
     );
 
-    debugPrint('server url  ${options.serverUrl}');
-
-    debugPrint("JitsiMeetingOptions: $options");
+    //debugPrint("JitsiMeetingOptions: $options");
     await JitsiMeetWrapper.joinMeeting(
       options: options,
       listener: JitsiMeetingListener(

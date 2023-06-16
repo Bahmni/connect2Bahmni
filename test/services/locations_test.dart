@@ -661,7 +661,7 @@ void main() {
       ]
     };
       Bundle bundle = Bundle.fromJson(bundleText);
-      debugPrint('${bundle.fhirId}');
+      expect(bundle.type?.value, "searchset");
   }, skip: 'TODO: to fix with later version of FHIR2 module as 1.3.0 does not set provenance.target');
 
 }

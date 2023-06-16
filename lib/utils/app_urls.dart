@@ -22,6 +22,8 @@ class OMRSRestUrls {
   String get visitType => '$base/visittype';
   String get encType => '$base/encountertype';
   String get obs => '$base/obs';
+  String get patientIdentifierTypes => '$base/idgen/identifiertype';
+  String get personAttrTypes => '$base/personattributetype?v=custom:(uuid,name,format,description)';
 }
 
 class FHIRUrls {
@@ -36,10 +38,13 @@ class FHIRUrls {
 class BahmniRestUrls {
   const BahmniRestUrls();
   String get base => '${AppUrls.baseUrl}/openmrs/ws/rest/v1';
+  String get profile => '$base/bahmnicore/patientprofile';
   String get appointments => '$base/appointments';
   String get appointment => '$base/appointment';
   String get diagnosis => '$base/bahmnicore/diagnosis/search';
   String get bahmniEncounter => '$base/bahmnicore/bahmniencounter';
+  String get activePatients => '$base/bahmnicore/sql?q=${dotenv.get('bahmni.list.activePatients', fallback: 'emrapi.sqlSearch.activePatients')}&location_uuid=VISIT_LOCATION';
+  String get dispensingPatients => '$base/bahmnicore/sql?q=${dotenv.get('bahmni.list.patientsToDispenseMeds', fallback: 'emrapi.sqlSearch.activePatients')}&location_uuid=VISIT_LOCATION';
 }
 
 class EmrApiUrls {

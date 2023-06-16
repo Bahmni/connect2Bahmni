@@ -32,6 +32,15 @@ jobs:
           touch .env
           echo fhir.support=false >> .env
           echo bahmni.server=https://dev.lite.mybahmni.in >> .env
+          echo bahmni.list.activePatients=emrapi.sqlSearch.activePatients  
+          echo bahmni.list.patientsToDispenseMeds=emrapi.sqlSearch.activePatientsWithMeds  
+          echo app.allowedVisitTypes=OPD New,OPD Review,IPD,FIELD       
+          echo app.allowedEncTypes=Consultation,REG,TRANSFER         
+          echo app.conceptConsultationNotes=3aebe365-7bbc-11ed-807c-026601bd99d0
+          echo app.conceptCodedDiagnosis=3aebe365-7bbc-11ed-807c-026601bd99d0  
+          echo app.additionalIdentifiers=ABHA Number,RCH_ID   
+          echo app.patientAttributes=phoneNumber*,email       
+          echo abdm.identifiers=ABHA Number,ABHA Address
       - run: flutter pub get
       - run: flutter analyze
       - run: flutter build apk --debug

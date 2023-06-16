@@ -1,3 +1,4 @@
+import 'package:connect2bahmni/widgets/patient_search.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 
@@ -6,7 +7,7 @@ import '../providers/user_provider.dart';
 import '../utils/app_routes.dart';
 import '../widgets/appointments_list_view.dart';
 import '../domain/models/person.dart';
-import '../screens/models/patient_view.dart';
+import '../screens/models/patient_model.dart';
 import '../services/patients.dart';
 
 class DashboardWidget extends StatefulWidget {
@@ -19,6 +20,7 @@ class DashboardWidget extends StatefulWidget {
 
 class _DashboardWidgetState extends State<DashboardWidget> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
+  static const welcomeMsg = 'Welcome';
 
   @override
   Widget build(BuildContext context) {
@@ -64,6 +66,7 @@ class _DashboardWidgetState extends State<DashboardWidget> {
   }
 
   Padding _greetings(BuildContext context, User? user) {
+
     return Padding(
       padding: const EdgeInsetsDirectional.fromSTEB(16, 8, 16, 0),
       child: Row(
@@ -101,7 +104,7 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                   mainAxisSize: MainAxisSize.max,
                   children: [
                     Text(
-                      'Welcome,',
+                      welcomeMsg,
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
                     Padding(
@@ -140,6 +143,8 @@ class _DashboardWidgetState extends State<DashboardWidget> {
   }
 
   Padding _mainContent(BuildContext context, User? user) {
+    //var services = [_patientSearch(false), _myAppointments(), _myNotifications(), _dispense()];
+    var services = [_patientSearch(true), _patientSearch(false), _myAppointments(), _dispense()];
     return Padding(
       padding: const EdgeInsetsDirectional.fromSTEB(0, 20, 0, 0),
       child: Container(
@@ -182,15 +187,16 @@ class _DashboardWidgetState extends State<DashboardWidget> {
             ),
             Padding(
               padding: const EdgeInsetsDirectional.fromSTEB(16, 12, 16, 0),
-              child: Row(
-                mainAxisSize: MainAxisSize.max,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  _patientSearch(),
-                  _myAppointments(),
-                  _myNotifications(),
-                ],
-              ),
+              child: Container(
+                  margin: const EdgeInsets.symmetric(vertical: 2),
+                  height: 100,
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    shrinkWrap: true,
+                    itemCount: services.length,
+                    itemBuilder: (ctx, i) => (Padding( padding: EdgeInsets.fromLTRB(2, 2, 2, 2), child: services[i])),
+                  ),
+             )
             ),
             Padding(
               padding: const EdgeInsetsDirectional.fromSTEB(20, 12, 20, 12),
@@ -216,7 +222,9 @@ class _DashboardWidgetState extends State<DashboardWidget> {
     );
   }
 
-  Widget _patientSearch() {
+  Widget _patientSearch(bool showActivePatients) {
+    var searchIcon = (showActivePatients ? Icons.person_pin : Icons.person_search);
+    var searchLabel = (showActivePatients ? 'Active' : 'Find');
     return Container(
       width: 100,
       height: 100,
@@ -234,20 +242,29 @@ class _DashboardWidgetState extends State<DashboardWidget> {
       child: Padding(
         padding: const EdgeInsetsDirectional.fromSTEB(4, 4, 4, 4),
         child: InkWell(
-          onTap: () => Navigator.pushNamed(context, AppRoutes.searchPatients),
+          onTap: () {
+            if (showActivePatients) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => PatientSearch(searchType: PatientSearchType.activePatients)),
+              );
+            } else {
+                Navigator.pushNamed(context, AppRoutes.searchPatients);
+            }
+          },
           child: Column(
             mainAxisSize: MainAxisSize.max,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(
-                Icons.person,
+              Icon(
+                searchIcon,
                 color: Color(0xFF1E2429),
                 size: 40,
               ),
               Padding(
                 padding: const EdgeInsetsDirectional.fromSTEB(0, 8, 0, 0),
                 child: Text(
-                  'Patients',
+                  searchLabel,
                   style: Theme.of(context).textTheme.bodyMedium?.merge(const TextStyle(
                     fontFamily: 'Lexend Deca',
                     color: Color(0xFF090F13),
@@ -295,7 +312,7 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                 padding: const EdgeInsetsDirectional.fromSTEB(
                     0, 8, 0, 0),
                 child: Text(
-                  'Appointments',
+                  'Appointment',
                   style: Theme.of(context).textTheme.bodyLarge?.merge(const TextStyle(
                     fontFamily: 'Lexend Deca',
                     color: Color(0xFF090F13),
@@ -359,12 +376,66 @@ class _DashboardWidgetState extends State<DashboardWidget> {
     );
   }
 
+  Widget _dispense() {
+    return Container(
+      width: 110,
+      height: 100,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: const [
+          BoxShadow(
+            blurRadius: 5,
+            color: Color(0x39000000),
+            offset: Offset(0, 2),
+          )
+        ],
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Padding(
+        padding: const EdgeInsetsDirectional.fromSTEB(4, 4, 4, 4),
+        child: InkWell(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => PatientSearch(searchType: PatientSearchType.dispensingPatients)),
+            );
+          },
+          //onTap: () => Navigator.pushNamed(context, AppRoutes.taskNotification),
+          child: Column(
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(
+                Icons.medication_outlined,
+                color: Color(0xFF1E2429),
+                size: 40,
+              ),
+              Padding(
+                padding: const EdgeInsetsDirectional.fromSTEB(
+                    0, 8, 0, 0),
+                child: Text(
+                  'Dispense',
+                  style: Theme.of(context).textTheme.bodyLarge?.merge(const TextStyle(
+                    fontFamily: 'Lexend Deca',
+                    color: Color(0xFF090F13),
+                    fontSize: 14,
+                    fontWeight: FontWeight.normal,
+                  )),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _quickViewList(User? user) {
       var practitionerUuid = user!.provider!.uuid;
       return Column(
         children: [
           ..._recentPatients(user),
-          ..._newInformation(),
+          //..._newInformation(),
           AppointmentsListView(practitionerUuid: practitionerUuid),
         ],
       );

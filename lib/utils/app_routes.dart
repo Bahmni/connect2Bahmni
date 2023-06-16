@@ -8,4 +8,5 @@ class AppRoutes {
   static const String patients = '/patients';
   static const String loginLocations = '/loginLocations';
   static const String addCondition = '/condition';
+  static const String registerPatient = '/registerPatient';
 }
