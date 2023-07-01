@@ -155,6 +155,7 @@ class _PatientsSearchWidgetState extends State<PatientSearch> {
           }
           if (searchInList) {
             _debouncer.stop();
+            // ignore_for_file: INVALID_USE_OF_PROTECTED_MEMBER
             if (patientListNotifier.hasListeners) {
               var matching = _initialPatientList.where((element) => element.fullName.toUpperCase().contains(searchController.text.toUpperCase())).toList();
               patientListNotifier.value = matching;

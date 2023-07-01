@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:connect2bahmni/domain/models/omrs_identifier_type.dart';
 import 'package:connect2bahmni/domain/models/omrs_person_attribute.dart';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:fhir/r4.dart';
 
@@ -9,10 +10,11 @@ import '../domain/models/omrs_patient.dart';
 import '../utils/app_urls.dart';
 import '../utils/app_config.dart';
 import '../utils/model_extn.dart';
+import 'domain_service.dart';
 import 'fhir_service.dart';
 import '../utils/shared_preference.dart';
 
-class Patients {
+class Patients extends DomainService {
   Future<Bundle> searchByName(String name) async {
     String url = '${AppUrls.fhir.patient}?name=$name';
     return FhirInterface().fetch(url);
@@ -89,7 +91,8 @@ class Patients {
       var responseJson = jsonDecode(response.body);
       return OmrsPatient.fromJson(responseJson);
     } else {
-      return null;
+      debugPrint('Failed to fetch patient information: status code ${response.statusCode}');
+      throw 'Could not fetch patient information';
     }
   }
 
@@ -201,6 +204,7 @@ class Patients {
       );
     }).then((response) {
       if (response.statusCode != 200) {
+        handleErrorResponse(response);
         throw 'Failed to create patient';
       }
       var responseJson = jsonDecode(response.body);

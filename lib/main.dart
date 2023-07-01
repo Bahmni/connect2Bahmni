@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:connect2bahmni/screens/registration/patient_registration.dart';
 import 'package:connect2bahmni/screens/registration/registration_page.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 import '../providers/user_provider.dart';
@@ -20,6 +21,10 @@ import '../screens/login_location.dart';
 import '../providers/meta_provider.dart';
 
 void main() async {
+  Logger.root.level = Level.INFO;
+  Logger.root.onRecord.listen((record) {
+    debugPrint('${record.level.name}: ${record.time}: ${record.message}');
+  });
   await dotenv.load(fileName: ".env");
   runApp(const MyApp());
 }

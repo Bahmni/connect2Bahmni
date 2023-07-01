@@ -292,17 +292,17 @@ class _BasicProfileState extends State<BasicProfile> {
     );
   }
 
-  InputDatePickerFormField _dobPickerFormField(DateTime currentDate) {
-    return InputDatePickerFormField(
-        initialDate: _birthDate,
-        fieldLabelText: 'Birth Date',
-        firstDate:  DateTime(currentDate.year-100, 1, 1) ,
-        lastDate: currentDate,
-        onDateSaved: (value) {
-          _birthDate = value;
-        }
-    );
-  }
+  // InputDatePickerFormField _dobPickerFormField(DateTime currentDate) {
+  //   return InputDatePickerFormField(
+  //       initialDate: _birthDate,
+  //       fieldLabelText: 'Birth Date',
+  //       firstDate:  DateTime(currentDate.year-100, 1, 1) ,
+  //       lastDate: currentDate,
+  //       onDateSaved: (value) {
+  //         _birthDate = value;
+  //       }
+  //   );
+  // }
 
   void updateDetails() {
     var model = Provider.of<ProfileModel?>(context, listen: false);

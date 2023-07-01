@@ -328,53 +328,53 @@ class _DashboardWidgetState extends State<DashboardWidget> {
     );
   }
 
-  Widget _myNotifications() {
-    return Container(
-      width: 110,
-      height: 100,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: const [
-          BoxShadow(
-            blurRadius: 5,
-            color: Color(0x39000000),
-            offset: Offset(0, 2),
-          )
-        ],
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Padding(
-        padding: const EdgeInsetsDirectional.fromSTEB(4, 4, 4, 4),
-        child: InkWell(
-          onTap: () => Navigator.pushNamed(context, AppRoutes.taskNotification),
-          child: Column(
-            mainAxisSize: MainAxisSize.max,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(
-                Icons.event_note,
-                color: Color(0xFF1E2429),
-                size: 40,
-              ),
-              Padding(
-                padding: const EdgeInsetsDirectional.fromSTEB(
-                    0, 8, 0, 0),
-                child: Text(
-                  'Notifications',
-                  style: Theme.of(context).textTheme.bodyLarge?.merge(const TextStyle(
-                    fontFamily: 'Lexend Deca',
-                    color: Color(0xFF090F13),
-                    fontSize: 14,
-                    fontWeight: FontWeight.normal,
-                  )),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
+  // Widget _myNotifications() {
+  //   return Container(
+  //     width: 110,
+  //     height: 100,
+  //     decoration: BoxDecoration(
+  //       color: Colors.white,
+  //       boxShadow: const [
+  //         BoxShadow(
+  //           blurRadius: 5,
+  //           color: Color(0x39000000),
+  //           offset: Offset(0, 2),
+  //         )
+  //       ],
+  //       borderRadius: BorderRadius.circular(8),
+  //     ),
+  //     child: Padding(
+  //       padding: const EdgeInsetsDirectional.fromSTEB(4, 4, 4, 4),
+  //       child: InkWell(
+  //         onTap: () => Navigator.pushNamed(context, AppRoutes.taskNotification),
+  //         child: Column(
+  //           mainAxisSize: MainAxisSize.max,
+  //           mainAxisAlignment: MainAxisAlignment.center,
+  //           children: [
+  //             const Icon(
+  //               Icons.event_note,
+  //               color: Color(0xFF1E2429),
+  //               size: 40,
+  //             ),
+  //             Padding(
+  //               padding: const EdgeInsetsDirectional.fromSTEB(
+  //                   0, 8, 0, 0),
+  //               child: Text(
+  //                 'Notifications',
+  //                 style: Theme.of(context).textTheme.bodyLarge?.merge(const TextStyle(
+  //                   fontFamily: 'Lexend Deca',
+  //                   color: Color(0xFF090F13),
+  //                   fontSize: 14,
+  //                   fontWeight: FontWeight.normal,
+  //                 )),
+  //               ),
+  //             ),
+  //           ],
+  //         ),
+  //       ),
+  //     ),
+  //   );
+  // }
 
   Widget _dispense() {
     return Container(
@@ -441,110 +441,110 @@ class _DashboardWidgetState extends State<DashboardWidget> {
       );
   }
 
-  List<Padding> _newInformation() {
-    List<Padding> newInfo = [];
-    newInfo.add(Padding(
-          padding: const EdgeInsetsDirectional.fromSTEB(0, 8, 0, 0),
-          child: Container(
-            width: MediaQuery.of(context).size.width * 0.92,
-            height: 70,
-            decoration: BoxDecoration(
-              color: const Color(0xFFF4F5F7),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.max,
-              children: [
-                Padding(
-                  padding:
-                  const EdgeInsetsDirectional.fromSTEB(8, 0, 0, 0),
-                  child: Card(
-                    clipBehavior: Clip.antiAliasWithSaveLayer,
-                    color: const Color(0x6639D2C0),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(40),
-                    ),
-                    child: const Padding(
-                      padding: EdgeInsetsDirectional.fromSTEB(
-                          8, 8, 8, 8),
-                      child: Icon(Icons.notification_important_rounded, size: 24,),
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsetsDirectional.fromSTEB(
-                        12, 0, 0, 0),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.max,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment:
-                      CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Hina Patel (Example)',
-                          style: Theme.of(context).textTheme.titleMedium?.merge(const TextStyle(
-                            fontFamily: 'Lexend Deca',
-                            color: Color(0xFF1E2429),
-                            fontSize: 18,
-                            fontWeight: FontWeight.w500,
-                          )),
-                        ),
-                        Padding(
-                          padding: const EdgeInsetsDirectional.fromSTEB(0, 4, 0, 0),
-                          child: Text(
-                            'New Health Record',
-                            style: Theme.of(context).textTheme.bodyLarge?.merge(const TextStyle(
-                              fontFamily: 'Lexend Deca',
-                              color: Color(0xFF090F13),
-                              fontSize: 14,
-                              fontWeight: FontWeight.normal,
-                            )),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsetsDirectional.fromSTEB(
-                      12, 0, 12, 0),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.max,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Text(
-                        'F 26',
-                        textAlign: TextAlign.end,
-                        style: Theme.of(context).textTheme.titleSmall?.merge(const TextStyle(
-                          fontFamily: 'Lexend Deca',
-                          color: Color(0xFF39D2C0),
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                        )),
-                      ),
-                      Padding(
-                        padding: const EdgeInsetsDirectional.fromSTEB(0, 4, 0, 0),
-                        child: Text(
-                          'Diagnostic Report',
-                          textAlign: TextAlign.end,
-                          style: Theme.of(context).textTheme.bodyLarge?.merge(const TextStyle(
-                              fontFamily: 'Lexend Deca',
-                              color: Color(0xFF090F13),
-                              fontSize: 12,
-                              fontWeight: FontWeight.normal)),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ));
-    return newInfo;
-  }
+  // List<Padding> _newInformation() {
+  //   List<Padding> newInfo = [];
+  //   newInfo.add(Padding(
+  //         padding: const EdgeInsetsDirectional.fromSTEB(0, 8, 0, 0),
+  //         child: Container(
+  //           width: MediaQuery.of(context).size.width * 0.92,
+  //           height: 70,
+  //           decoration: BoxDecoration(
+  //             color: const Color(0xFFF4F5F7),
+  //             borderRadius: BorderRadius.circular(8),
+  //           ),
+  //           child: Row(
+  //             mainAxisSize: MainAxisSize.max,
+  //             children: [
+  //               Padding(
+  //                 padding:
+  //                 const EdgeInsetsDirectional.fromSTEB(8, 0, 0, 0),
+  //                 child: Card(
+  //                   clipBehavior: Clip.antiAliasWithSaveLayer,
+  //                   color: const Color(0x6639D2C0),
+  //                   shape: RoundedRectangleBorder(
+  //                     borderRadius: BorderRadius.circular(40),
+  //                   ),
+  //                   child: const Padding(
+  //                     padding: EdgeInsetsDirectional.fromSTEB(
+  //                         8, 8, 8, 8),
+  //                     child: Icon(Icons.notification_important_rounded, size: 24,),
+  //                   ),
+  //                 ),
+  //               ),
+  //               Expanded(
+  //                 child: Padding(
+  //                   padding: const EdgeInsetsDirectional.fromSTEB(
+  //                       12, 0, 0, 0),
+  //                   child: Column(
+  //                     mainAxisSize: MainAxisSize.max,
+  //                     mainAxisAlignment: MainAxisAlignment.center,
+  //                     crossAxisAlignment:
+  //                     CrossAxisAlignment.start,
+  //                     children: [
+  //                       Text(
+  //                         'Hina Patel (Example)',
+  //                         style: Theme.of(context).textTheme.titleMedium?.merge(const TextStyle(
+  //                           fontFamily: 'Lexend Deca',
+  //                           color: Color(0xFF1E2429),
+  //                           fontSize: 18,
+  //                           fontWeight: FontWeight.w500,
+  //                         )),
+  //                       ),
+  //                       Padding(
+  //                         padding: const EdgeInsetsDirectional.fromSTEB(0, 4, 0, 0),
+  //                         child: Text(
+  //                           'New Health Record',
+  //                           style: Theme.of(context).textTheme.bodyLarge?.merge(const TextStyle(
+  //                             fontFamily: 'Lexend Deca',
+  //                             color: Color(0xFF090F13),
+  //                             fontSize: 14,
+  //                             fontWeight: FontWeight.normal,
+  //                           )),
+  //                         ),
+  //                       ),
+  //                     ],
+  //                   ),
+  //                 ),
+  //               ),
+  //               Padding(
+  //                 padding: const EdgeInsetsDirectional.fromSTEB(
+  //                     12, 0, 12, 0),
+  //                 child: Column(
+  //                   mainAxisSize: MainAxisSize.max,
+  //                   mainAxisAlignment: MainAxisAlignment.center,
+  //                   crossAxisAlignment: CrossAxisAlignment.end,
+  //                   children: [
+  //                     Text(
+  //                       'F 26',
+  //                       textAlign: TextAlign.end,
+  //                       style: Theme.of(context).textTheme.titleSmall?.merge(const TextStyle(
+  //                         fontFamily: 'Lexend Deca',
+  //                         color: Color(0xFF39D2C0),
+  //                         fontSize: 16,
+  //                         fontWeight: FontWeight.w500,
+  //                       )),
+  //                     ),
+  //                     Padding(
+  //                       padding: const EdgeInsetsDirectional.fromSTEB(0, 4, 0, 0),
+  //                       child: Text(
+  //                         'Diagnostic Report',
+  //                         textAlign: TextAlign.end,
+  //                         style: Theme.of(context).textTheme.bodyLarge?.merge(const TextStyle(
+  //                             fontFamily: 'Lexend Deca',
+  //                             color: Color(0xFF090F13),
+  //                             fontSize: 12,
+  //                             fontWeight: FontWeight.normal)),
+  //                       ),
+  //                     ),
+  //                   ],
+  //                 ),
+  //               ),
+  //             ],
+  //           ),
+  //         ),
+  //       ));
+  //   return newInfo;
+  // }
 
   List<Container> _recentPatients(User user) {
     var recentlyViewedPatients = user.recentlyViewedPatients();
