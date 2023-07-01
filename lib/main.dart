@@ -1,13 +1,13 @@
 import 'dart:io';
 
-import 'package:connect2bahmni/screens/registration/patient_registration.dart';
-import 'package:connect2bahmni/screens/registration/registration_page.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 import '../providers/user_provider.dart';
 import '../providers/auth.dart';
+import '../screens/registration/patient_registration.dart';
+import '../screens/registration/registration_page.dart';
 import '../screens/user_dashboard.dart';
 import '../screens/login.dart';
 import '../screens/register.dart';
