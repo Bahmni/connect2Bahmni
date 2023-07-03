@@ -9,7 +9,7 @@ import '../utils/shared_preference.dart';
 
 class Locations {
   /// This currently fails because FHIR module sends provenance resources as well
-  /// and  provenance.target which is a mandatory field is not passeed
+  /// and  provenance.target which is a mandatory field is not passed
   Future<List<Location>> allLoginLocations() async {
     String url = '${AppUrls.fhir.location}?_tag=Login Location';
     var result = await FhirInterface().fetch(url);
