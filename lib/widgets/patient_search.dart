@@ -2,6 +2,7 @@ import 'package:connect2bahmni/widgets/patient_list.dart';
 import 'package:fhir/r4.dart';
 import 'package:flutter/material.dart';
 
+import '../screens/patient_profile.dart';
 import '../services/patients.dart';
 import '../utils/debouncer.dart';
 import '../screens/models/patient_model.dart';
@@ -107,6 +108,7 @@ class _PatientsSearchWidgetState extends State<PatientSearch> {
               builder: (context, patients, child) {
                 return PatientListWidget(
                   patientList: patients,
+                  onAction: _onActionPatient,
                   onSelect: _onSelectPatient,
                 );
               },
@@ -119,15 +121,23 @@ class _PatientsSearchWidgetState extends State<PatientSearch> {
 
   void _primaryAction() async {
     Navigator.of(context).pushReplacementNamed(AppRoutes.registerPatient);
-    //Navigator.of(context).pushReplacementNamed('registerNewPatient');
+    // Navigator.of(context).pushReplacementNamed('registerNewPatient');
   }
 
-  void _onSelectPatient(PatientModel patient) async {
+  void _onActionPatient(PatientModel patient) async {
     _debouncer.stop();
     await Navigator.pushNamed(
       context,
       AppRoutes.patients,
       arguments: patient,
+    );
+  }
+
+  void _onSelectPatient(PatientModel patient) async {
+    _debouncer.stop();
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => PatientProfileView(patientUuid: patient.uuid,)),
     );
   }
 
@@ -167,7 +177,9 @@ class _PatientsSearchWidgetState extends State<PatientSearch> {
                 ? List<PatientModel>.from(result.entry!.map((e) => PatientModel(e.resource as Patient)))
                 : [];
             _debouncer.stop();
-            patientListNotifier.value = patients;
+            if (patientListNotifier.hasListeners) {
+              patientListNotifier.value = patients;
+            }
           },
           onError: (err) {
             String errorMsg = err is Failure ? err.message : '';

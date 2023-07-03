@@ -63,7 +63,6 @@ class DropDownSearchFormField<T> extends FormField<T> {
         return DropdownSearch<T>(
           popupProps: PopupProps.menu(showSelectedItems: true, showSearchBox: true,),
           filterFn: (item, filter) => filterFn != null ? filterFn(item, filter) : item.toString().toLowerCase().contains(filter.toLowerCase()),
-          //filterFn: (item, filter) => item.toLowerCase().contains(filter.toLowerCase()),
           items: items,
           dropdownDecoratorProps: DropDownDecoratorProps(
             dropdownSearchDecoration: InputDecoration(
@@ -71,14 +70,13 @@ class DropDownSearchFormField<T> extends FormField<T> {
               errorStyle: TextStyle(color: Colors.red),
               errorText: state.hasError? state.errorText : null,
             ),),
-          //onChanged: onChanged,
           onChanged: (value) {
             state.didChange(value);
             if (onChanged != null) {
               onChanged(value);
             }
           },
-          selectedItem: state.value,
+          selectedItem: initialValue,
         );
       },
   );

@@ -20,6 +20,9 @@ class _ProfileSummaryState extends State<ProfileSummary> {
 
   @override
   Widget build(BuildContext context) {
+    debugPrint('Summary build(). basic details - ${widget.basicDetails}');
+    debugPrint('Summary build(). firstname - ${widget.basicDetails?.firstName}');
+    debugPrint('Summary build(). Address - ${widget.address}');
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -31,19 +34,6 @@ class _ProfileSummaryState extends State<ProfileSummary> {
 
         SizedBox(height: 5.0),
         SizedBox(height: 5.0),
-
-
-        Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            OutlinedButton(
-              onPressed: () {
-
-              },
-              child: Text('Previous'),
-            )
-          ],
-        ),
       ],
     );
 
@@ -155,11 +145,15 @@ class _ProfileSummaryState extends State<ProfileSummary> {
   }
 
   String _fullName() {
-    return '${widget.basicDetails!.firstName} ${widget.basicDetails!.lastName}';
+    return '${widget.basicDetails?.firstName} ${widget.basicDetails?.lastName}';
   }
 
   String? _genderAge() {
-    return '${widget.basicDetails!.gender?.name}, ${DateFormat("dd-MM-yyyy").format( widget.basicDetails!.dateOfBirth!)}';
+    var dateStr = '';
+    if (widget.basicDetails != null && widget.basicDetails!.dateOfBirth != null) {
+      dateStr = DateFormat("dd-MM-yyyy").format( widget.basicDetails!.dateOfBirth!);
+    }
+    return '${widget.basicDetails?.gender?.name}, $dateStr';
   }
 
   Widget showAddress() {

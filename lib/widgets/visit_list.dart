@@ -13,9 +13,16 @@ class PatientVisitList extends StatefulWidget {
 }
 
 class _PatientVisitListState extends State<PatientVisitList> {
+  late Future<List<OmrsVisit>> patientVisits;
+
+  @override
+  void initState() {
+    super.initState();
+    patientVisits = Visits().visitsForPatient(widget.patientUuid);
+  }
+
   @override
   Widget build(BuildContext context) {
-    Future<List<OmrsVisit>> patientVisits = Visits().visitsForPatient(widget.patientUuid);
     return FutureBuilder<List<OmrsVisit>>(
         future: patientVisits,
         initialData: const [],

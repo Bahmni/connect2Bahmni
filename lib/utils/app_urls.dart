@@ -39,6 +39,7 @@ class BahmniRestUrls {
   const BahmniRestUrls();
   String get base => '${AppUrls.baseUrl}/openmrs/ws/rest/v1';
   String get profile => '$base/bahmnicore/patientprofile';
+  String get fetchProfile => '$base/patientprofile';
   String get appointments => '$base/appointments';
   String get appointment => '$base/appointment';
   String get diagnosis => '$base/bahmnicore/diagnosis/search';

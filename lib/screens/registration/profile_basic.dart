@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import 'profile_age.dart';
+import 'profile_controller.dart';
 import '../models/person_age.dart';
 import '../models/profile_model.dart';
 import '../../domain/models/omrs_identifier_type.dart';
@@ -16,8 +17,10 @@ class BasicProfile extends StatefulWidget {
   final ProfileBasics? basicDetails;
   final String? phoneNumber;
   final List<ProfileIdentifier>? identifiers;
+  final GlobalKey<FormState>? formKey;
+  final ProfileController<ProfileBasics>? controller;
 
-  const BasicProfile({Key? key, this.phoneNumber, this.basicDetails, this.identifiers}) : super(key: key);
+  const BasicProfile({Key? key, this.phoneNumber, this.basicDetails, this.identifiers, this.formKey, this.controller}) : super(key: key);
 
   @override
   State<BasicProfile> createState() => _BasicProfileState();
@@ -32,13 +35,14 @@ const String msgEnterGender = 'Please select gender';
 const String msgUpdateAge = 'Please update age';
 const String msgEnterDob = 'Please select birth date';
 const String msgEnterFirstName = 'Please enter first name';
+const String msgEnterIdentifier = 'Please enter a valid identifier';
 const String msgEnterLastName = 'Please enter last name';
 const String msgEnterValidPhone = 'Please enter valid phone number';
 
 class _BasicProfileState extends State<BasicProfile> {
 
   final _basicProfileFormKey = GlobalKey<FormState>();
-  String? _firstName = '', _lastName = '', _gender = '', _phoneNumber = '';
+  String? _firstName = '', _lastName = '', _gender = '';
   DateTime? _birthDate;
   TextEditingController dobController = TextEditingController();
   bool showAgePicker = false;
@@ -49,12 +53,11 @@ class _BasicProfileState extends State<BasicProfile> {
 
   @override
   void initState() {
-    super.initState();
+    debugPrint('BasicProfile: initState. firstName - ${widget.basicDetails?.firstName}, lastName = ${widget.basicDetails?.lastName}');
     _firstName = widget.basicDetails?.firstName ?? '';
     _lastName = widget.basicDetails?.lastName ?? '';
     _gender = widget.basicDetails?.gender?.name ?? '';
     _birthDate = widget.basicDetails?.dateOfBirth;
-    _phoneNumber = widget.phoneNumber;
     _abdmIdentifierNames = dotenv.get('abdm.identifiers', fallback: '').split(',');
 
     var metaProvider = Provider.of<MetaProvider>(context, listen: false);
@@ -73,6 +76,7 @@ class _BasicProfileState extends State<BasicProfile> {
         _identifierValues[idType.uuid!] = id.value;
       });
     }
+    super.initState();
   }
 
   bool _isPrimaryIdenfier(OmrsIdentifierType idType) => idType.primary != null && idType.primary == true;
@@ -90,8 +94,9 @@ class _BasicProfileState extends State<BasicProfile> {
   }
 
   Widget _basicDetails() {
+    debugPrint('BasicProfile: build. firstName - ${widget.basicDetails?.firstName}, lastName = ${widget.basicDetails?.lastName}');
     return Form(
-      key: _basicProfileFormKey,
+      key: widget.formKey ?? _basicProfileFormKey,
       child: ListView(
         children: [
           Card(
@@ -137,31 +142,7 @@ class _BasicProfileState extends State<BasicProfile> {
           ),
           birthDateDisplay(),
           if (!showAgePicker) displayDobAgeInText(),
-          //_dobPickerFormField(currentDate),
-          _phoneNumberField(),
-          // const SizedBox(
-          //   height: 5.0,
-          // ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              OutlinedButton(
-                onPressed: () {
-                  if (showAgePicker) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text(msgUpdateAge)),
-                    );
-                    return;
-                  }
-                  if (_basicProfileFormKey.currentState?.validate() ?? false) {
-                    _basicProfileFormKey.currentState?.save();
-                    updateDetails();
-                  }
-                },
-                child: const Text(lblNext),
-              )
-            ],
-          ),
+          //_phoneNumberField(),
         ],
       ),
     );
@@ -177,11 +158,14 @@ class _BasicProfileState extends State<BasicProfile> {
         validator: (value) {
           return value != null && value.isEmpty ? msgEnterGender : null;
         },
-        onSaved: (value) {
-          _gender = value;
-        },
+        onSaved: _updateGender,
       )
     ];
+  }
+
+  void _updateGender(String? value) {
+      _gender = value;
+      widget.controller?.getData()?.gender = toGenderType(value);
   }
 
   List<Widget> identifierFields() {
@@ -222,11 +206,14 @@ class _BasicProfileState extends State<BasicProfile> {
                 readOnly: allowABHALinkage,
                 initialValue: _identifierValues[identifierType.uuid!] ?? '',
                 validator: (value) {
+                  if (identifierType.required != null && identifierType.required!) {
+                    return value != null && value.isEmpty ? msgEnterIdentifier : null;
+                  }
                   return null;
-                  //return value != null && value.isEmpty ? msgEnterFirstName : null;
                 },
                 onSaved: (value) {
                   _identifierValues[identifierType.uuid!] = value ?? '';
+                  _updateIdentifier(identifierType, value);
                 },
                 decoration: InputDecoration( hintText: _identifierHint(),),
               ),
@@ -250,6 +237,20 @@ class _BasicProfileState extends State<BasicProfile> {
         ),
       );
     }).toList();
+  }
+
+
+  void _updateIdentifier(OmrsIdentifierType identifierType, String? value) {
+    Iterable<ProfileIdentifier>? iterator = widget.controller?.getData()?.identifiers?.where((element) => element.typeUuid == identifierType.uuid);
+    if (iterator != null && iterator.isNotEmpty) {
+      iterator.first.value = value!;
+    } else if (value != null && value.isNotEmpty) {
+      widget.controller?.getData()?.identifiers?.add(ProfileIdentifier(
+          typeUuid: identifierType.uuid,
+          value: value,
+          name: identifierType.name!,
+          preferred: identifierType.primary));
+    }
   }
 
   String _identifierHint() {
@@ -285,7 +286,8 @@ class _BasicProfileState extends State<BasicProfile> {
                     _birthDate = date;
                   });
                 }
-              }
+              },
+              onSaved: _updateDob,
           ),
         ),
       ],
@@ -304,22 +306,10 @@ class _BasicProfileState extends State<BasicProfile> {
   //   );
   // }
 
-  void updateDetails() {
-    var model = Provider.of<ProfileModel?>(context, listen: false);
-    List<ProfileIdentifier> identifiers = [];
-    for (var element in _identifierValues.entries) {
-      if (element.value.isNotEmpty) {
-        var identifier = _assignableIdentifierTypes.where((id) => id.uuid! == element.key).first;
-        var profileIdentifier = ProfileIdentifier(typeUuid: element.key, value: element.value, name: identifier.name!);
-        identifiers.add(profileIdentifier);
-      }
-    }
-    if (identifiers.isNotEmpty) {
-      model?.updateIdentifiers(identifiers);
-    }
-    model?.updatePhone(_phoneNumber);
-    model?.updateBasicDetails(ProfileBasics(_firstName, _lastName, toGenderType(_gender), _birthDate));
-    model?.nextSection();
+  void _updateDob(String? value) {
+    var dob = DateFormat("dd-MM-yyyy").parse(value!);
+    _birthDate = dob;
+    widget.controller?.getData()?.dateOfBirth = dob;
   }
 
   List<Widget> _firstNameField() {
@@ -334,9 +324,14 @@ class _BasicProfileState extends State<BasicProfile> {
         validator: (value) {
           return value != null && value.isEmpty ? msgEnterFirstName : null;
         },
-        onSaved: (value) => _firstName = value,
+        onSaved: _updateFirstName,
         decoration: const InputDecoration( hintText: lblGivenName,),
       )];
+  }
+
+  void _updateFirstName(String? value) {
+    _firstName = value;
+    widget.controller?.getData()?.firstName = value;
   }
 
   List<Widget> _lastNameField() {
@@ -350,55 +345,60 @@ class _BasicProfileState extends State<BasicProfile> {
         validator: (value) {
           return value != null && value.isEmpty ? msgEnterLastName : null;
         },
-        onSaved: (value) => _lastName = value,
+        onSaved: _updateLastName,
         decoration: const InputDecoration( hintText: lblFamilyName,),
       )];
   }
 
-  Widget _phoneNumberField() {
-    return TextFormField(
-      autofocus: false,
-      initialValue: _phoneNumber,
-      decoration: InputDecoration(
-        hintText: 'Phone',
-        prefixIcon: Icon(Icons.phone),
-        // focusedBorder: OutlineInputBorder(
-        //     borderRadius: BorderRadius.circular(25.0),
-        //     borderSide: const BorderSide(
-        //         color: Colors.green,
-        //         width: 1.5
-        //     )
-        // ),
-        // border: OutlineInputBorder(
-        //     borderRadius: BorderRadius.circular(25.0),
-        //     borderSide:const  BorderSide(
-        //         color: Colors.blue,
-        //         width: 1.5
-        //     )
-        // ),
-        // enabledBorder: OutlineInputBorder(
-        //     borderRadius: BorderRadius.circular(25.0),
-        //     borderSide:const  BorderSide(
-        //         color: Colors.blue,
-        //         width: 1.5
-        //     )
-        // ),
-      ),
-      keyboardType: TextInputType.phone,
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return msgEnterValidPhone;
-        }
-        var regExpr = r'^\s*(?:\+?(\d{1,3}))?[-. (]*(\d{3})[-. )]*(\d{3})[-. ]*(\d{4})(?: *x(\d+))?\s*$';
-        if(!RegExp(regExpr).hasMatch(value)){
-          return msgEnterValidPhone;
-        }
-        return null;
-      },
-      onSaved: (value) => _phoneNumber = value,
-      //decoration: const InputDecoration( hintText: lblPhoneNumber,),
-    );
+  void _updateLastName(String? value) {
+    _lastName = value;
+    widget.controller?.getData()?.lastName = value;
   }
+
+  // Widget _phoneNumberField() {
+  //   return TextFormField(
+  //     autofocus: false,
+  //     initialValue: _phoneNumber,
+  //     decoration: InputDecoration(
+  //       hintText: 'Phone',
+  //       prefixIcon: Icon(Icons.phone),
+  //       // focusedBorder: OutlineInputBorder(
+  //       //     borderRadius: BorderRadius.circular(25.0),
+  //       //     borderSide: const BorderSide(
+  //       //         color: Colors.green,
+  //       //         width: 1.5
+  //       //     )
+  //       // ),
+  //       // border: OutlineInputBorder(
+  //       //     borderRadius: BorderRadius.circular(25.0),
+  //       //     borderSide:const  BorderSide(
+  //       //         color: Colors.blue,
+  //       //         width: 1.5
+  //       //     )
+  //       // ),
+  //       // enabledBorder: OutlineInputBorder(
+  //       //     borderRadius: BorderRadius.circular(25.0),
+  //       //     borderSide:const  BorderSide(
+  //       //         color: Colors.blue,
+  //       //         width: 1.5
+  //       //     )
+  //       // ),
+  //     ),
+  //     keyboardType: TextInputType.phone,
+  //     validator: (value) {
+  //       if (value == null || value.isEmpty) {
+  //         return msgEnterValidPhone;
+  //       }
+  //       var regExpr = r'^\s*(?:\+?(\d{1,3}))?[-. (]*(\d{3})[-. )]*(\d{3})[-. ]*(\d{4})(?: *x(\d+))?\s*$';
+  //       if(!RegExp(regExpr).hasMatch(value)){
+  //         return msgEnterValidPhone;
+  //       }
+  //       return null;
+  //     },
+  //     onSaved: (value) => _phoneNumber = value,
+  //     //decoration: const InputDecoration( hintText: lblPhoneNumber,),
+  //   );
+  // }
 
   Widget displayDobAgeInText() {
     var personAge = _birthDate != null ? calculateAge(_birthDate!) : PersonAge(0, 0);
@@ -419,4 +419,5 @@ class _BasicProfileState extends State<BasicProfile> {
       showAgePicker = false;
     });
   }
+
 }

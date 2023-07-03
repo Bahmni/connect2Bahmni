@@ -13,9 +13,6 @@ class ProfileModel extends ChangeNotifier {
   List<ProfileAttribute>? attributes;
   OmrsIdentifierType? primaryPatientIdentifierType;
 
-
-  int currentSection = 0;
-
   ProfileModel({
     this.uuid,
     this.basicDetails,
@@ -29,38 +26,39 @@ class ProfileModel extends ChangeNotifier {
   bool get isNewPatient => uuid == null;
 
   updateBasicDetails(ProfileBasics basics) {
-    basicDetails = basics;
-  }
-
-
-
-  void updateAddress(String selectedDistrict, String selectedSubdistrict, String selectedVillage) {
-    address = ProfileAddress(
-      countyDistrict: selectedDistrict,
-      subDistrict: selectedSubdistrict,
-      cityVillage: selectedVillage,
+    debugPrint('Updating profile basics - ${basics.firstName} ${basics.lastName}');
+    basicDetails = ProfileBasics(
+      firstName: basics.firstName,
+      lastName: basics.lastName,
+      gender: basics.gender,
+      dateOfBirth: basics.dateOfBirth,
     );
-    currentSection = 2;
-    notifyListeners();
-  }
-
-  void nextSection() {
-    currentSection++;
-    notifyListeners();
   }
 
   void updateProfileAddress(ProfileAddress profileAddress) {
-    address = profileAddress;
-  }
-
-  void previousSection() {
-    currentSection--;
-    notifyListeners();
+    address = ProfileAddress(
+      cityVillage: profileAddress.cityVillage,
+      subDistrict: profileAddress.subDistrict,
+      countyDistrict: profileAddress.countyDistrict,
+      stateProvince: profileAddress.stateProvince,
+    );
   }
 
   void updateIdentifiers(List<ProfileIdentifier> identifiers) {
-    this.identifiers = identifiers;
-    notifyListeners();
+    if (this.identifiers == null) {
+      this.identifiers = [];
+    }
+    for (var id in identifiers) {
+      var iterable = this.identifiers?.where((element) {
+        return element.typeUuid == id.typeUuid;
+      });
+      if (iterable !=null && iterable.isNotEmpty) {
+        var existing = iterable.first;
+        existing.value = id.value;
+      } else {
+        this.identifiers?.add(id);
+      }
+    }
   }
 
   void updatePhone(String? phoneNumber) {
@@ -68,7 +66,7 @@ class ProfileModel extends ChangeNotifier {
   }
 
   void updateAttributes(List<ProfileAttribute> attributes) {
-      if (attributes.isNotEmpty) {
+      if (this.attributes == null) {
         this.attributes = [];
       }
       for (var attr in attributes) {
@@ -168,10 +166,10 @@ class ProfileModel extends ChangeNotifier {
     profile.uuid = patientJson["uuid"];
     var personJson = patientJson["person"];
     profile.basicDetails = ProfileBasics(
-        personJson["names"][0]["givenName"],
-        personJson["names"][0]["familyName"],
-        fromGenderPrefix(personJson["gender"]),
-        DateTime.parse(personJson["birthdate"])
+        firstName : personJson["names"][0]["givenName"],
+        lastName : personJson["names"][0]["familyName"],
+        gender: fromGenderPrefix(personJson["gender"]),
+        dateOfBirth: DateTime.parse(personJson["birthdate"])
     );
     profile.identifiers = patientJson["identifiers"].map<ProfileIdentifier>((identifier) {
       return ProfileIdentifier(
@@ -192,6 +190,14 @@ class ProfileModel extends ChangeNotifier {
         );
       }).toList();
     }
+    if (personJson["preferredAddress"] != null) {
+      profile.address = ProfileAddress(
+          cityVillage: personJson["preferredAddress"]["cityVillage"],
+          subDistrict: personJson["preferredAddress"]["address4"],
+          countyDistrict: personJson["preferredAddress"]["countyDistrict"],
+          stateProvince: personJson["preferredAddress"]["stateProvince"],
+        );
+    }
     return profile;
   }
 
@@ -199,7 +205,6 @@ class ProfileModel extends ChangeNotifier {
     uuid = serverResponse.uuid;
     identifiers = serverResponse.identifiers;
     attributes = serverResponse.attributes;
-    notifyListeners();
   }
 
   bool validate() {
@@ -216,7 +221,7 @@ class ProfileModel extends ChangeNotifier {
         return false;
       }
     }
-
+    debugPrint('validated model');
     return true;
   }
 
@@ -244,8 +249,10 @@ class ProfileBasics {
   String? lastName;
   Gender? gender;
   DateTime? dateOfBirth;
+  List<ProfileIdentifier>? identifiers;
+  List<ProfileAttribute>? attributes;
 
-  ProfileBasics(this.firstName, this.lastName, this.gender, this.dateOfBirth);
+  ProfileBasics({this.firstName, this.lastName, this.gender, this.dateOfBirth, this.identifiers, this.attributes});
 }
 
 class ProfileAddress {

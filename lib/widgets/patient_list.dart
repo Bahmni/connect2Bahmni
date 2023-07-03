@@ -6,7 +6,8 @@ import '../utils/app_type_def.dart';
 class PatientListWidget extends StatelessWidget {
   final List<PatientModel> patientList;
   final OnSelectPatient? onSelect;
-  const PatientListWidget({Key? key, required this.patientList, this.onSelect}) : super(key: key);
+  final OnActionPatient? onAction;
+  const PatientListWidget({Key? key, required this.patientList, this.onSelect, this.onAction}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -54,7 +55,15 @@ class PatientListWidget extends StatelessWidget {
                       height: 60,
                       clipBehavior: Clip.antiAlias,
                       decoration: const BoxDecoration(shape: BoxShape.circle,),
-                      child: const Icon(Icons.person_rounded, size: 24,),
+                      child: InkWell(
+                        onTap: () {
+                          debugPrint('patient search clicked');
+                          if (onSelect != null) {
+                            onSelect!(patient);
+                          }
+                        },
+                        child: const Icon(Icons.person_rounded, size: 24,),
+                      ),
                     ),
                   ],
                 ),
@@ -103,14 +112,8 @@ class PatientListWidget extends StatelessWidget {
                 padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 8, 0),
                 child: InkWell(
                   onTap: () async {
-                    //_debouncer.stop();
-                    // await Navigator.pushNamed(
-                    //   context,
-                    //   AppRoutes.patients,
-                    //   arguments: patient,
-                    // );
-                    if (onSelect != null) {
-                      onSelect!(patient);
+                    if (onAction != null) {
+                      onAction!(patient);
                     }
                   },
                   child: const Column(

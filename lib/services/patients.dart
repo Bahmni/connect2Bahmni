@@ -91,7 +91,6 @@ class Patients extends DomainService {
       var responseJson = jsonDecode(response.body);
       return OmrsPatient.fromJson(responseJson);
     } else {
-      debugPrint('Failed to fetch patient information: status code ${response.statusCode}');
       throw 'Could not fetch patient information';
     }
   }
@@ -206,6 +205,30 @@ class Patients extends DomainService {
       if (response.statusCode != 200) {
         handleErrorResponse(response);
         throw 'Failed to create patient';
+      }
+      var responseJson = jsonDecode(response.body);
+      return responseJson;
+    });
+  }
+
+  Future<Map<String, dynamic>> getPatientProfile(String patientUuid) async {
+    return UserPreferences().getSessionId().then((sessionId) {
+      if (sessionId == null) {
+        throw 'Authentication Failure';
+      }
+      debugPrint('calling - ${AppUrls.bahmni.fetchProfile}/$patientUuid?v=full');
+      return http.get(
+        Uri.parse('${AppUrls.bahmni.fetchProfile}/$patientUuid?v=full'),
+        headers: <String, String>{
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Cookie': 'JSESSIONID=$sessionId',
+        },
+      );
+    }).then((response) {
+      if (response.statusCode != 200) {
+        handleErrorResponse(response);
+        throw 'Failed to fetch patient profile';
       }
       var responseJson = jsonDecode(response.body);
       return responseJson;

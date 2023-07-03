@@ -4,12 +4,13 @@ import 'package:provider/provider.dart';
 
 import '../../providers/meta_provider.dart';
 import '../models/profile_model.dart';
-import 'patient_registration.dart';
+import 'profile_controller.dart';
 
 class ProfileAttributes extends StatefulWidget {
   final List<ProfileAttribute>? attributes;
   final GlobalKey<FormState>? formKey;
-  const ProfileAttributes({Key? key, this.attributes, this.formKey}) : super(key: key);
+  final ProfileController<List<ProfileAttribute>>? controller;
+  const ProfileAttributes({Key? key, this.attributes, this.formKey, this.controller}) : super(key: key);
 
   @override
   State<ProfileAttributes> createState() => _ProfileAttributesState();
@@ -33,6 +34,7 @@ class _ProfileAttributesState extends State<ProfileAttributes> {
 
   List<ProfileAttributeType> attributeTypes = [];
   Map<String, String?> attributeValues = {};
+  final _attributesFormKey = GlobalKey<FormState>();
 
 
   @override
@@ -58,7 +60,8 @@ class _ProfileAttributesState extends State<ProfileAttributes> {
       });
     });
     for (var attrType in attributeTypes) {
-      widget.attributes?.where((attr) => attr.typeUuid == attrType.uuid).forEach((attr) {
+      List<ProfileAttribute>? attributes = widget.attributes ?? widget.controller?.getData();
+      attributes?.where((attr) => attr.typeUuid == attrType.uuid).forEach((attr) {
         attributeValues[attrType.uuid!] = attr.value;
       });
     }
@@ -76,55 +79,14 @@ class _ProfileAttributesState extends State<ProfileAttributes> {
 
   Widget _buildForm() {
     return Form(
-      key: widget.formKey,
+      key: widget.formKey ?? _attributesFormKey,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           ...attributeFields(),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              OutlinedButton(
-                onPressed: () {
-                  if (widget.formKey?.currentState?.validate() ?? false) {
-                    widget.formKey?.currentState?.save();
-                    moveToPreviousSection();
-                  }
-                },
-                child: const Text(lblPrevious),
-              ),
-              OutlinedButton(
-                onPressed: () {
-                  if (widget.formKey?.currentState?.validate() ?? false) {
-                    widget.formKey?.currentState?.save();
-                    moveToNextSection();
-                  }
-                },
-                child: const Text(lblNext),
-              )
-            ],
-          ),
         ],
       ),
     );
-  }
-
-  void moveToPreviousSection() {
-    var model = Provider.of<ProfileModel?>(context, listen: false);
-    updateAttributes(model);
-    model?.previousSection();
-  }
-
-  void updateAttributes(ProfileModel? model) {
-    List<ProfileAttribute> attributes = [];
-    for (var element in attributeValues.entries) {
-      if (element.value != null) {
-        if (element.value!.isEmpty) continue;
-        var attrType = attributeTypes.where((id) => id.uuid! == element.key).first;
-        attributes.add(ProfileAttribute(typeUuid: element.key, value: element.value, name: attrType.name, description: attrType.description));
-      }
-    }
-    model?.updateAttributes(attributes);
   }
 
   List<Widget> attributeFields() {
@@ -160,7 +122,10 @@ class _ProfileAttributesState extends State<ProfileAttributes> {
         }
         return null;
       },
-      onSaved: (value) => attributeValues[attributeType.uuid!] = value,
+      onSaved: (value) {
+        attributeValues[attributeType.uuid!] = value;
+        updateAttribute(attributeType, value);
+      },
     );
   }
 
@@ -190,16 +155,37 @@ class _ProfileAttributesState extends State<ProfileAttributes> {
         }
         return null;
       },
-      onSaved: (value) => attributeValues[attributeType.uuid!] = value,
+      onSaved: (value) {
+        attributeValues[attributeType.uuid!] = value;
+        updateAttribute(attributeType, value);
+      },
     );
   }
 
-  void moveToNextSection() {
-    var model = Provider.of<ProfileModel?>(context, listen: false);
-    updateAttributes(model);
-    model?.nextSection();
+  void updateAttribute(ProfileAttributeType attributeType, String? value) {
+    if (widget.controller != null) {
+      var attributes = widget.controller?.getData();
+      if (attributes == null || attributes.isEmpty) {
+        widget.controller?.setData([ProfileAttribute(
+                typeUuid: attributeType.uuid,
+                value: value,
+                name: attributeType.name,
+                description: attributeType.description)
+        ]);
+        return;
+      }
+      var iterator = attributes.where((element) => element.typeUuid == attributeType.uuid);
+      if (iterator.isEmpty) {
+        attributes.add(ProfileAttribute(
+            typeUuid: attributeType.uuid,
+            value: value,
+            name: attributeType.name,
+            description: attributeType.description)
+        );
+        return;
+      }
+      iterator.first.value = value;
+    }
   }
-
-
 
 }
