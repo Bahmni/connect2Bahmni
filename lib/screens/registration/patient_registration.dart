@@ -48,7 +48,6 @@ class _PatientRegistration extends State<PatientRegistration> {
 
   @override
   void initState() {
-    debugPrint('PatientRegistration.initState');
     super.initState();
     primaryPatientIdentifierType = Provider.of<MetaProvider>(context, listen: false).primaryPatientIdentifierType;
     profile = initializeModel();
@@ -65,21 +64,22 @@ class _PatientRegistration extends State<PatientRegistration> {
           builder: (BuildContext context, int pageIndex, Widget? child) {
             switch (pageIndex) {
               case 0:
-                return Container (
-                    padding: EdgeInsets.all(10),
-                    child: BasicProfile(
-                      formKey: _basicDetailsFormKey,
-                      identifiers: profile.identifiers,
-                      basicDetails: profile.basicDetails,
-                      controller: _basicDetailsController,
-                    )
-                );
+                return Wrap(children: [
+                  ..._heading(),
+                  Container(
+                      padding: EdgeInsets.all(10),
+                      child: BasicProfile(
+                        formKey: _basicDetailsFormKey,
+                        identifiers: profile.identifiers,
+                        basicDetails: profile.basicDetails,
+                        controller: _basicDetailsController,
+                      ))
+                ]);
               case 1:
                 return Column(
                   mainAxisSize: MainAxisSize.max,
                   children: [
                     ..._heading(),
-                    SizedBox(height: 5.0),
                     Container (
                         padding: EdgeInsets.all(10),
                         child: ProfileAttributes(
@@ -91,14 +91,16 @@ class _PatientRegistration extends State<PatientRegistration> {
                   ],
                 );
               case 2:
-                return Container(
-                    padding: EdgeInsets.all(10),
-                    child: AddressScreen(
-                      formKey: _addressFormKey,
-                      address: profile.address,
-                      controller: _addressController,
-                    )
-                );
+                return Wrap(children: [
+                  ..._heading(),
+                  Container(
+                      padding: EdgeInsets.all(10),
+                      child: AddressScreen(
+                        formKey: _addressFormKey,
+                        address: profile.address,
+                        controller: _addressController,
+                      ))
+                ]);
               case 3:
               default:
                 return Container (
@@ -118,7 +120,6 @@ class _PatientRegistration extends State<PatientRegistration> {
         builder: (BuildContext context, int pageIndex, Widget? child) {
           if (pageIndex == 3) {
             var profileValidated = profile.validate();
-            profileValidated;
             return Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [

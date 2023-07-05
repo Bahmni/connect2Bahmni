@@ -97,28 +97,10 @@ class _BasicProfileState extends State<BasicProfile> {
     debugPrint('BasicProfile: build. firstName - ${widget.basicDetails?.firstName}, lastName = ${widget.basicDetails?.lastName}');
     return Form(
       key: widget.formKey ?? _basicProfileFormKey,
-      child: ListView(
+      child: Column(
+        mainAxisSize: MainAxisSize.max,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Card(
-              elevation: 0,
-              color: Theme.of(context).colorScheme.surfaceVariant,
-              // shape: RoundedRectangleBorder(
-              //   side: BorderSide(
-              //     color: Theme.of(context).colorScheme.outline,
-              //   ),
-              //   borderRadius: const BorderRadius.all(Radius.circular(12)),
-              // ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: const [
-                  ListTile(
-                    leading: Icon(Icons.person_add_alt_1_rounded),
-                    title: Text('New Patient Registration'),
-                    subtitle: Text(''),
-                  ),
-                ],
-              )
-          ),
           ...identifierFields(),
           ..._firstNameField(),
           ..._lastNameField(),

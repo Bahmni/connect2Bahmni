@@ -9,12 +9,12 @@ import '../utils/shared_preference.dart';
 import '../../domain/models/oms_visit.dart';
 
 class Visits {
-  Future<List<OmrsVisit>> visitsForPatient(String patientUuid) async {
+  Future<List<OmrsVisit>> visitsForPatient(String patientUuid, [bool includeInactive = true]) async {
     String? sessionId = await UserPreferences().getSessionId();
     if (sessionId == null) {
       throw 'Authentication Failure';
     }
-    String url = '${AppUrls.omrs.visit}?patient=$patientUuid&v=full';
+    String url = '${AppUrls.omrs.visit}?patient=$patientUuid&includeInactive=$includeInactive&v=full';
     Response response = await get(
       Uri.parse(url),
       headers: <String, String>{

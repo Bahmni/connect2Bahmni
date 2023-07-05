@@ -53,6 +53,7 @@ dependencies:
   file: ^6.1.4
   dropdown_search: ^5.0.6
   logging: ^1.2.0
+  flutter_speed_dial: ^7.0.0
 
 
 dev_dependencies:
