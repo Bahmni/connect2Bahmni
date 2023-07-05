@@ -2,7 +2,7 @@ import 'package:connect2bahmni/widgets/patient_list.dart';
 import 'package:fhir/r4.dart';
 import 'package:flutter/material.dart';
 
-import '../screens/patient_profile.dart';
+import '../screens/patient_profile_view.dart';
 import '../services/patients.dart';
 import '../utils/debouncer.dart';
 import '../screens/models/patient_model.dart';

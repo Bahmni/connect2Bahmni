@@ -14,14 +14,17 @@ class LoginLocation extends StatefulWidget {
   State<LoginLocation> createState() => _LoginLocationState();
 }
 
+const msgFailedToLoadLocations = "Failed to load locations";
+const lblProceed = 'Proceed';
+const lblHeader = 'Connect2 Bahmni';
+const lblLoginLocation = 'Login Location';
+
 class _LoginLocationState extends State<LoginLocation> {
   final _formKey = GlobalKey<FormState>();
   String? selectedValue;
-  AuthProvider? _authenticator;
 
   @override
   Widget build(BuildContext context) {
-    _authenticator = Provider.of<AuthProvider>(context);
     Map? assignedLocations = ModalRoute.of(context)?.settings.arguments as Map?;
     Future<List<DropdownMenuItem<String>>> locationsFuture = (assignedLocations != null)
         ? _fetchPresetLoginLocations(assignedLocations)
@@ -36,8 +39,7 @@ class _LoginLocationState extends State<LoginLocation> {
             );
           }
           if (snapshot.hasError) {
-            //write to log
-            return const Center(child: Text("Failed to load locations"),);
+            return const Center(child: Text(msgFailedToLoadLocations),);
           }
           if (snapshot.hasData) {
             return _locationForm(context, snapshot.data!);
@@ -53,7 +55,7 @@ class _LoginLocationState extends State<LoginLocation> {
     return Scaffold(
         appBar: AppBar(
           automaticallyImplyLeading: false,
-          title: const Text('Connect2 Bahmni'),
+          title: const Text(lblHeader),
           elevation: 0.1,
         ),
         body: Container(
@@ -63,43 +65,52 @@ class _LoginLocationState extends State<LoginLocation> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text('Login Location', style: TextStyle(fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 5.0),
                   DropdownButtonFormField<String>(
-                      // decoration: InputDecoration(
-                      //   enabledBorder: OutlineInputBorder(
-                      //     //borderSide: const BorderSide(color: Colors.blue, width: 2),
-                      //     borderRadius: BorderRadius.circular(20),
-                      //   ),
-                      //   border: OutlineInputBorder(
-                      //     //borderSide: const BorderSide(color: Colors.blue, width: 2),
-                      //     borderRadius: BorderRadius.circular(20),
-                      //   ),
-                      //   // filled: true,
-                      //   // fillColor: Colors.blueAccent,
-                      // ),
+                      decoration: InputDecoration(
+                        enabledBorder: OutlineInputBorder(
+                          // borderSide: const BorderSide(color: Colors.blue, width: 2),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        border: OutlineInputBorder(
+                          borderSide: const BorderSide(color: Colors.blue, width: 2),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                      ),
                       validator: (value) => value == null ? "Select a location" : null,
-                      //dropdownColor: Colors.blueAccent,
+                      icon: const Icon(Icons.location_on_outlined),
                       value: selectedValue,
                       onChanged: (newVal)  {
                         selectedValue = newVal;
                       },
+                      hint: const Text(lblLoginLocation),
                       items: locationList
                   ),
-                  const SizedBox(height: 5.0),
-                  ElevatedButton(
+                  const SizedBox(height: 10.0),
+                  Container(
+                    height: 40,
+                    width: 100,
+                    decoration: BoxDecoration(
+                        color: Colors.blue,
+                        borderRadius: BorderRadius.circular(50)),
+                    child: TextButton(
+                      autofocus: false,
                       onPressed: () {
                         if (_formKey.currentState!.validate()) {
-                          _authenticator!.updateSessionLocation(OmrsLocation( uuid: selectedValue!, name: '')).then((value) {
+                          Provider.of<AuthProvider>(context, listen: false).updateSessionLocation(OmrsLocation( uuid: selectedValue!, name: '')).then((value) {
                             Navigator.pushReplacementNamed(context, AppRoutes.dashboard);
                           },
-                          onError: (e) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('Login failed. error $e')),
-                            );
-                          });
+                              onError: (e) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text('Login failed. error $e')),
+                                );
+                              });
                         }
                       },
-                      child: const Text("Submit"))
+                      child: const Text(lblProceed,
+                          style: TextStyle(color: Colors.white)),
+                    ),
+                  ),
                 ],
               ))
         ),
@@ -114,6 +125,7 @@ class _LoginLocationState extends State<LoginLocation> {
     return Future.delayed(const Duration(seconds: 2), () => locationList,);
   }
   Future<List<DropdownMenuItem<String>>> _fetchAllLoginLocations() {
+    debugPrint("Calling Fetching all locations API");
     var completer = Completer<List<DropdownMenuItem<String>>>();
     Locations().allOmrsLoginLocations().then((values) {
       var list = List<DropdownMenuItem<String>>.of(values.map((loc) => DropdownMenuItem(value: loc.uuid, child: Text(loc.name!))));

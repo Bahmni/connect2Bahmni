@@ -48,11 +48,11 @@ class MetaProvider with ChangeNotifier {
     ConceptDictionary().fetchDiagnosisCertainty().then((value) {
       _conditionCertainty = value;
       notifyListeners();
-    });
+    }).onError((error, stackTrace) => _logError(error));
     ConceptDictionary().fetchDiagnosisOrder().then((value) {
       _diagnosisOrder = value;
       notifyListeners();
-    });
+    }).onError((error, stackTrace) => _logError(error));
     Encounters().visitTypes().then((value) {
       _visitTypes = value;
       notifyListeners();

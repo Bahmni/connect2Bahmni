@@ -7,6 +7,7 @@ import '../providers/user_provider.dart';
 import '../utils/app_routes.dart';
 import '../providers/meta_provider.dart';
 
+const locationAttributeName = 'Login Locations';
 
 class Login extends StatefulWidget {
   const Login({Key? key}) : super(key: key);
@@ -14,6 +15,12 @@ class Login extends StatefulWidget {
   @override
   State<Login> createState() => _LoginState();
 }
+
+
+const lblUserName = 'User name';
+const lblPassword = 'Password';
+const msgEnterPwd = 'Please enter password';
+const msgLoginFailed = 'Login failed';
 
 class _LoginState extends State<Login> {
   final _formKey = GlobalKey<FormState>();
@@ -38,7 +45,8 @@ class _LoginState extends State<Login> {
             child: Form(
               key: _formKey,
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: _formWidgets(''),
               ),
             ),
@@ -57,7 +65,7 @@ class _LoginState extends State<Login> {
           var session = response.session!;
           Provider.of<UserProvider>(context, listen: false).setUser(session.user);
           Provider.of<MetaProvider>(context, listen: false).initialize();
-          var providerLoginLocations = session.user.provider?.attrValue('locations');
+          var providerLoginLocations = session.user.provider?.attrValue(locationAttributeName);
           if (providerLoginLocations != null && providerLoginLocations.isNotEmpty) {
             var assignedLocations = <String, String>{};
             for (var loc in providerLoginLocations) {
@@ -89,6 +97,7 @@ class _LoginState extends State<Login> {
   }
 
   TextFormField _userNameField() {
+
     return TextFormField(
       autofocus: false,
       validator: (value) {
@@ -96,7 +105,7 @@ class _LoginState extends State<Login> {
       },
       onSaved: (value) => _username = value,
       decoration: const InputDecoration(
-        hintText: 'enter user name',
+        hintText: lblUserName,
       ),
     );
   }
@@ -121,14 +130,14 @@ class _LoginState extends State<Login> {
       obscureText: !_passwordVisible,
       validator: (value) {
         if (value == null || value.isEmpty) {
-          return 'Please enter password';
+          return msgEnterPwd;
         }
         return null;
       },
       onSaved: (value) => _password = value,
       decoration: InputDecoration(
         //suffixIcon: Icon(Icons.visibility, color: Color.fromRGBO(50, 62, 72, 1.0)),
-        hintText: 'enter password',
+        hintText: lblPassword,
         suffixIcon: GestureDetector(
           onLongPress: () {
             setState(() {
@@ -147,25 +156,29 @@ class _LoginState extends State<Login> {
     );
   }
 
-  Row _forgotLabel() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: <Widget>[
-        TextButton(
-          onPressed: () {
-//            Navigator.pushReplacementNamed(context, '/reset-password');
-          },
-          child: const Text('Forgot password?'),
-        ),
-      ],
+  Widget _forgotLabel() {
+    return TextButton(
+      onPressed: (){
+        //TODO FORGOT PASSWORD SCREEN GOES HERE
+      },
+      child: Text(
+        'Forgot password?',
+        style: TextStyle(color: Colors.blue, fontSize: 15),
+      ),
     );
   }
 
-  ElevatedButton _loginButton() {
-    return ElevatedButton(
-      autofocus: false,
-      onPressed: _doLogin,
-      child: const Text('Login'),
+  Widget _loginButton() {
+    return Container(
+      height: 50,
+      width: 250,
+      decoration: BoxDecoration(
+          color: Colors.blue, borderRadius: BorderRadius.circular(50)),
+      child: TextButton(
+        autofocus: false,
+        onPressed: _doLogin,
+        child: const Text('Login', style: TextStyle(color: Colors.white)),
+      ),
     );
   }
 
@@ -173,26 +186,21 @@ class _LoginState extends State<Login> {
     List<Widget> formElements = [];
     if (serverInfo == null) {
       formElements.addAll([
-        const SizedBox(height: 5.0),
-        const SizedBox(height: 5.0),
+        const SizedBox(height: 10.0),
         const Text('Server'),
         _serverUrlField()
       ]);
     }
     formElements.addAll([
-      const SizedBox(height: 5.0),
-      const SizedBox(height: 5.0),
-      const Text('User'),
+      const SizedBox(height: 10.0),
       _userNameField(),
       const SizedBox(height: 20.0),
-      const Text("Password"),
       _passwordField(),
-      const SizedBox(height: 5.0),
-      const SizedBox(height: 20.0),
+      const SizedBox(height: 25.0),
       _authProvider!.loggedInStatus == Status.authenticating
           ? _showLoading()
           : _loginButton(),
-      const SizedBox(height: 5.0),
+      const SizedBox(height: 10.0),
       _forgotLabel()
     ]);
     return formElements;
@@ -200,7 +208,7 @@ class _LoginState extends State<Login> {
 
   void showLoginFailure(BuildContext context) {
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Login failed")),
+      const SnackBar(content: Text(msgLoginFailed)),
     );
   }
 

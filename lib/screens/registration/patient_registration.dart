@@ -5,10 +5,12 @@ import 'package:provider/provider.dart';
 
 import '../../providers/meta_provider.dart';
 import '../../screens/registration/profile_attributes.dart';
+import '../../screens/patient_profile_view.dart';
 import '../../domain/models/omrs_identifier_type.dart';
-import '../../services/patients.dart';
 import '../../utils/app_failures.dart';
 import '../../widgets/address_selection.dart';
+import '../../services/registrations.dart';
+import '../../widgets/visit_types_fab.dart';
 import '../models/profile_model.dart';
 import 'profile_basic.dart';
 import 'profile_controller.dart';
@@ -20,6 +22,7 @@ const String lblEditProfile = 'Edit Profile';
 const String lblError = 'Profile Error';
 const String lblPrevious = 'Previous';
 const String lblPatientProfile =  "Patient Profile";
+const errInvalidProfile = 'Please provide required information';
 
 class PatientRegistration extends StatefulWidget {
   const PatientRegistration({Key? key}) : super(key: key);
@@ -39,6 +42,7 @@ class _PatientRegistration extends State<PatientRegistration> {
   final ProfileController<ProfileBasics> _basicDetailsController = ProfileController<ProfileBasics>();
 
   final ValueNotifier<int> _pageIndex = ValueNotifier<int>(0);
+  final ValueNotifier<bool> _profileSaved = ValueNotifier<bool>(false);
   late ProfileModel profile;
 
   @override
@@ -48,7 +52,6 @@ class _PatientRegistration extends State<PatientRegistration> {
 
   @override
   void initState() {
-    debugPrint('PatientRegistration.initState');
     super.initState();
     primaryPatientIdentifierType = Provider.of<MetaProvider>(context, listen: false).primaryPatientIdentifierType;
     profile = initializeModel();
@@ -61,94 +64,15 @@ class _PatientRegistration extends State<PatientRegistration> {
         title: const Text(lblPatientProfile,),
       ),
       body: ValueListenableBuilder<int>(
-          valueListenable: _pageIndex,
           builder: (BuildContext context, int pageIndex, Widget? child) {
-            switch (pageIndex) {
-              case 0:
-                return Container (
-                    padding: EdgeInsets.all(10),
-                    child: BasicProfile(
-                      formKey: _basicDetailsFormKey,
-                      identifiers: profile.identifiers,
-                      basicDetails: profile.basicDetails,
-                      controller: _basicDetailsController,
-                    )
-                );
-              case 1:
-                return Column(
-                  mainAxisSize: MainAxisSize.max,
-                  children: [
-                    ..._heading(),
-                    SizedBox(height: 5.0),
-                    Container (
-                        padding: EdgeInsets.all(10),
-                        child: ProfileAttributes(
-                          formKey: _profileAttributeFormKey,
-                          attributes: profile.attributes,
-                          controller: _attributesController,
-                        )
-                    )
-                  ],
-                );
-              case 2:
-                return Container(
-                    padding: EdgeInsets.all(10),
-                    child: AddressScreen(
-                      formKey: _addressFormKey,
-                      address: profile.address,
-                      controller: _addressController,
-                    )
-                );
-              case 3:
-              default:
-                return Container (
-                    padding: EdgeInsets.all(10),
-                    child: ProfileSummary(
-                      uuid: profile.uuid,
-                      basicDetails: profile.basicDetails,
-                      address: profile.address,
-                      attributes: profile.attributes,
-                      identifiers: profile.identifiers,
-                    )
-                );
-            }
-          }
+            return _buildPage(pageIndex);
+          },
+          valueListenable: _pageIndex,
       ),
       floatingActionButton: ValueListenableBuilder<int>(
         builder: (BuildContext context, int pageIndex, Widget? child) {
           if (pageIndex == 3) {
-            var profileValidated = profile.validate();
-            profileValidated;
-            return Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  SizedBox(width: 10.0),
-                  if (profile.isNewPatient && profileValidated)
-                    FloatingActionButton(
-                      onPressed: () async {
-                        await validateAndSave(profile);
-                      },
-                      tooltip: lblSaveProfile,
-                      child: const Icon(Icons.save_outlined),
-                    )
-                  else if (!profileValidated)
-                    FloatingActionButton(
-                      onPressed: () {
-                        // Navigator.pushNamed(context, '/patientSummary', arguments: patient);
-                      },
-                      tooltip: lblError,
-                      backgroundColor: Colors.redAccent,
-                      child: const Icon(Icons.error),
-                    )
-                  else
-                    FloatingActionButton(
-                      onPressed: () {
-                        // Navigator.pushNamed(context, '/patientSummary', arguments: patient);
-                      },
-                      tooltip: lblEditProfile,
-                      child: const Icon(Icons.edit_outlined),
-                    )
-                ]);
+            return _profileActionButton();
           }
           return SizedBox();
         },
@@ -166,36 +90,160 @@ class _PatientRegistration extends State<PatientRegistration> {
               BottomNavigationBarItem(icon: Icon(Icons.summarize_outlined),label: 'Summary'),
             ],
             type: BottomNavigationBarType.fixed,
-            onTap: (v) {
-              debugPrint('Page clicked $v');
-              debugPrint('Existing page ${_pageIndex.value}');
-              bool validated = false;
-              switch (_pageIndex.value) {
-                case 0:
-                  validated = _validateAndUpdateBasicDetails();
-                  break;
-                case 1:
-                  validated = _validateAndUpdateAttributes();
-                  break;
-                case 2:
-                  validated = _validateAndUpdateAddress();
-                  break;
-                case 3:
-                  validated = true;
-                  break;
-                default:
-                  validated = true;
-                  break;
-              }
-              if (validated) {
-                _pageIndex.value = v;
-              }
+            onTap: (navItemIndex) {
+              _pageAction(navItemIndex);
             },
           );
         },
         valueListenable: _pageIndex,
       ),
     );
+  }
+
+  Widget _buildPage(int pageIndex) {
+    switch (pageIndex) {
+      case 0:
+        return Wrap(children: [
+          ..._heading(),
+          Container(
+              padding: EdgeInsets.all(10),
+              child: BasicProfile(
+                formKey: _basicDetailsFormKey,
+                identifiers: profile.identifiers,
+                basicDetails: profile.basicDetails,
+                controller: _basicDetailsController,
+              ))
+        ]);
+      case 1:
+        return Column(
+          mainAxisSize: MainAxisSize.max,
+          children: [
+            ..._heading(),
+            Container (
+                padding: EdgeInsets.all(10),
+                child: ProfileAttributes(
+                  formKey: _profileAttributeFormKey,
+                  attributes: profile.attributes,
+                  controller: _attributesController,
+                )
+            )
+          ],
+        );
+      case 2:
+        return Wrap(children: [
+          ..._heading(),
+          Container(
+              padding: EdgeInsets.all(10),
+              child: AddressScreen(
+                formKey: _addressFormKey,
+                address: profile.address,
+                controller: _addressController,
+              ))
+        ]);
+      case 3:
+      default:
+        return Container (
+            padding: EdgeInsets.all(10),
+            child: ProfileSummary(
+              uuid: profile.uuid,
+              basicDetails: profile.basicDetails,
+              address: profile.address,
+              attributes: profile.attributes,
+              identifiers: profile.identifiers,
+            )
+        );
+    }
+  }
+
+  Widget _profileActionButton() {
+    var profileValidated = profile.validate();
+    return Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          SizedBox(width: 10.0),
+          if (profileValidated)
+            ValueListenableBuilder(
+              valueListenable: _profileSaved,
+              builder: (context, saved, child) {
+                if (saved) {
+                  // return FloatingActionButton.extended(
+                  //   label: const Text(lblStartVisit),
+                  //   backgroundColor: Colors.pink,
+                  //   onPressed: () {
+                  //   },
+                  //   tooltip: lblStartVisit,
+                  //   icon: const Icon(Icons.start),
+                  // );
+                  return VisitTypesFab(
+                    label: lblStartVisit,
+                    icon: Icons.start_outlined,
+                    onSelect: (visitType) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text("Not yet Implemented")),
+                      );
+                    },
+                  );
+                }
+                return FloatingActionButton(
+                    onPressed: () async {
+                      var saved = await validateAndSave(profile);
+                      _profileSaved.value = saved;
+                    },
+                    tooltip: lblSaveProfile,
+                    child: const Icon(Icons.save_outlined),
+                );
+              },
+            )
+          else if (!profileValidated)
+            FloatingActionButton(
+              onPressed: () {
+                // should show error about why not validated
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(errInvalidProfile)),
+                );
+              },
+              tooltip: lblError,
+              backgroundColor: Colors.redAccent,
+              child: const Icon(Icons.error),
+            )
+          else if (_profileSaved.value)
+              FloatingActionButton.extended(
+                label: const Text(lblStartVisit),
+                backgroundColor: Colors.pink,
+                onPressed: () {
+                  // Navigator.pushNamed(context, '/patientSummary', arguments: patient);
+                },
+                tooltip: lblStartVisit,
+                icon: const Icon(Icons.start),
+              )
+          else
+            SizedBox()
+        ]
+    );
+  }
+
+  void _pageAction(int pageNumber) {
+    debugPrint('Page clicked $pageNumber');
+    debugPrint('Existing page ${_pageIndex.value}');
+    bool pageValidated = false;
+    switch (_pageIndex.value) {
+      case 0:
+        pageValidated = _validateAndUpdateBasicDetails();
+        break;
+      case 1:
+        pageValidated = _validateAndUpdateAttributes();
+        break;
+      case 2:
+        pageValidated = _validateAndUpdateAddress();
+        break;
+      case 3:
+      default:
+        pageValidated = true;
+        break;
+    }
+    if (pageValidated) {
+      _pageIndex.value = pageNumber;
+    }
   }
 
   bool _validateAndUpdateBasicDetails() {
@@ -261,29 +309,33 @@ class _PatientRegistration extends State<PatientRegistration> {
     return profileModel;
   }
 
-  Future<void> validateAndSave(ProfileModel profile) async {
-    profile.validate();
+  Future<bool> validateAndSave(ProfileModel profile) async {
+    if (!profile.validate()) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(errInvalidProfile)),
+      );
+      return false;
+    }
     var profileJson = profile.toProfileJson();
     debugPrint(jsonEncode(profileJson));
     if (profile.isNewPatient) {
-      Patients().createPatient(profileJson)
-          .then((value) {
-            //debugPrint('Profile post response: $value');
-            var serverResponse = ProfileModel.fromProfileJson(value);
-            profile.updateFrom(serverResponse);
-          })
+      return Registrations().createPatient(profile)
+          .then((value) => profile.updateFrom(value))
+          .then((value) => true)
           .onError((error, stackTrace) {
               String errorMsg = error is Failure ? error.message : '';
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Error. $errorMsg')),
+                SnackBar(content: Text('Could not save patient. $errorMsg')),
               );
-          });
+              return false;
+            });
     } else {
-      // var response = await Patients().updatePatient(profile.toProfileJson());
+      // var response = await Registrations().updatePatient(profile.toProfileJson());
       // debugPrint('Profile post response: $response');
       // var serverResponse = ProfileModel.fromProfileJson(response);
       // profile.updateFrom(serverResponse);
     }
+    return true;
   }
 
   List<Widget> _heading() {
@@ -307,10 +359,6 @@ class _PatientRegistration extends State<PatientRegistration> {
           ],
         )
     )];
-  }
-
-  int getCurrentNavIndex() {
-    return 0;
   }
 
 }

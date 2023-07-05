@@ -1,18 +1,18 @@
 import 'dart:convert';
-import 'package:connect2bahmni/domain/models/omrs_identifier_type.dart';
-import 'package:connect2bahmni/domain/models/omrs_person_attribute.dart';
+
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:fhir/r4.dart';
 
 import '../domain/models/omrs_patient.dart';
-
+import '../domain/models/omrs_identifier_type.dart';
+import '../domain/models/omrs_person_attribute.dart';
 import '../utils/app_urls.dart';
 import '../utils/app_config.dart';
 import '../utils/model_extn.dart';
+import '../utils/shared_preference.dart';
 import 'domain_service.dart';
 import 'fhir_service.dart';
-import '../utils/shared_preference.dart';
 
 class Patients extends DomainService {
   Future<Bundle> searchByName(String name) async {
@@ -21,6 +21,7 @@ class Patients extends DomainService {
   }
 
   Future<Bundle> getActivePatients() async {
+    debugPrint('Patients ... fetching ActivePatients');
     var session = await UserPreferences().getSession();
     if (session?.sessionId == null) {
       throw 'Authentication Failure';
@@ -41,9 +42,11 @@ class Patients extends DomainService {
 
     if (response.statusCode == 200) {
       var responseJson = jsonDecode(response.body);
+      debugPrint('Patients ... ActivePatients responseJson: $responseJson');
       if (responseJson != null && responseJson is List) {
         var patients = responseJson.map((p) =>
           Patient(
+            fhirId: p['uuid'],
             name: [HumanName(given:  [p['name']])],
             identifier: [Identifier(value: p['identifier'])],
             birthDate: FhirDate.fromDateTime(DateTime.fromMillisecondsSinceEpoch(p['birthdate'] as int)),
@@ -119,6 +122,7 @@ class Patients extends DomainService {
       if (responseJson != null && responseJson is List) {
         var patients = responseJson.map((p) {
           return Patient(
+              fhirId: p['uuid'],
               name: [HumanName(given:  [p['name']])],
               identifier: [Identifier(value: p['identifier'])],
               birthDate: FhirDate.fromDateTime(DateTime.fromMillisecondsSinceEpoch(p['birthdate'] as int)),
@@ -184,54 +188,6 @@ class Patients extends DomainService {
       var responseJson = jsonDecode(response.body);
       var resultList = responseJson['results'] ?? [];
       return List<OmrsPersonAttributeType>.from(resultList.map((v) => OmrsPersonAttributeType.fromJson(v)));
-    });
-  }
-
-  Future<Map<String, dynamic>> createPatient(Map<String, Object?> patientProfileJson) async {
-    return UserPreferences().getSessionId().then((sessionId) {
-      if (sessionId == null) {
-        throw 'Authentication Failure';
-      }
-      return http.post(
-        Uri.parse(AppUrls.bahmni.profile),
-        headers: <String, String>{
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'Cookie': 'JSESSIONID=$sessionId',
-        },
-        body: jsonEncode(patientProfileJson),
-      );
-    }).then((response) {
-      if (response.statusCode != 200) {
-        handleErrorResponse(response);
-        throw 'Failed to create patient';
-      }
-      var responseJson = jsonDecode(response.body);
-      return responseJson;
-    });
-  }
-
-  Future<Map<String, dynamic>> getPatientProfile(String patientUuid) async {
-    return UserPreferences().getSessionId().then((sessionId) {
-      if (sessionId == null) {
-        throw 'Authentication Failure';
-      }
-      debugPrint('calling - ${AppUrls.bahmni.fetchProfile}/$patientUuid?v=full');
-      return http.get(
-        Uri.parse('${AppUrls.bahmni.fetchProfile}/$patientUuid?v=full'),
-        headers: <String, String>{
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'Cookie': 'JSESSIONID=$sessionId',
-        },
-      );
-    }).then((response) {
-      if (response.statusCode != 200) {
-        handleErrorResponse(response);
-        throw 'Failed to fetch patient profile';
-      }
-      var responseJson = jsonDecode(response.body);
-      return responseJson;
     });
   }
 

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:fhir/r4.dart';
 
+import '../../utils/app_routes.dart';
+import '../models/patient_model.dart';
 import '../models/profile_model.dart';
 
 class ProfileSummary extends StatefulWidget {
@@ -20,9 +23,9 @@ class _ProfileSummaryState extends State<ProfileSummary> {
 
   @override
   Widget build(BuildContext context) {
-    debugPrint('Summary build(). basic details - ${widget.basicDetails}');
-    debugPrint('Summary build(). firstname - ${widget.basicDetails?.firstName}');
-    debugPrint('Summary build(). Address - ${widget.address}');
+    // debugPrint('Summary build(). basic details - ${widget.basicDetails}');
+    // debugPrint('Summary build(). firstname - ${widget.basicDetails?.firstName}');
+    // debugPrint('Summary build(). Address - ${widget.address}');
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -31,9 +34,6 @@ class _ProfileSummaryState extends State<ProfileSummary> {
           ...showIdentifiers(),
         showAddress(),
         ...showAttributes(),
-
-        SizedBox(height: 5.0),
-        SizedBox(height: 5.0),
       ],
     );
 
@@ -59,89 +59,137 @@ class _ProfileSummaryState extends State<ProfileSummary> {
   List<Widget> nameGenderAge() {
       return [
         Row(
-        mainAxisSize: MainAxisSize.max,
-        children: [
-          Flexible(
-              child: Container(
-            width: MediaQuery.of(context).size.width,
-            height: 65,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              border: Border.all(
-                color: const Color(0xFFC8CED5),
-                width: 1,
-              ),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsetsDirectional.fromSTEB(8, 0, 8, 0),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.max,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        width: 50,
-                        height: 50,
-                        clipBehavior: Clip.antiAlias,
-                        decoration: const BoxDecoration(
-                          shape: BoxShape.circle,
-                        ),
-                        child: Icon(
-                          (widget.uuid != null) ? Icons.person_rounded : Icons.person_add_alt_1_rounded,
-                          size: 24,
-                        ),
-                      ),
-                    ],
+          mainAxisSize: MainAxisSize.max,
+          children: [
+            Flexible(
+                child: Container(
+                  width: MediaQuery.of(context).size.width,
+                  height: 65,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    border: Border.all(
+                      color: const Color(0xFFC8CED5),
+                      width: 1,
+                    ),
                   ),
-                ),
-                Expanded(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.max,
-                    mainAxisAlignment: MainAxisAlignment.center,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      Row(
-                        mainAxisSize: MainAxisSize.max,
-                        children: [
-                          Text(
-                            _fullName(),
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleMedium
-                                ?.merge(const TextStyle(
-                                  fontFamily: 'Lexend Deca',
-                                  color: Color(0xFF15212B),
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w500,
-                                )),
-                          ),
-                        ],
-                      ),
-                      Row(
-                        mainAxisSize: MainAxisSize.max,
-                        children: [
-                          Flexible(
-                            child: RichText(
-                              overflow: TextOverflow.ellipsis,
-                              strutStyle: const StrutStyle(fontSize: 12.0),
-                              text: TextSpan(
-                                style: const TextStyle(color: Colors.black),
-                                text: _genderAge(),
+                      Padding(
+                        padding: const EdgeInsetsDirectional.fromSTEB(8, 0, 8, 0),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.max,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              width: 50,
+                              height: 50,
+                              clipBehavior: Clip.antiAlias,
+                              decoration: const BoxDecoration(
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                (widget.uuid != null)
+                                    ? Icons.person_rounded
+                                    : Icons.person_add_alt_1_rounded,
+                                size: 24,
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
+                      Expanded(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.max,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Row(
+                              mainAxisSize: MainAxisSize.max,
+                              children: [
+                                Text(
+                                  _fullName(),
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .titleMedium
+                                      ?.merge(const TextStyle(
+                                        fontFamily: 'Lexend Deca',
+                                        color: Color(0xFF15212B),
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w500,
+                                      )),
+                                ),
+                              ],
+                            ),
+                            Row(
+                              mainAxisSize: MainAxisSize.max,
+                              children: [
+                                Flexible(
+                                  child: RichText(
+                                    overflow: TextOverflow.ellipsis,
+                                    strutStyle: const StrutStyle(fontSize: 12.0),
+                                    text: TextSpan(
+                                      style: const TextStyle(color: Colors.black),
+                                      text: _genderAge(),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                      if (widget.uuid != null)
+                        TextButton(
+                            onPressed: () {
+                              _navigateToPatientChart();
+                            },
+                            child: const Column(
+                                children: [
+                                  SizedBox(height: 10.0),
+                                  Icon(Icons.subdirectory_arrow_right_outlined, color: Colors.pink, size: 20.0),
+                                  Text('Charts')
+                                ]
+                            )
+                        )
                     ],
                   ),
-                ),
-              ],
-            ),
-          )),
-        ],
-      )
+            )),
+          ],
+       ),
     ];
+  }
+
+  void _navigateToPatientChart() {
+    var patient = PatientModel(Patient(
+      fhirId: widget.uuid,
+      name: [HumanName(given:  [widget.basicDetails!.firstName!], family: widget.basicDetails?.lastName)],
+      identifier: widget.identifiers?.map((id) => Identifier(
+          fhirId: id.uuid,
+          value: id.value,
+          use: id.preferred != null && id.preferred! ? IdentifierUse.usual : IdentifierUse.official,
+          type: CodeableConcept(
+              coding: [
+                Coding(
+                  code: FhirCode.asConst(id.typeUuid ?? ''),
+                  display: id.name,
+                )
+              ]
+          )
+      )).toList(),
+      birthDate: FhirDate.fromDateTime(widget.basicDetails!.dateOfBirth!),
+      gender: FhirCode.asConst(widget.basicDetails!.gender!.name),
+      address: widget.address != null ? [Address(
+          city: widget.address!.cityVillage,
+          district: widget.address!.countyDistrict,
+          state: widget.address!.stateProvince,
+          extension_: [
+            FhirExtension(
+              url: FhirUri("http://fhir.openmrs.org/ext/address#address4"),
+              valueString: widget.address!.subDistrict,
+            )
+          ])] : null,
+    ));
+    Navigator.pushReplacementNamed(context, AppRoutes.patients, arguments: patient);
   }
 
   String _fullName() {
