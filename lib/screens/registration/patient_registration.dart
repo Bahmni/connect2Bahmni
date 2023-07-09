@@ -5,7 +5,6 @@ import 'package:provider/provider.dart';
 
 import '../../providers/meta_provider.dart';
 import '../../screens/registration/profile_attributes.dart';
-import '../../screens/patient_profile_view.dart';
 import '../../domain/models/omrs_identifier_type.dart';
 import '../../utils/app_failures.dart';
 import '../../widgets/address_selection.dart';
@@ -17,6 +16,7 @@ import 'profile_controller.dart';
 import 'profile_summary.dart';
 
 const String lblNext = 'Next';
+const String lblStartVisit = 'Start Visit';
 const String lblSaveProfile = 'Save Profile';
 const String lblEditProfile = 'Edit Profile';
 const String lblError = 'Profile Error';
