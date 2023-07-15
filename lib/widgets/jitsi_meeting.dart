@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:jitsi_meet_wrapper/jitsi_meet_wrapper.dart';
@@ -226,20 +224,7 @@ class _LaunchMeetingState extends State<LaunchMeeting> {
     // Enable or disable any feature flag here
     // If feature flag are not provided, default values will be used
     // Full list of feature flags (and defaults) available in the README
-    Map<FeatureFlag, bool> featureFlags = {
-      FeatureFlag.isWelcomePageEnabled: false,
-    };
-    if (!kIsWeb) {
-      // Here is an example, disabling features for each platform
-      if (Platform.isAndroid) {
-        // Disable ConnectionService usage on Android to avoid issues (see README)
-        featureFlags[FeatureFlag.isCallIntegrationEnabled] = false;
-      } else if (Platform.isIOS) {
-        // Disable PIP on iOS as it looks weird
-        featureFlags[FeatureFlag.isPipEnabled] = false;
-      }
-    }
-    // Define meetings options here
+    Map<String, Object> featureFlags = {};
 
     var options = JitsiMeetingOptions(
         roomNameOrUrl: roomIdentifier.text,
@@ -296,20 +281,7 @@ joinJitsiMeeting(BahmniAppointment appointment, User user) async {
   // Enable or disable any feature flag here
   // If feature flag are not provided, default values will be used
   // Full list of feature flags (and defaults) available in the README
-  Map<FeatureFlag, bool> featureFlags = {
-    FeatureFlag.isWelcomePageEnabled: false,
-  };
-  if (!kIsWeb) {
-    // Here is an example, disabling features for each platform
-    if (Platform.isAndroid) {
-      // Disable ConnectionService usage on Android to avoid issues (see README)
-      featureFlags[FeatureFlag.isCallIntegrationEnabled] = false;
-    } else if (Platform.isIOS) {
-      // Disable PIP on iOS as it looks weird
-      featureFlags[FeatureFlag.isPipEnabled] = false;
-    }
-  }
-
+  Map<String, Object> featureFlags = {};
   // Define meetings options here
   var options = JitsiMeetingOptions(
       roomNameOrUrl: appointment.uuid!,
