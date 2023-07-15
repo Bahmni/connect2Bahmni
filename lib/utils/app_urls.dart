@@ -1,8 +1,7 @@
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class AppUrls {
-  // static const String defaultServer = 'https://qa-02.hip.bahmni-covid19.in';
-  static const String defaultServer = 'https://next.mybahmni.org';
+  static const String defaultServer = 'https://dev.lite.mybahmni.in';
   static String baseUrl = dotenv.get('bahmni.server', fallback: defaultServer);
   static OMRSRestUrls omrs = const OMRSRestUrls();
   static FHIRUrls fhir = const FHIRUrls();
@@ -24,6 +23,7 @@ class OMRSRestUrls {
   String get obs => '$base/obs';
   String get patientIdentifierTypes => '$base/idgen/identifiertype';
   String get personAttrTypes => '$base/personattributetype?v=custom:(uuid,name,format,description)';
+  String get forms => '$base/form';
 }
 
 class FHIRUrls {
@@ -46,6 +46,8 @@ class BahmniRestUrls {
   String get bahmniEncounter => '$base/bahmnicore/bahmniencounter';
   String get activePatients => '$base/bahmnicore/sql?q=${dotenv.get('bahmni.list.activePatients', fallback: 'emrapi.sqlSearch.activePatients')}&location_uuid=VISIT_LOCATION';
   String get dispensingPatients => '$base/bahmnicore/sql?q=${dotenv.get('bahmni.list.patientsToDispenseMeds', fallback: 'emrapi.sqlSearch.activePatients')}&location_uuid=VISIT_LOCATION';
+  String get publishedForms => '$base/bahmniie/form/latestPublishedForms';
+
 }
 
 class EmrApiUrls {

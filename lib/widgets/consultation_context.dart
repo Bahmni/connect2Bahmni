@@ -23,6 +23,8 @@ class _ConsultationContextState extends State<ConsultationContext> {
 
   OmrsEncounterType? _selectedEncType;
   OmrsVisitType? _selectedVisitType;
+  static const lblVisitType = 'Visit Type';
+  static const lblEncounterType = 'Encounter Type';
 
 
   @override
@@ -53,32 +55,37 @@ class _ConsultationContextState extends State<ConsultationContext> {
         body: Container(
             padding: const EdgeInsets.all(10),
             child: Column(
+              mainAxisSize: MainAxisSize.max,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height:10),
                 PatientInfo(patient: widget.patient),
-                _rowVisitType(),
-                _rowEncType(),
+                ..._buildVisitType(),
+                ..._buildEncType(),
                 const SizedBox(height: 20),
-                ElevatedButton(
-                  style: ButtonStyle(
-                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                          RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10.0),
-                              side: const BorderSide(color: Colors.red)
-                          )
-                      )
+                Align(
+                  alignment: Alignment.center,
+                  child: ElevatedButton(
+                    style: ButtonStyle(
+                        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                            RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10.0),
+                                side: const BorderSide(color: Colors.red)
+                            )
+                        )
+                    ),
+                    onPressed: () {
+                      if ((_selectedEncType == null) || (_selectedVisitType == null)) {
+                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please provide the required info')));
+                      } else {
+                        Navigator.pop(context, {
+                          'encounterType' : _selectedEncType,
+                          'visitType' : _selectedVisitType,
+                        });
+                      }
+                    },
+                    child: isNewConsultation ? const Text('Start') : const Text('Update'),
                   ),
-                  onPressed: () {
-                    if ((_selectedEncType == null) || (_selectedVisitType == null)) {
-                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please provide the required info')));
-                    } else {
-                      Navigator.pop(context, {
-                        'encounterType' : _selectedEncType,
-                        'visitType' : _selectedVisitType,
-                      });
-                    }
-                  },
-                  child: isNewConsultation ? const Text('Start') : const Text('Update'),
                 ),
               ],
             )
@@ -86,50 +93,40 @@ class _ConsultationContextState extends State<ConsultationContext> {
     );
   }
 
-  Widget _rowVisitType() {
-    return Row(
-      children:[
-        const Expanded(
-          child: Text("Visit Type",),
-        ),
-        Align(
-          alignment: Alignment.centerRight,
-          child: DropdownButton<OmrsVisitType>(
-              value: _selectedVisitType,
-              onChanged: (newVal)  {
-                setState(() {
-                  _selectedVisitType = newVal;
-                });
-              },
-              items: (_allowedVisitTypes ?? [])
-                  .map<DropdownMenuItem<OmrsVisitType>>((vt) => DropdownMenuItem(value: vt, child: Text(vt.display ?? 'unknown'))).toList()
-          ),
-        ),
-      ],
-    );
+  List<Widget> _buildVisitType() {
+    return [
+      const SizedBox(height: 10.0),
+      const Text(lblVisitType),
+      DropdownButton<OmrsVisitType>(
+          value: _selectedVisitType,
+          isExpanded: true,
+          onChanged: (newVal)  {
+            setState(() {
+              _selectedVisitType = newVal;
+            });
+          },
+          items: (_allowedVisitTypes ?? [])
+              .map<DropdownMenuItem<OmrsVisitType>>((vt) => DropdownMenuItem(value: vt, child: Text(vt.display ?? 'unknown'))).toList()
+      )
+    ];
   }
 
-  Widget _rowEncType() {
-    return Row(
-      children:[
-        const Expanded(
-          child: Text("Encounter Type",),
-        ),
-        Align(
-          alignment: Alignment.centerRight,
-          child: DropdownButton<OmrsEncounterType>(
-              value: _selectedEncType,
-              onChanged: (newVal)  {
-                setState(() {
-                  _selectedEncType = newVal;
-                });
-              },
-              items: (_allowedEncTypes ?? [])
-                  .map<DropdownMenuItem<OmrsEncounterType>>((et) => DropdownMenuItem(value: et, child: Text(et.display ?? 'unknown'))).toList()
-          ),
-        ),
-      ],
-    );
+  List<Widget> _buildEncType() {
+    return [
+      const SizedBox(height: 10.0),
+      const Text(lblEncounterType),
+      DropdownButton<OmrsEncounterType>(
+          value: _selectedEncType,
+          isExpanded: true,
+          onChanged: (newVal)  {
+            setState(() {
+              _selectedEncType = newVal;
+            });
+          },
+          items: (_allowedEncTypes ?? [])
+              .map<DropdownMenuItem<OmrsEncounterType>>((et) => DropdownMenuItem(value: et, child: Text(et.display ?? 'unknown'))).toList()
+      )
+    ];
   }
 
 }

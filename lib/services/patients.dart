@@ -94,7 +94,7 @@ class Patients extends DomainService {
       var responseJson = jsonDecode(response.body);
       return OmrsPatient.fromJson(responseJson);
     } else {
-      throw 'Could not fetch patient information';
+      throw handleErrorResponse(response);
     }
   }
 

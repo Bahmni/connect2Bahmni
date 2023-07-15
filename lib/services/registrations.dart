@@ -26,8 +26,7 @@ class Registrations extends DomainService {
       );
     }).then((response) {
       if (response.statusCode != 200) {
-        handleErrorResponse(response);
-        throw 'Failed to fetch patient profile';
+        throw handleErrorResponse(response);
       }
       var responseJson = jsonDecode(response.body);
       return responseJson;
@@ -52,8 +51,7 @@ class Registrations extends DomainService {
       );
     }).then((response) {
       if (response.statusCode != 200) {
-        handleErrorResponse(response);
-        throw 'Failed to create patient';
+        throw handleErrorResponse(response);
       }
       var responseJson = jsonDecode(response.body);
       return ProfileModel.fromProfileJson(responseJson);

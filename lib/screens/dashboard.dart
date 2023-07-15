@@ -1,3 +1,4 @@
+import 'package:connect2bahmni/utils/app_failures.dart';
 import 'package:connect2bahmni/widgets/patient_search.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
@@ -745,7 +746,13 @@ class _DashboardWidgetState extends State<DashboardWidget> {
   }
 
   Future<PatientModel?> _patientDetails(String uuid) async {
-    var omrsPatient = await Patients().withUuid(uuid);
-    return omrsPatient != null ? Future.value(PatientModel(omrsPatient.toFhir())) : Future.value(null);
+    return Patients().withUuid(uuid)
+        .then((value) => value != null ? PatientModel(value.toFhir()) : null)
+        .onError((error, stackTrace) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(error is Failure ? error.message : error.toString())),
+            );
+            return null;
+        });
   }
 }

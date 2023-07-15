@@ -106,3 +106,13 @@ class OmrsConceptClass {
   };
 }
 
+enum ConceptDataType {
+  text,
+  numeric,
+  date,
+  datetime,
+  boolean,
+  complex,
+  coded,
+  na,
+}

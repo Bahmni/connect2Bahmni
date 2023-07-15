@@ -20,4 +20,5 @@ class NetworkError {
   String get internalServerError => 'Server error. Please try again later.';
   String get gatewayError => 'Gateway Error. Please try again later.';
   String get gatewayTimeout => 'Proxy or Gateway timeout. Please try again later.';
+  String get unknown => 'Network error. Please try again later.';
 }

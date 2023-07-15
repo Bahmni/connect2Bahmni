@@ -56,6 +56,9 @@ class DropDownSearchFormField<T> extends FormField<T> {
     String? hint,
     ValueChanged<T?>? onChanged,
     DropdownSearchFilterFn<T>? filterFn,
+    DropdownSearchItemAsString<T>? itemAsString,
+    DropdownSearchCompareFn<T>? compareFn,
+    bool enabled = true,
   }) : super(
       initialValue: initialValue,
       autovalidateMode: autoValidateMode ?? AutovalidateMode.disabled,
@@ -64,6 +67,14 @@ class DropDownSearchFormField<T> extends FormField<T> {
           popupProps: PopupProps.menu(showSelectedItems: true, showSearchBox: true,),
           filterFn: (item, filter) => filterFn != null ? filterFn(item, filter) : item.toString().toLowerCase().contains(filter.toLowerCase()),
           items: items,
+          itemAsString: itemAsString,
+          clearButtonProps: ClearButtonProps(
+            color: Colors.red,
+            isVisible: true,
+            icon: Icon(Icons.clear, size: 12)
+          ),
+          enabled: enabled,
+          compareFn: compareFn,
           dropdownDecoratorProps: DropDownDecoratorProps(
             dropdownSearchDecoration: InputDecoration(
               hintText: label,
@@ -80,4 +91,37 @@ class DropDownSearchFormField<T> extends FormField<T> {
         );
       },
   );
+}
+
+class CheckboxFormField extends FormField<bool> {
+  CheckboxFormField({
+    super.key,
+    Widget? title,
+    FormFieldSetter<bool>? onSaved,
+    FormFieldValidator<bool>? validator,
+    bool enabled = true,
+    bool initialValue = false,
+    bool autoValidate = false})
+  : super(
+      onSaved: onSaved,
+      validator: validator,
+      initialValue: initialValue,
+      enabled: enabled,
+      builder: (FormFieldState<bool> state) {
+        return CheckboxListTile(
+          dense: state.hasError,
+          title: title,
+          value: state.value,
+          enabled: enabled,
+          onChanged: state.didChange,
+          subtitle: state.hasError ? Builder(
+            builder: (BuildContext context) => Text(
+              state.errorText ?? "",
+              style: TextStyle(
+                  color: Theme.of(context).colorScheme.error),
+            ),
+          ) : null,
+          controlAffinity: ListTileControlAffinity.leading,
+        );
+      });
 }

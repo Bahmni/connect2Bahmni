@@ -100,11 +100,11 @@ class _LoginLocationState extends State<LoginLocation> {
                           Provider.of<AuthProvider>(context, listen: false).updateSessionLocation(OmrsLocation( uuid: selectedValue!, name: '')).then((value) {
                             Navigator.pushReplacementNamed(context, AppRoutes.dashboard);
                           },
-                              onError: (e) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text('Login failed. error $e')),
-                                );
-                              });
+                          onError: (e) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Login failed. error $e')),
+                            );
+                          });
                         }
                       },
                       child: const Text(lblProceed,

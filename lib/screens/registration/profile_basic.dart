@@ -296,9 +296,7 @@ class _BasicProfileState extends State<BasicProfile> {
 
   List<Widget> _firstNameField() {
     return [
-      SizedBox(height: 5.0),
-      const SizedBox(height: 5.0),
-      const SizedBox(height: 5.0),
+      const SizedBox(height: 15.0),
       const Text(lblGivenName),
       TextFormField(
         autofocus: false,
@@ -318,8 +316,7 @@ class _BasicProfileState extends State<BasicProfile> {
 
   List<Widget> _lastNameField() {
     return [
-      const SizedBox(height: 5.0),
-      const SizedBox(height: 5.0),
+      const SizedBox(height: 10.0),
       const Text(lblFamilyName),
       TextFormField(
         autofocus: false,

@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 import '../../domain/models/bahmni_appointment.dart';
 import '../widgets/app_drawer.dart';
+import '../widgets/bahmniForms/form_view.dart';
 import '../widgets/consult_pad.dart';
 import '../widgets/consultation_notes.dart';
 import '../widgets/jitsi_meeting.dart';
@@ -65,9 +66,12 @@ class _DashboardWidget extends StatefulWidget {
 class _DashboardWidgetState extends State<_DashboardWidget> {
   final _widgetState = GlobalKey<_DashboardWidgetState>();
   OmrsLocation? _currentLocation;
+
   @override
   Widget build(BuildContext context) {
-    _currentLocation = Provider.of<AuthProvider>(context).sessionLocation;
+    _currentLocation = Provider
+        .of<AuthProvider>(context)
+        .sessionLocation;
     return Scaffold(
       key: _widgetState,
       //floatingActionButton: _floatingActions(),
@@ -75,18 +79,19 @@ class _DashboardWidgetState extends State<_DashboardWidget> {
       appBar: _buildAppBar(context),
       drawer: appDrawer(context),
       body: _buildDraggableScrollable(),
-      bottomNavigationBar: const ConsultationActions(),
+      bottomNavigationBar: ConsultationActions(patient: widget.patient),
     );
   }
 
   AppBar _buildAppBar(BuildContext context) {
     return AppBar(
       //automaticallyImplyLeading: true,
-      leading:  IconButton(
+      leading: IconButton(
         icon: const Icon(Icons.home),
         highlightColor: Colors.pink,
         onPressed: () {
-          Navigator.pushNamedAndRemoveUntil(context, AppRoutes.dashboard, (r) => false);
+          Navigator.pushNamedAndRemoveUntil(
+              context, AppRoutes.dashboard, (r) => false);
         },
       ),
       title: _displayHeading(),
@@ -95,9 +100,17 @@ class _DashboardWidgetState extends State<_DashboardWidget> {
         Consumer<ConsultationBoard>(
             builder: (context, board, child) {
               //good case for Selector?
-              return board.currentConsultation == null ? _startNewConsultAction(context) : _saveConsultAction(context);
+              return board.currentConsultation == null ? _startNewConsultAction(
+                  context) : _saveConsultAction(context);
             }
         ),
+        // Consumer<ConsultationBoard>(
+        //     builder: (context, board, child) {
+        //       return board.currentConsultation == null
+        //           ? Container()
+        //           : _obsForm();
+        //     }
+        // ),
         _moreOptions()
       ],
     );
@@ -105,45 +118,46 @@ class _DashboardWidgetState extends State<_DashboardWidget> {
 
   PopupMenuButton<String> _moreOptions() {
     return PopupMenuButton<String>(
-          onSelected: (_) {},
-          itemBuilder: (BuildContext context) {
-            return [
-              PopupMenuItem<String>(
-                value: 'scheduleAppointment',
-                child: const Text('Schedule Appointment'),
-                onTap: () => {},
-              ),
-              PopupMenuItem<String>(
-                value: 'virtualAppointment',
-                child: const Text('Start Virtual'),
-                onTap: () {
-                  var appointment = BahmniAppointment(
-                      uuid: const Uuid().v4(),
-                      patient: Subject(
-                          uuid: widget.patient.uuid,
-                          name: widget.patient.fullName,
-                          identifier: widget.patient.uuid)
-                  );
-                  //print('launching meeting');
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => LaunchMeeting(event: appointment)),
-                  );
-                },
-              ),
-              PopupMenuItem<String>(
-                value: 'graphs',
-                child: const Text('Graphs'),
-                onTap: () => {},
-              ),
-              PopupMenuItem<String>(
-                value: 'discardSession',
-                child: const Text('Discard Session'),
-                onTap: () => {},
-              )
-            ];
-          },
-        );
+      onSelected: (_) {},
+      itemBuilder: (BuildContext context) {
+        return [
+          PopupMenuItem<String>(
+            value: 'scheduleAppointment',
+            child: const Text('Schedule Appointment'),
+            onTap: () => {},
+          ),
+          PopupMenuItem<String>(
+            value: 'virtualAppointment',
+            child: const Text('Start Virtual'),
+            onTap: () {
+              var appointment = BahmniAppointment(
+                  uuid: const Uuid().v4(),
+                  patient: Subject(
+                      uuid: widget.patient.uuid,
+                      name: widget.patient.fullName,
+                      identifier: widget.patient.uuid)
+              );
+              //print('launching meeting');
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => LaunchMeeting(event: appointment)),
+              );
+            },
+          ),
+          PopupMenuItem<String>(
+            value: 'graphs',
+            child: const Text('Graphs'),
+            onTap: () => {},
+          ),
+          PopupMenuItem<String>(
+            value: 'discardSession',
+            child: const Text('Discard Session'),
+            onTap: () => {},
+          )
+        ];
+      },
+    );
   }
 
   IconButton _startNewConsultAction(BuildContext context) {
@@ -155,20 +169,27 @@ class _DashboardWidgetState extends State<_DashboardWidget> {
       ),
       onPressed: () async {
         var board = Provider.of<ConsultationBoard>(context, listen: false);
-        var consultEncTypeUuid = (board.currentConsultation == null) ?  null : board.currentConsultation?.encounterType?.uuid;
-        var consultVisitTypeUuid = (board.currentConsultation == null) ?  null : board.currentConsultation?.visitType?.uuid;
+        var consultEncTypeUuid = (board.currentConsultation == null)
+            ? null
+            : board.currentConsultation?.encounterType?.uuid;
+        var consultVisitTypeUuid = (board.currentConsultation == null)
+            ? null
+            : board.currentConsultation?.visitType?.uuid;
         final consultInfo = await Navigator.push(
           context,
           MaterialPageRoute(
-              builder: (context) => ConsultationContext(
-                  encTypeUuid: consultEncTypeUuid,
-                  visitTypeUuid: consultVisitTypeUuid,
-                  patient: widget.patient,
-                  isNew: true,
-              )),
+              builder: (context) =>
+                  ConsultationContext(
+                    encTypeUuid: consultEncTypeUuid,
+                    visitTypeUuid: consultVisitTypeUuid,
+                    patient: widget.patient,
+                    isNew: true,
+                  )),
         );
         if (consultInfo != null) {
-          board.initNewConsult(widget.patient, _currentLocation, consultInfo['visitType'], consultInfo['encounterType']);
+          board.initNewConsult(
+              widget.patient, _currentLocation, consultInfo['visitType'],
+              consultInfo['encounterType']);
         }
       },
     );
@@ -184,7 +205,8 @@ class _DashboardWidgetState extends State<_DashboardWidget> {
       onPressed: () {
         var board = Provider.of<ConsultationBoard>(context, listen: false);
         if (board.currentConsultation?.status == ConsultationStatus.finalized) {
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Consultation is already finalized.')));
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+              content: Text('Consultation is already finalized.')));
         } else {
           board.save().then((value) {
             var message = value
@@ -222,17 +244,18 @@ class _DashboardWidgetState extends State<_DashboardWidget> {
   Widget _buildDraggableScrollable() {
     return SizedBox.expand(
         child: Stack(
-          children: <Widget>[
-            _buildPatientChart(),
-            const ConsultPadWidget()
-        ]
-      )
+            children: <Widget>[
+              _buildPatientChart(),
+              const ConsultPadWidget()
+            ]
+        )
     );
   }
 }
 
 class ConsultationActions extends StatelessWidget {
-  const ConsultationActions({Key? key}) : super(key: key);
+  final PatientModel patient;
+  const ConsultationActions({Key? key, required this.patient}) : super(key: key);
   final FloatingActionButtonLocation fabLocation = FloatingActionButtonLocation.endDocked;
   final NotchedShape shape = const CircularNotchedRectangle();
 
@@ -274,10 +297,28 @@ class ConsultationActions extends StatelessWidget {
               tooltip: 'Notes',
               icon: const Icon(Icons.description),
               onPressed: () => _addConsultationNotes(context),
-            )
+            ),
+            _obsForm(context),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _obsForm(BuildContext context) {
+    return IconButton(
+      tooltip: 'Form',
+      icon: Icon(
+        Icons.note_add_outlined,
+        //color: Colors.white,
+      ),
+      onPressed: () async {
+        var board = _activeBoardToUpdate(context);
+        if (board == null) return;
+        Navigator.push(context,
+          MaterialPageRoute(builder: (context) => ObservationForm(patient: patient)),
+        );
+      },
     );
   }
 
