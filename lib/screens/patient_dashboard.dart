@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 import '../../domain/models/bahmni_appointment.dart';
+import '../utils/app_failures.dart';
 import '../widgets/app_drawer.dart';
 import '../widgets/bahmniForms/form_view.dart';
 import '../widgets/consult_pad.dart';
@@ -104,13 +105,6 @@ class _DashboardWidgetState extends State<_DashboardWidget> {
                   context) : _saveConsultAction(context);
             }
         ),
-        // Consumer<ConsultationBoard>(
-        //     builder: (context, board, child) {
-        //       return board.currentConsultation == null
-        //           ? Container()
-        //           : _obsForm();
-        //     }
-        // ),
         _moreOptions()
       ],
     );
@@ -189,7 +183,7 @@ class _DashboardWidgetState extends State<_DashboardWidget> {
         if (consultInfo != null) {
           board.initNewConsult(
               widget.patient, _currentLocation, consultInfo['visitType'],
-              consultInfo['encounterType']);
+              consultInfo['encounterType'], consultInfo['existingVisit']);
         }
       },
     );
@@ -202,13 +196,13 @@ class _DashboardWidgetState extends State<_DashboardWidget> {
         Icons.save_outlined,
         //color: Colors.white,
       ),
-      onPressed: () {
+      onPressed: () async {
         var board = Provider.of<ConsultationBoard>(context, listen: false);
         if (board.currentConsultation?.status == ConsultationStatus.finalized) {
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
               content: Text('Consultation is already finalized.')));
         } else {
-          board.save().then((value) {
+          await board.save().then((value) {
             var message = value
                 ? 'Consultation Saved'
                 : 'Could not save consultation';
@@ -216,6 +210,19 @@ class _DashboardWidgetState extends State<_DashboardWidget> {
                 SnackBar(content: Text(message)));
             if (value && (widget.onConsultationSave != null)) {
               widget.onConsultationSave!();
+            }
+          }).onError((error, stackTrace) {
+            if (error is String) {
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error)));
+            } else if (error is Failure) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(error.message)));
+            } else if (error is List<Failure>) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(error[0].message)));
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Could not save consultation')));
             }
           });
         }

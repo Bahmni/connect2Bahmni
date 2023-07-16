@@ -9,6 +9,7 @@ class GenderFormField extends FormField<String> {
     super.onSaved,
     super.validator,
     String initialValue = '',
+    bool enabled = true,
     AutovalidateMode? autoValidateMode,
     List<Gender> genders =  Gender.values,
   }) : super(
@@ -17,9 +18,9 @@ class GenderFormField extends FormField<String> {
       builder: (FormFieldState<String> state) {
         return ToggleButtons(
           direction: Axis.horizontal,
-          onPressed: (int index) {
+          onPressed: enabled ? (int index) {
             state.didChange(_identifyGender(index));
-          },
+          } : null,
           borderRadius: const BorderRadius.all(Radius.circular(8)),
           selectedBorderColor: Colors.red[700],
           selectedColor: Colors.white,

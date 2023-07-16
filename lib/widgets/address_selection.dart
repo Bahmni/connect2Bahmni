@@ -8,7 +8,8 @@ class AddressScreen extends StatefulWidget {
   final ProfileAddress? address;
   final GlobalKey<FormState>? formKey;
   final ProfileController<ProfileAddress>? controller;
-  const AddressScreen({Key? key, this.address, this.controller, this.formKey}) : super(key: key);
+  final bool readOnly;
+  const AddressScreen({Key? key, this.address, this.controller, this.formKey, this.readOnly = false}) : super(key: key);
   @override
   State<AddressScreen> createState() => _AddressScreenState();
 }
@@ -76,6 +77,7 @@ class _AddressScreenState extends State<AddressScreen> {
               validator: (value) {
                 return value == null ? msgPleaseSelectValue : null;
               },
+              enabled: !widget.readOnly,
             ),
             SizedBox(height: 5.0),
             DropDownSearchFormField<String>(
@@ -90,6 +92,7 @@ class _AddressScreenState extends State<AddressScreen> {
               validator: (value) {
                 return value == null ? msgPleaseSelectValue : null;
               },
+              enabled: !widget.readOnly,
             ),
             SizedBox(height: 5.0),
             DropDownSearchFormField<String>(
@@ -104,6 +107,7 @@ class _AddressScreenState extends State<AddressScreen> {
               validator: (value) {
                 return value == null ? msgPleaseSelectValue : null;
               },
+              enabled: !widget.readOnly,
             ),
             SizedBox(height: 5.0),
             SizedBox(height: 5.0),

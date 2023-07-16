@@ -20,7 +20,7 @@ class ConsultationBoard extends ChangeNotifier {
 
   bool get isEmpty => _currentConsultation == null;
 
-  void initNewConsult(PatientModel forWhom,[OmrsLocation? atLocation, OmrsVisitType? vType, OmrsEncounterType? eType]) {
+  void initNewConsult(PatientModel forWhom,[OmrsLocation? atLocation, OmrsVisitType? vType, OmrsEncounterType? eType, bool existingVisit = false]) {
     var canInitNew = (_currentConsultation == null) ? true :  (_currentConsultation?.status != ConsultationStatus.draft);
     if (!canInitNew) {
       throw 'Please stage or discard current consultation';
@@ -30,6 +30,7 @@ class ConsultationBoard extends ChangeNotifier {
     newConsult.location = atLocation;
     newConsult.status = ConsultationStatus.draft;
     newConsult.visitType = vType;
+    newConsult.existingVisit = existingVisit;
     newConsult.encounterType = eType;
     newConsult.startTime ??= DateTime.now();
     newConsult.lastUpdateAt = DateTime.now();
@@ -53,7 +54,11 @@ class ConsultationBoard extends ChangeNotifier {
   Future<bool> save() {
     _currentConsultation ?? { throw 'Nothing to save' };
     if (_currentConsultation?.status == ConsultationStatus.finalized) {
-      throw 'Already finalized';
+      return Future.error('Already finalized');
+    }
+    var results = _currentConsultation!.validate();
+    if (results.isNotEmpty) {
+      return Future.error(results);
     }
     return _currentConsultation!.save();
   }

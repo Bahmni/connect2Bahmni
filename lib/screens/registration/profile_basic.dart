@@ -19,8 +19,9 @@ class BasicProfile extends StatefulWidget {
   final List<ProfileIdentifier>? identifiers;
   final GlobalKey<FormState>? formKey;
   final ProfileController<ProfileBasics>? controller;
+  final bool readOnly;
 
-  const BasicProfile({Key? key, this.phoneNumber, this.basicDetails, this.identifiers, this.formKey, this.controller}) : super(key: key);
+  const BasicProfile({Key? key, this.phoneNumber, this.basicDetails, this.identifiers, this.formKey, this.controller, this.readOnly = false}) : super(key: key);
 
   @override
   State<BasicProfile> createState() => _BasicProfileState();
@@ -113,6 +114,7 @@ class _BasicProfileState extends State<BasicProfile> {
               ),
               Switch(value: showAgePicker,
                 onChanged:(value) {
+                  if (widget.readOnly) return;
                   setState(() {
                     showAgePicker=value;
                   });
@@ -124,7 +126,6 @@ class _BasicProfileState extends State<BasicProfile> {
           ),
           birthDateDisplay(),
           if (!showAgePicker) displayDobAgeInText(),
-          //_phoneNumberField(),
         ],
       ),
     );
@@ -137,6 +138,7 @@ class _BasicProfileState extends State<BasicProfile> {
       const Text(lblGender),
       GenderFormField(
         initialValue: _gender ?? Gender.male.name,
+        enabled : !widget.readOnly,
         validator: (value) {
           return value != null && value.isEmpty ? msgEnterGender : null;
         },
@@ -256,7 +258,10 @@ class _BasicProfileState extends State<BasicProfile> {
                 return value != null && value.isEmpty ? msgEnterDob : null;
               },
               onTap: () async {
-                //FocusScope.of(context).requestFocus(FocusNode());
+                FocusScope.of(context).requestFocus(FocusNode());
+                if (widget.readOnly) {
+                  return;
+                }
                 DateTime? date = await showDatePicker(
                     context: context,
                     initialDate: _birthDate ?? DateTime.now(),
@@ -301,6 +306,7 @@ class _BasicProfileState extends State<BasicProfile> {
       TextFormField(
         autofocus: false,
         initialValue: _firstName,
+        enabled: !widget.readOnly,
         validator: (value) {
           return value != null && value.isEmpty ? msgEnterFirstName : null;
         },
@@ -321,6 +327,7 @@ class _BasicProfileState extends State<BasicProfile> {
       TextFormField(
         autofocus: false,
         initialValue: _lastName,
+        enabled: !widget.readOnly,
         validator: (value) {
           return value != null && value.isEmpty ? msgEnterLastName : null;
         },

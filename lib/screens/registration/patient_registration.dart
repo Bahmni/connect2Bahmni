@@ -112,6 +112,7 @@ class _PatientRegistration extends State<PatientRegistration> {
                 identifiers: profile.identifiers,
                 basicDetails: profile.basicDetails,
                 controller: _basicDetailsController,
+                readOnly: _profileSaved.value,
               ))
         ]);
       case 1:
@@ -125,6 +126,7 @@ class _PatientRegistration extends State<PatientRegistration> {
                   formKey: _profileAttributeFormKey,
                   attributes: profile.attributes,
                   controller: _attributesController,
+                  readOnly: _profileSaved.value,
                 )
             )
           ],
@@ -138,6 +140,7 @@ class _PatientRegistration extends State<PatientRegistration> {
                 formKey: _addressFormKey,
                 address: profile.address,
                 controller: _addressController,
+                readOnly: _profileSaved.value,
               ))
         ]);
       case 3:
@@ -166,14 +169,6 @@ class _PatientRegistration extends State<PatientRegistration> {
               valueListenable: _profileSaved,
               builder: (context, saved, child) {
                 if (saved) {
-                  // return FloatingActionButton.extended(
-                  //   label: const Text(lblStartVisit),
-                  //   backgroundColor: Colors.pink,
-                  //   onPressed: () {
-                  //   },
-                  //   tooltip: lblStartVisit,
-                  //   icon: const Icon(Icons.start),
-                  // );
                   return VisitTypesFab(
                     label: lblStartVisit,
                     icon: Icons.start_outlined,

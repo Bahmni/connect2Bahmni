@@ -1,3 +1,4 @@
+import 'package:connect2bahmni/services/visits.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../domain/models/omrs_encounter_type.dart';
@@ -11,7 +12,8 @@ class ConsultationContext extends StatefulWidget {
   final String? encTypeUuid;
   final PatientModel patient;
   final bool? isNew;
-  const ConsultationContext({Key? key, this.visitTypeUuid, this.encTypeUuid, required this.patient, this.isNew}) : super(key: key);
+  final bool allowVisitTypeChange;
+  const ConsultationContext({Key? key, this.visitTypeUuid, this.encTypeUuid, required this.patient, this.isNew, this.allowVisitTypeChange = true}) : super(key: key);
 
   @override
   State<ConsultationContext> createState() => _ConsultationContextState();
@@ -25,6 +27,7 @@ class _ConsultationContextState extends State<ConsultationContext> {
   OmrsVisitType? _selectedVisitType;
   static const lblVisitType = 'Visit Type';
   static const lblEncounterType = 'Encounter Type';
+  final ValueNotifier<bool> _visitChangeAllowed = ValueNotifier<bool>(true);
 
 
   @override
@@ -37,7 +40,20 @@ class _ConsultationContextState extends State<ConsultationContext> {
       var matchingVisitTypes = _allowedVisitTypes!.where((element) => element.uuid == widget.visitTypeUuid);
       if (matchingVisitTypes.isNotEmpty) {
         _selectedVisitType = matchingVisitTypes.first;
+        _visitChangeAllowed.value = widget.allowVisitTypeChange;
       }
+    } else {
+      Visits().visitsForPatient(widget.patient.uuid, false).then((activeVisitList) {
+        if (activeVisitList.isNotEmpty) {
+          //identify open visit
+          var lastVisit = activeVisitList.first;
+          var matchingVisitTypes = _allowedVisitTypes!.where((element) => element.uuid == lastVisit.visitType?.uuid);
+          if (matchingVisitTypes.isNotEmpty) {
+            _selectedVisitType = matchingVisitTypes.first;
+            _visitChangeAllowed.value = (_selectedVisitType == null);
+          }
+        }
+      });
     }
     if (widget.encTypeUuid != null) {
       var matchingEncTypes = _allowedEncTypes!.where((element) => element.uuid == widget.encTypeUuid);
@@ -81,6 +97,7 @@ class _ConsultationContextState extends State<ConsultationContext> {
                         Navigator.pop(context, {
                           'encounterType' : _selectedEncType,
                           'visitType' : _selectedVisitType,
+                          'existingVisit' : !_visitChangeAllowed.value,
                         });
                       }
                     },
@@ -97,17 +114,22 @@ class _ConsultationContextState extends State<ConsultationContext> {
     return [
       const SizedBox(height: 10.0),
       const Text(lblVisitType),
-      DropdownButton<OmrsVisitType>(
-          value: _selectedVisitType,
-          isExpanded: true,
-          onChanged: (newVal)  {
-            setState(() {
-              _selectedVisitType = newVal;
-            });
-          },
-          items: (_allowedVisitTypes ?? [])
-              .map<DropdownMenuItem<OmrsVisitType>>((vt) => DropdownMenuItem(value: vt, child: Text(vt.display ?? 'unknown'))).toList()
-      )
+      ValueListenableBuilder<bool>(
+        builder: (BuildContext context, bool allowChange, Widget? child) {
+          return DropdownButton<OmrsVisitType>(
+              value: _selectedVisitType,
+              isExpanded: true,
+              onChanged: allowChange ? (newVal)  {
+                setState(() {
+                  _selectedVisitType = newVal;
+                });
+              } : null,
+              items: (_allowedVisitTypes ?? [])
+                  .map<DropdownMenuItem<OmrsVisitType>>((vt) => DropdownMenuItem(value: vt, child: Text(vt.display ?? 'unknown'))).toList()
+          );
+        },
+        valueListenable: _visitChangeAllowed,
+      ),
     ];
   }
 

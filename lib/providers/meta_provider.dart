@@ -48,6 +48,14 @@ class MetaProvider with ChangeNotifier {
     return _encTypes!.where((e) => allowedList.contains(e.display?.toLowerCase())).toList();
   }
 
+  List<FormResource> get observationForms {
+    if (_publishedForms == null) return [];
+    var allowedList = dotenv.get('bahmni.obsForms', fallback: '')
+        .split(',')
+        .map((e) => e.trim().toLowerCase()).toList();
+    return _publishedForms!.where((form) => allowedList.contains(form.name.toLowerCase())).toList();
+  }
+
   void initialize() {
     ConceptDictionary().fetchDiagnosisCertainty().then((value) {
       _conditionCertainty = value;

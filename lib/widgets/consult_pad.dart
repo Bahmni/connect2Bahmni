@@ -132,6 +132,7 @@ class _ConsultPadWidgetState extends State<ConsultPadWidget> {
                       visitTypeUuid: board.currentConsultation!.visitType?.uuid,
                       patient: board.currentConsultation!.patient!,
                       isNew: false,
+                      allowVisitTypeChange: !board.currentConsultation!.existingVisit,
                   )),
             );
             if (consultInfo != null) {

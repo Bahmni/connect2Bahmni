@@ -1,6 +1,8 @@
 
 
 import 'dart:convert';
+import 'package:connect2bahmni/services/domain_service.dart';
+import 'package:connect2bahmni/utils/app_failures.dart';
 import 'package:http/http.dart' as http;
 import '../utils/app_urls.dart';
 import '../utils/shared_preference.dart';
@@ -8,7 +10,12 @@ import '../domain/models/omrs_patient.dart';
 import '../domain/condition_model.dart';
 import '../screens/models/consultation_model.dart';
 
-class EmrApiService {
+class EmrApiService extends DomainService {
+  static const errLocationRequired = 'Location is required';
+  static const errVisitTypeRequired = 'Visit type is required';
+  static const errEncTypeRequired = 'Encounter type is required';
+  static const errConsultationNoteRequired = 'Consultation note is required';
+
   Future<List<ConditionModel>> searchCondition(OmrsPatient patient) async {
     String? sessionId = await UserPreferences().getSessionId();
     if (sessionId == null) {
@@ -33,27 +40,11 @@ class EmrApiService {
   }
 
   Future<bool> saveConsultation(ConsultationModel consultation) {
-    var validationResult = _validate(consultation);
-    if (validationResult.isNotEmpty) {
-      return Future.value(false);
-    }
-
     DateTime encounterDateTime = consultation.lastUpdateAt ?? DateTime.now();
     //var encounterTime =  encounterDateTime.isUtc ? encounterDateTime.toLocal() :  encounterDateTime;
     return UserPreferences().getSessionId()
       .then((sessionId) {
-        var payload = jsonEncode({
-          'patientUuid': consultation.patient?.uuid,
-          'locationUuid': consultation.location?.uuid,
-          'visitTypeUuid': consultation.visitType?.uuid,
-          'encounterTypeUuid': consultation.encounterType?.uuid,
-          'encounterDateTime': encounterDateTime.millisecondsSinceEpoch,
-          'providers': [{
-            'uuid': consultation.user.provider?.uuid
-          }],
-          'bahmniDiagnoses': _diagnosesPayload(consultation, encounterDateTime),
-          'observations': _obsPayload(consultation, encounterDateTime),
-        });
+        var payload = jsonEncode(_encounterTxPayload(consultation, encounterDateTime));
         //print('posting consultation: $payload');
         return http.post(
           Uri.parse(AppUrls.bahmni.bahmniEncounter),
@@ -65,33 +56,42 @@ class EmrApiService {
           body: payload,
         );
       }).then((response) {
-        // print('response code: ${response.statusCode}');
-        // print('response : ${response.body}');
         switch (response.statusCode) {
           case 200:
           case 201:
           case 202:
           case 204:
-            {
                 return true;
-            }
           default:
-            {
               //TODO, log error
-              //print('consultation save error: response  ${response.body}');
+              handleErrorResponse(response);
               return false;
-            }
         }
     });
   }
 
-  List<String> _validate(ConsultationModel consultation) {
-    List<String> validationResults = [];
-    consultation.location ?? validationResults.add("required:location");
-    consultation.visitType ?? validationResults.add("required:visit type");
-    consultation.encounterType ?? validationResults.add("required:encounter type");
+  Map<String, Object?> _encounterTxPayload(ConsultationModel consultation, DateTime encounterDateTime) {
+    return {
+        'patientUuid': consultation.patient?.uuid,
+        'locationUuid': consultation.location?.uuid,
+        'visitTypeUuid': consultation.visitType?.uuid,
+        'encounterTypeUuid': consultation.encounterType?.uuid,
+        'encounterDateTime': encounterDateTime.millisecondsSinceEpoch,
+        'providers': [{
+          'uuid': consultation.user.provider?.uuid
+        }],
+        'bahmniDiagnoses': _diagnosesPayload(consultation, encounterDateTime),
+        'observations': _obsPayload(consultation, encounterDateTime),
+      };
+  }
+
+  List<Failure> validate(ConsultationModel consultation) {
+    List<Failure> validationResults = [];
+    consultation.location ?? validationResults.add(Failure(errLocationRequired));
+    consultation.visitType ?? validationResults.add(Failure(errVisitTypeRequired));
+    consultation.encounterType ?? validationResults.add(Failure(errEncTypeRequired));
     if (consultation.consultNote?.concept.uuid == null) {
-      validationResults.add("required:consult notes concept");
+      validationResults.add(Failure(errConsultationNoteRequired));
     }
     return validationResults;
   }

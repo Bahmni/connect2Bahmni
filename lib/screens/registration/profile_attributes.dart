@@ -10,7 +10,8 @@ class ProfileAttributes extends StatefulWidget {
   final List<ProfileAttribute>? attributes;
   final GlobalKey<FormState>? formKey;
   final ProfileController<List<ProfileAttribute>>? controller;
-  const ProfileAttributes({Key? key, this.attributes, this.formKey, this.controller}) : super(key: key);
+  final bool readOnly;
+  const ProfileAttributes({Key? key, this.attributes, this.formKey, this.controller, this.readOnly = false}) : super(key: key);
 
   @override
   State<ProfileAttributes> createState() => _ProfileAttributesState();
@@ -113,6 +114,7 @@ class _ProfileAttributesState extends State<ProfileAttributes> {
         prefixIcon: Icon(Icons.phone),
       ),
       keyboardType: TextInputType.phone,
+      enabled: !widget.readOnly,
       validator: (value) {
         if (value == null || value.isEmpty) {
           return mandatory ? msgEnterValidPhone : null;
@@ -138,6 +140,7 @@ class _ProfileAttributesState extends State<ProfileAttributes> {
     return TextFormField(
       autofocus: false,
       initialValue: attributeValues[attributeType.uuid!] ?? '',
+      enabled: !widget.readOnly,
       decoration: InputDecoration(
         hintText: label,
       ),

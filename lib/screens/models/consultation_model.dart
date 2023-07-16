@@ -1,3 +1,4 @@
+import 'package:connect2bahmni/utils/app_failures.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../domain/models/omrs_location.dart';
@@ -25,6 +26,8 @@ class ConsultationModel {
   OmrsEncounterType? encounterType;
 
   OmrsObs? consultNote;
+
+  bool existingVisit = false;
   String? get consultationNotes {
     return (consultNote == null) ? null : consultNote?.valueAsString;
   }
@@ -67,12 +70,22 @@ class ConsultationModel {
     conditionModel.isEncounterDiagnosis ? diagnosisList.remove(conditionModel) : problemList.remove(conditionModel);
   }
 
+  List<Failure> validate() {
+    return EmrApiService().validate(this);
+  }
+
   Future<bool> save() {
-    return EmrApiService().saveConsultation(this).then((value) {
-      if (value) {
+    var service = EmrApiService();
+    var validationResults = service.validate(this);
+    if (validationResults.isNotEmpty) {
+      return Future.value(false);
+    }
+
+    return service.saveConsultation(this).then((status) {
+      if (status) {
         _finalizeConsultation();
       }
-      return value;
+      return status;
     });
   }
 

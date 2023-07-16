@@ -2,9 +2,11 @@ import 'package:connect2bahmni/screens/models/patient_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 import '../../domain/models/form_definition.dart';
 import '../../domain/models/omrs_concept.dart';
+import '../../providers/meta_provider.dart';
 import '../../services/forms.dart';
 import '../form_fields.dart';
 import '../patient_info.dart';
@@ -33,7 +35,8 @@ class _ObservationFormState extends State<ObservationForm> {
   @override
   void initState() {
     super.initState();
-    _formInitialized = BahmniForms().fetch('d95f4ced-40d0-40a2-a6c9-e76bf5f97e83').then((value) => value.definition).then((value) => _initObservationInstances(value));
+    FormResource form = Provider.of<MetaProvider>(context, listen: false).observationForms.firstWhere((form) => form.name.toLowerCase() == 'Vitals'.toLowerCase());
+    _formInitialized = BahmniForms().fetch(form.uuid).then((value) => value.definition).then((value) => _initObservationInstances(value));
   }
 
   @override
@@ -247,33 +250,6 @@ class _ObservationFormState extends State<ObservationForm> {
           compareFn: (ConceptAnswerDefinition? i, ConceptAnswerDefinition? s) => i?.uuid == s?.uuid,
           filterFn: (ConceptAnswerDefinition? i, String? s) => i?.displayString?.toLowerCase().contains(s!.toLowerCase()) ?? false,
         );
-    // return DropdownButtonFormField<String>(
-    //   key: UniqueKey(),
-    //   isExpanded: true,
-    //   // decoration: InputDecoration(
-    //   //   enabledBorder: OutlineInputBorder(
-    //   //     // borderSide: const BorderSide(color: Colors.blue, width: 2),
-    //   //     borderRadius: BorderRadius.circular(20),
-    //   //   ),
-    //   //   border: OutlineInputBorder(
-    //   //     borderSide: const BorderSide(color: Colors.blue, width: 2),
-    //   //     borderRadius: BorderRadius.circular(20),
-    //   //   ),
-    //   // ),
-    //   //validator: (value) => value == null ? "Select a location" : null,
-    //   //icon: const Icon(Icons.location_on_outlined),
-    //   value: field.value,
-    //   onChanged: (newVal) {
-    //     field.value = newVal;
-    //   },
-    //   hint: Text(field.label ?? ''),
-    //   items: field.definition.concept?.answers?.map((answer) {
-    //     return DropdownMenuItem<String>(
-    //       value: answer.uuid,
-    //       child: Text(answer.displayString ?? ''),
-    //     );
-    //   }).toList(),
-    // );
   }
 
   TextFormField _buildTextField(ObservationField field) {
@@ -382,7 +358,7 @@ class _ObservationFormState extends State<ObservationForm> {
     if (observationInstance.definition?.type == obsGroupControlType) {
       labelText = observationInstance.definition?.label?.value;
     }
-    labelText ??= '${observationInstance.fields?.first.label} #${rowNum + 1}';
+    labelText ??= '${observationInstance.fields?.first.label}';
 
     return Positioned(
       left: 20,
