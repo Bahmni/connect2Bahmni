@@ -54,6 +54,7 @@ dependencies:
   dropdown_search: ^5.0.6
   logging: ^1.2.0
   flutter_speed_dial: ^7.0.0
+  flutter_typeahead: ^4.6.2
 
 
 dev_dependencies:
