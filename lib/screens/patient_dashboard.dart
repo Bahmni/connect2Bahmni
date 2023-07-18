@@ -7,6 +7,7 @@ import '../widgets/app_drawer.dart';
 import '../widgets/bahmniForms/form_view.dart';
 import '../widgets/consult_pad.dart';
 import '../widgets/consultation_notes.dart';
+import '../widgets/investigation_search.dart';
 import '../widgets/jitsi_meeting.dart';
 import '../widgets/patient_chart.dart';
 import '../providers/user_provider.dart';
@@ -298,7 +299,7 @@ class ConsultationActions extends StatelessWidget {
             IconButton(
               tooltip: 'Investigation',
               icon: const Icon(Icons.assessment),
-              onPressed: () {},
+              onPressed: () => addInvestigationToConsultation(context),
             ),
             IconButton(
               tooltip: 'Notes',
@@ -328,8 +329,21 @@ class ConsultationActions extends StatelessWidget {
       },
     );
   }
+   addInvestigationToConsultation(BuildContext context) async {
+    var board = _activeBoardToUpdate(context);
+    if (board == null) return;
 
-  Future<void> _addConditionToConsultation(BuildContext context) async {
+    String concept = await Navigator.push(context,
+      MaterialPageRoute(
+          builder: (context) => const InvestigationSearch(),
+    ));
+    if (concept != null) {
+        print(concept);
+        board.addInvestigation(concept);
+    }
+  }
+
+    Future<void> _addConditionToConsultation(BuildContext context) async {
     var board = _activeBoardToUpdate(context);
     if (board == null) return;
 

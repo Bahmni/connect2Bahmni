@@ -70,6 +70,7 @@ class _ConsultPadWidgetState extends State<ConsultPadWidget> {
             _consultationContext(context, consultation),
             ..._diagnoses(consultation?.diagnosisList),
             ..._problemList(consultation?.problemList),
+            ..._investigationList(consultation?.investigationList),
             (consultation?.consultNote != null) ? _ObsListItem(consultNote: consultation!.consultNote!, sliding: true,) : const SizedBox(height: 1),
           ],
         ));
@@ -186,7 +187,45 @@ class _ConsultPadWidgetState extends State<ConsultPadWidget> {
       ...problemList.map((el) => _conditionWidget(el)).toList()
     ];
   }
-
+  List<Widget> _investigationList(List<String>? investigationList) {
+    if (investigationList == null) return [];
+    if (investigationList.isEmpty) return [];
+    return <Widget>[
+      Align(
+        alignment: Alignment.centerLeft,
+        child: Container(
+          padding: const EdgeInsets.fromLTRB(10, 5, 0, 0),
+          child: Text('Investigation List',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+      ),
+      ...investigationList.map((el) => _investigationWidget(el)).toList()
+    ];
+  }
+  Widget _investigationWidget(String investigation){
+    return Slidable(
+      endActionPane: ActionPane(
+        motion: const ScrollMotion(),
+        children: [
+          _removeInvestigationAction(investigation)
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Container(
+          alignment: Alignment.topLeft,
+          padding: const EdgeInsets.fromLTRB(10, 5, 0, 0),
+          child: Text("✧ $investigation",
+          style: TextStyle(
+            fontSize: 16
+          ),),
+        ),
+      )
+    );
+  }
   Widget _conditionWidget(ConditionModel condition) {
     String? display = condition.code?.display;
     display ??= '(Unknown)';
@@ -232,12 +271,31 @@ class _ConsultPadWidgetState extends State<ConsultPadWidget> {
       ),
     );
   }
+  SlidableAction _removeInvestigationAction(String investigation){
+    return SlidableAction(
+        onPressed: (context){
+          setState(() {
+            Provider.of<ConsultationBoard>(context, listen: false)
+                .removeInvestigation(investigation);
+          });
+        },
+      borderRadius: BorderRadius.all(Radius.circular(100)),
+      autoClose: true,
+        icon: Icons.delete,
+        backgroundColor: Color.fromRGBO(240, 39, 22, 0.6),
+      foregroundColor: Colors.white,
+    );
+  }
 
   SlidableAction _removeConditionAction(ConditionModel condition) {
     return SlidableAction(
+
       onPressed: (context) {
-        Provider.of<ConsultationBoard>(context, listen: false)
-            .removeCondition(condition);
+        setState(() {
+          Provider.of<ConsultationBoard>(context, listen: false)
+              .removeCondition(condition);
+        });
+
       },
       backgroundColor: const Color.fromRGBO(240, 39, 22, 0.6),
       foregroundColor: Colors.white,
@@ -266,7 +324,6 @@ class _ConsultPadWidgetState extends State<ConsultPadWidget> {
     );
   }
 }
-
 class _ObsListItem extends StatelessWidget {
   final OmrsObs consultNote;
   final bool? sliding;

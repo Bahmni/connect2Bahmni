@@ -16,12 +16,12 @@ class ConsultationModel {
   final User user;
   PatientModel? patient;
   OmrsLocation? location;
-
   ConsultationStatus status = ConsultationStatus.none;
   DateTime? startTime;
   DateTime? lastUpdateAt;
   List<ConditionModel> problemList = [];
   List<ConditionModel> diagnosisList = [];
+  List<String> investigationList = [];
   OmrsVisitType? visitType;
   OmrsEncounterType? encounterType;
 
@@ -70,6 +70,7 @@ class ConsultationModel {
     conditionModel.isEncounterDiagnosis ? diagnosisList.remove(conditionModel) : problemList.remove(conditionModel);
   }
 
+
   List<Failure> validate() {
     return EmrApiService().validate(this);
   }
@@ -100,6 +101,12 @@ class ConsultationModel {
 
   void addNotes(OmrsObs notes) {
      consultNote = notes;
+  }
+  void addInvestigation(String investigation){
+    investigationList.add(investigation);
+  }
+  void removeInvestigation(String investigation){
+    investigationList.remove(investigation);
   }
 }
 

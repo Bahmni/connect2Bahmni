@@ -82,5 +82,14 @@ class ConsultationBoard extends ChangeNotifier {
     _currentConsultation?.addNotes(consultNotes);
     notifyListeners();
   }
+  void addInvestigation(String investigation){
+    _verifyEditable();
+    _currentConsultation?.addInvestigation(investigation);
+    notifyListeners();
+  }
+  void removeInvestigation(String investigation){
+    _verifyEditable();
+    _currentConsultation?.removeInvestigation(investigation);
+  }
 
 }
