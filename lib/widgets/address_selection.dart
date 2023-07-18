@@ -1,15 +1,19 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_typeahead/flutter_typeahead.dart';
 
 import '../screens/models/profile_model.dart';
-import 'form_fields.dart';
 import '../screens/registration/profile_controller.dart';
+import '../domain/models/address_entry.dart';
 
 class AddressScreen extends StatefulWidget {
   final ProfileAddress? address;
   final GlobalKey<FormState>? formKey;
   final ProfileController<ProfileAddress>? controller;
   final bool readOnly;
-  const AddressScreen({Key? key, this.address, this.controller, this.formKey, this.readOnly = false}) : super(key: key);
+  final OnAddressSearch? onSearch;
+  const AddressScreen({Key? key, this.address, this.controller, this.formKey, this.readOnly = false, this.onSearch}) : super(key: key);
   @override
   State<AddressScreen> createState() => _AddressScreenState();
 }
@@ -18,139 +22,257 @@ class _AddressScreenState extends State<AddressScreen> {
   final _addressFormKey = GlobalKey<FormState>();
 
   static const lblSelectAddress = 'Select Address';
-  static const lblSubDistrict = "Sub District";
+  static const lblSubDistrict = "Sub-district";
   static const lblDistrict = "District";
+  static const lblState = "State";
   static const lblVillage = "Village";
-  static const msgPleaseSelectValue = 'Please select a value';
+  //static const msgNoMatchFound = 'No match found';
+  static const msgSelect = 'Select';
 
-  String? selectedDistrict;
-  String? selectedSubDistrict;
-  String? selectedVillage;
-
-  List<String> states = ['Karnataka'];
-  List<String> districts = ['District A', 'District B', 'District C'];
-  Map<String, List<String>> subDistricts = {
-    'District A': ['Subdistrict A1', 'Subdistrict A2', 'Subdistrict A3'],
-    'District B': ['Subdistrict B1', 'Subdistrict B2'],
-    'District C': ['Subdistrict C1', 'Subdistrict C2', 'Subdistrict C3']
-  };
-  Map<String, List<String>> villages = {
-    'Subdistrict A1': ['Village A1', 'Village A2', 'Village A3'],
-    'Subdistrict A2': ['Village A4', 'Village A5'],
-    'Subdistrict A3': ['Village A6', 'Village A7', 'Village A8'],
-    'Subdistrict B1': ['Village B1', 'Village B2'],
-    'Subdistrict B2': ['Village B3', 'Village B4'],
-    'Subdistrict C1': ['Village C1', 'Village C2'],
-    'Subdistrict C2': ['Village C3', 'Village C4', 'Village C5'],
-    'Subdistrict C3': ['Village C6', 'Village C7']
-  };
+  final TextEditingController _stateController = TextEditingController();
+  final TextEditingController _districtController = TextEditingController();
+  final TextEditingController _subDistrictController = TextEditingController();
+  final TextEditingController _villageController = TextEditingController();
 
 
   @override
   void initState() {
     super.initState();
     if (widget.address != null) {
-      selectedDistrict = widget.address!.countyDistrict;
-      selectedSubDistrict = widget.address!.subDistrict;
-      selectedVillage = widget.address!.cityVillage;
+      _stateController.text = widget.address?.stateProvince ?? '';
+      _districtController.text = widget.address?.countyDistrict ?? '';
+      _subDistrictController.text = widget.address?.subDistrict ?? '';
+      _villageController.text = widget.address?.cityVillage ?? '';
     }
+  }
+
+
+  @override
+  void dispose() {
+    _villageController.dispose();
+    _subDistrictController.dispose();
+    _districtController.dispose();
+    _stateController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-      debugPrint('Address.build(). Widget District = ${widget.address?.countyDistrict}. Local district = $selectedDistrict formkey = ${widget.formKey}');
       return Form(
         key: widget.formKey ?? _addressFormKey,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(lblSelectAddress),
-            DropDownSearchFormField<String>(
-              label: lblDistrict,
-              initialValue: selectedDistrict,
-              items: districts,
-              onChanged: onDistrictSelected,
-              onSaved: (value) {
-                selectedDistrict = value;
-                _updateAddress();
-              },
-              validator: (value) {
-                return value == null ? msgPleaseSelectValue : null;
-              },
-              enabled: !widget.readOnly,
-            ),
+            _buildStateProvinceField(context),
             SizedBox(height: 5.0),
-            DropDownSearchFormField<String>(
-              label: lblSubDistrict,
-              initialValue: selectedSubDistrict,
-              items: selectedDistrict != null ? subDistricts[selectedDistrict] ?? [] : [],
-              onChanged: onSubDistrictSelected,
-              onSaved: (value) {
-                selectedSubDistrict = value;
-                _updateAddress();
-              },
-              validator: (value) {
-                return value == null ? msgPleaseSelectValue : null;
-              },
-              enabled: !widget.readOnly,
-            ),
+            _buildDistrictField(context),
             SizedBox(height: 5.0),
-            DropDownSearchFormField<String>(
-              label: lblVillage,
-              initialValue: selectedVillage,
-              items: selectedSubDistrict != null ? villages[selectedSubDistrict] ?? [] : [],
-              onChanged: onVillageSelected,
-              onSaved: (value) {
-                selectedVillage = value;
-                _updateAddress();
-              },
-              validator: (value) {
-                return value == null ? msgPleaseSelectValue : null;
-              },
-              enabled: !widget.readOnly,
-            ),
+            _buildSubDistrictField(context),
             SizedBox(height: 5.0),
-            SizedBox(height: 5.0),
-            const SizedBox(height: 12.0,),
+            _buildVillageField(context),
           ],
         ),
       );
   }
 
-  void onDistrictSelected(String? district) {
-    debugPrint('updating district: $district');
-    setState(() {
-      selectedDistrict = district;
-      selectedSubDistrict = null;
-      selectedVillage = null;
-    });
+  TypeAheadFormField<String> _buildStateProvinceField(BuildContext context) {
+    return
+      TypeAheadFormField<String>(
+          enabled: !widget.readOnly,
+          textFieldConfiguration: TextFieldConfiguration(
+              //autofocus: true,
+              decoration: InputDecoration(
+                  hintText: lblState
+              ),
+              controller: _stateController
+          ),
+          noItemsFoundBuilder: (context) {
+            return SizedBox();
+          },
+          suggestionsCallback: (pattern) async {
+            // if (pattern.isEmpty) {
+            //   return districts;
+            // }
+            if (widget.onSearch != null) {
+              var addressPattern = pattern;
+              List<AddressEntry> matches = await widget.onSearch!(addressPattern);
+              return matches.map((e) => e.name).toList();
+            }
+            //return districts.where((element) => element.toLowerCase().contains(pattern.toLowerCase()));
+            return [];
+          },
+          itemBuilder: (context, suggestion) {
+            return ListTile(
+              title: Text(suggestion.toString()),
+              subtitle: Text(suggestion),
+            );
+          },
+          onSuggestionSelected: (suggestion) {
+            _stateController.text = suggestion;
+          },
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return '$msgSelect $lblState';
+            }
+            return null;
+          },
+          onSaved: (value) {
+            _updateAddress();
+          }
+      );
+  }
+
+  TypeAheadFormField<String> _buildDistrictField(BuildContext context) {
+    return
+      TypeAheadFormField<String>(
+          enabled: !widget.readOnly,
+          //initialValue: selectedDistrict,
+          textFieldConfiguration: TextFieldConfiguration(
+              autofocus: true,
+              // style: DefaultTextStyle.of(context).style.copyWith(
+              //     fontStyle: FontStyle.italic
+              // ),
+              decoration: InputDecoration(
+                  hintText: lblDistrict
+              ),
+              controller: _districtController
+          ),
+          noItemsFoundBuilder: (context) {
+            return SizedBox();
+          },
+          suggestionsCallback: (pattern) async {
+            if (widget.onSearch != null) {
+              var addressPattern = '${_stateController.text}|$pattern';
+              List<AddressEntry> matches = await widget.onSearch!(addressPattern);
+              return matches.map((e) => e.name).toList();
+            }
+            return [];
+          },
+          itemBuilder: (context, suggestion) {
+            return ListTile(
+              title: Text(suggestion.toString()),
+              subtitle: Text(suggestion),
+            );
+          },
+          onSuggestionSelected: (suggestion) {
+            _districtController.text = suggestion;
+          },
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return '$msgSelect $lblDistrict';
+            }
+            return null;
+          },
+          onSaved: (value) {
+            _updateAddress();
+          }
+      );
+  }
+
+  TypeAheadFormField<String> _buildSubDistrictField(BuildContext context) {
+    return TypeAheadFormField(
+        enabled: !widget.readOnly,
+        textFieldConfiguration: TextFieldConfiguration(
+            autofocus: true,
+            decoration: InputDecoration(
+                hintText: lblSubDistrict
+            ),
+            controller: _subDistrictController
+        ),
+        noItemsFoundBuilder: (context) {
+          return SizedBox();
+        },
+        suggestionsCallback: (pattern) async {
+          if (widget.onSearch != null) {
+            var addressPattern = '${_stateController.text}|${_districtController.text}|$pattern';
+            List<AddressEntry> matches = await widget.onSearch!(addressPattern);
+            return matches.map((e) => e.name).toList();
+          }
+          return [];
+        },
+        itemBuilder: (context, suggestion) {
+          return ListTile(
+            title: Text(suggestion.toString()),
+            subtitle: Text(suggestion),
+          );
+        },
+        onSuggestionSelected: (suggestion) {
+          _subDistrictController.text = suggestion;
+        },
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return '$msgSelect $lblSubDistrict';
+          }
+          return null;
+        },
+        onSaved: (value) {
+          _updateAddress();
+        }
+    );
+  }
+
+  TypeAheadFormField<String> _buildVillageField(BuildContext context) {
+    return TypeAheadFormField(
+        enabled: !widget.readOnly,
+        textFieldConfiguration: TextFieldConfiguration(
+            autofocus: true,
+            decoration: InputDecoration(
+                hintText: lblVillage
+            ),
+            controller: _villageController
+        ),
+        noItemsFoundBuilder: (context) {
+          return SizedBox();
+        },
+        suggestionsCallback: (pattern) async {
+          if (widget.onSearch != null) {
+            var addressPattern = '${_stateController.text}|${_districtController.text}|${_subDistrictController.text}|$pattern';
+            List<AddressEntry> matches = await widget.onSearch!(addressPattern);
+            return matches.map((e) => e.name).toList();
+          }
+          return [];
+        },
+        itemBuilder: (context, suggestion) {
+          return ListTile(
+            title: Text(suggestion.toString()),
+            subtitle: Text(suggestion),
+          );
+        },
+        onSuggestionSelected: (suggestion) {
+          _villageController.text = suggestion;
+        },
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return '$msgSelect $lblVillage';
+          }
+          return null;
+        },
+        onSaved: (value) {
+          _updateAddress();
+        }
+    );
   }
 
   void _updateAddress() {
+    debugPrint('updating address: district = ${_districtController.text}, subDistrict = ${_subDistrictController.text}, village = ${_villageController.text}');
     if (widget.controller != null) {
        ProfileAddress? address = widget.controller?.getData();
        if (address != null) {
-         address.countyDistrict = selectedDistrict;
-         address.subDistrict = selectedSubDistrict;
-         address.cityVillage = selectedVillage;
+         address.stateProvince = _stateController.text.trim();
+         address.countyDistrict = _districtController.text.trim();
+         address.subDistrict = _subDistrictController.text.trim();
+         address.cityVillage = _villageController.text.trim();
        } else {
-         widget.controller?.setData(ProfileAddress(cityVillage: selectedVillage, countyDistrict: selectedDistrict, subDistrict: selectedSubDistrict));
+         widget.controller?.setData(
+             ProfileAddress(
+               stateProvince: _stateController.text.trim(),
+               cityVillage: _villageController.text.trim(),
+               subDistrict: _subDistrictController.text.trim(),
+               countyDistrict: _districtController.text.trim()));
        }
     }
   }
-
-  void onSubDistrictSelected(String? subDistrict) {
-    setState(() {
-      selectedSubDistrict = subDistrict;
-      selectedVillage = null;
-    });
-  }
-
-
-  void onVillageSelected(String? village) {
-    setState(() {
-      selectedVillage = village;
-    });
-  }
-
 }
+
+typedef OnAddressSearch = Future<List<AddressEntry>> Function(String pattern);

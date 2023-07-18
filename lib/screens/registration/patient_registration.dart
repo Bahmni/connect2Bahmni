@@ -3,9 +3,11 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../domain/models/address_entry.dart';
 import '../../providers/meta_provider.dart';
 import '../../screens/registration/profile_attributes.dart';
 import '../../domain/models/omrs_identifier_type.dart';
+import '../../services/address_hierarchy.dart';
 import '../../utils/app_failures.dart';
 import '../../widgets/address_selection.dart';
 import '../../services/registrations.dart';
@@ -44,6 +46,7 @@ class _PatientRegistration extends State<PatientRegistration> {
   final ValueNotifier<int> _pageIndex = ValueNotifier<int>(0);
   final ValueNotifier<bool> _profileSaved = ValueNotifier<bool>(false);
   late ProfileModel profile;
+  final List<AddressEntry> addressHierarchy = [];
 
   @override
   void dispose() {
@@ -54,6 +57,9 @@ class _PatientRegistration extends State<PatientRegistration> {
   void initState() {
     super.initState();
     primaryPatientIdentifierType = Provider.of<MetaProvider>(context, listen: false).primaryPatientIdentifierType;
+    AddressHierarchy().loadAddressHierarchy(context).then((value) {
+      addressHierarchy.addAll(value);
+    });
     profile = initializeModel();
   }
 
@@ -141,6 +147,9 @@ class _PatientRegistration extends State<PatientRegistration> {
                 address: profile.address,
                 controller: _addressController,
                 readOnly: _profileSaved.value,
+                onSearch: (pattern) async {
+                  return _findAddressEntries(pattern);
+                },
               ))
         ]);
       case 3:
@@ -156,6 +165,81 @@ class _PatientRegistration extends State<PatientRegistration> {
             )
         );
     }
+  }
+
+  /// TODO: refactor the code. This is a quick fix
+  List<AddressEntry> _findAddressEntries(String pattern) {
+      if (pattern.trim().isEmpty) {
+        return addressHierarchy;
+      }
+      var searchString = pattern.trim();
+      bool showAllChildren = searchString.endsWith("|");
+      if (showAllChildren) {
+        searchString = searchString.substring(0, searchString.length-1);
+      }
+      var queries = searchString.split('|');
+      var searchable = addressHierarchy;
+      switch (queries.length) {
+        case 1: //State
+          if (showAllChildren) {
+              AddressEntry? entry = addressHierarchy.where((element) => element.name == queries[0]).firstOrNull;
+              return entry != null ? (entry.children ?? []) : [];
+          }
+          return searchable.where((element) => element.name.toLowerCase().contains(queries[0].toLowerCase())).toList();
+        case 2: //District
+          AddressEntry? entry = addressHierarchy.where((element) => element.name == queries[0]).firstOrNull;
+          if (entry != null) {
+            if (showAllChildren) {
+              entry = entry.children?.where((element) => element.name == queries[1]).firstOrNull;
+              return entry != null ? (entry.children ?? []) : [];
+            } else {
+              return entry.children?.where((element) => element.name.toLowerCase().contains(queries[1].toLowerCase())).toList() ?? [];
+            }
+          } else {
+            return [];
+          }
+        case 3: //Sub - District
+          AddressEntry? entry = addressHierarchy.where((element) => element.name == queries[0]).firstOrNull;
+          if (entry != null) {
+            entry = entry.children?.where((element) => element.name == queries[1]).firstOrNull;
+            if (entry != null) {
+              if (showAllChildren) {
+                entry = entry.children?.where((element) => element.name == queries[2]).firstOrNull;
+                return entry != null ? (entry.children ?? []) : [];
+              } else {
+                return entry.children?.where((element) => element.name.toLowerCase().contains(queries[2].toLowerCase())).toList() ?? [];
+              }
+            } else {
+              return [];
+            }
+          } else {
+            return [];
+          }
+        case 4: // village
+          AddressEntry? entry = addressHierarchy.where((element) => element.name == queries[0]).firstOrNull;
+          if (entry != null) {
+            entry = entry.children?.where((element) => element.name == queries[1]).firstOrNull;
+            if (entry != null) {
+              entry = entry.children?.where((element) => element.name == queries[2]).firstOrNull;
+              if (entry != null) {
+                if (showAllChildren) {
+                  entry = entry.children?.where((element) => element.name == queries[3]).firstOrNull;
+                  return entry != null ? (entry.children ?? []) : [];
+                } else {
+                  return entry.children?.where((element) => element.name.toLowerCase().contains(queries[3].toLowerCase())).toList() ?? [];
+                }
+              } else {
+                return [];
+              }
+            } else {
+              return [];
+            }
+          } else {
+            return [];
+          }
+        default:
+          return [];
+      }
   }
 
   Widget _profileActionButton() {

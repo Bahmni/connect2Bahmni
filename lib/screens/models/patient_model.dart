@@ -34,9 +34,12 @@ class PatientModel {
 
   String get genderAndAge {
     String result = _patient.gender?.value ?? '';
-    DateTime dob = _patient.birthDate?.valueDateTime ?? DateTime.now();
-    PersonAge age = calculateAge(dob);
-    String strAge = age.year != 0 ? '${age.year}y ${age.month}m' : '${age.month}m ${age.days}d';
+    String strAge = '';
+    DateTime? dob = _patient.birthDate?.valueDateTime;
+    if (dob != null) {
+      PersonAge age = calculateAge(dob);
+      strAge = age.year != 0 ? '${age.year}y ${age.month}m' : '${age.month}m ${age.days}d';
+    }
     return '${_genderMap[result] ?? ''}, $strAge' ;
   }
 

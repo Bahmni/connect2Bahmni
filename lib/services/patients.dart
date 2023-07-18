@@ -49,8 +49,8 @@ class Patients extends DomainService {
             fhirId: p['uuid'],
             name: [HumanName(given:  [p['name']])],
             identifier: [Identifier(value: p['identifier'])],
-            birthDate: FhirDate.fromDateTime(DateTime.fromMillisecondsSinceEpoch(p['birthdate'] as int)),
-            gender: FhirCode(_getGenderCode(p['gender'])),
+            birthDate: p['birthdate'] != null ? FhirDate.fromDateTime(DateTime.fromMillisecondsSinceEpoch(p['birthdate'] as int)) : null,
+            gender: p['gender'] != null ? FhirCode(_getGenderCode(p['gender'])) : null,
           )).toList();
         Bundle bundle = Bundle(
           entry: patients.map((p) => BundleEntry(resource: p)).toList()
@@ -59,7 +59,7 @@ class Patients extends DomainService {
       }
       return Bundle();
     } else {
-      throw 'Failed to fetch locations';
+      throw handleErrorResponse(response);
     }
   }
 
