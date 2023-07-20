@@ -24,6 +24,7 @@ class OMRSRestUrls {
   String get patientIdentifierTypes => '$base/idgen/identifiertype';
   String get personAttrTypes => '$base/personattributetype?v=custom:(uuid,name,format,description)';
   String get forms => '$base/form';
+  String get orderType => '$base/ordertype?v=custom:(uuid,display,conceptClasses:(uuid,display,name))';
 }
 
 class FHIRUrls {

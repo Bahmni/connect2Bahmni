@@ -97,9 +97,10 @@ class OmrsConceptDataType {
 class OmrsConceptClass {
   String? uuid;
   String? name;
+  String? display;
 
-  OmrsConceptClass({this.uuid, this.name});
-  OmrsConceptClass.fromJson(Map<String, dynamic> json): uuid = json['uuid'], name = json['name'];
+  OmrsConceptClass({this.uuid, this.name, this.display});
+  OmrsConceptClass.fromJson(Map<String, dynamic> json): uuid = json['uuid'], name = json['name'], display = json['display'];
   Map<String, dynamic> toJson() => {
     'uuid': uuid,
     'name': name
