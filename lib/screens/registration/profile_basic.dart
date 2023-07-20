@@ -254,6 +254,7 @@ class _BasicProfileState extends State<BasicProfile> {
         Flexible(
           child: TextFormField(
               controller: dobController,
+              readOnly: widget.readOnly,
               validator: (value) {
                 return value != null && value.isEmpty ? msgEnterDob : null;
               },
