@@ -1,3 +1,4 @@
+import 'package:connect2bahmni/domain/models/omrs_concept.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:provider/provider.dart';
@@ -187,7 +188,7 @@ class _ConsultPadWidgetState extends State<ConsultPadWidget> {
       ...problemList.map((el) => _conditionWidget(el)).toList()
     ];
   }
-  List<Widget> _investigationList(List<String>? investigationList) {
+  List<Widget> _investigationList(List<OmrsConcept>? investigationList) {
     if (investigationList == null) return [];
     if (investigationList.isEmpty) return [];
     return <Widget>[
@@ -205,7 +206,8 @@ class _ConsultPadWidgetState extends State<ConsultPadWidget> {
       ...investigationList.map((el) => _investigationWidget(el)).toList()
     ];
   }
-  Widget _investigationWidget(String investigation){
+  Widget _investigationWidget(OmrsConcept investigation){
+    String? text=investigation.display;
     return Slidable(
       endActionPane: ActionPane(
         motion: const ScrollMotion(),
@@ -216,9 +218,10 @@ class _ConsultPadWidgetState extends State<ConsultPadWidget> {
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Container(
+
           alignment: Alignment.topLeft,
           padding: const EdgeInsets.fromLTRB(10, 5, 0, 0),
-          child: Text("✧ $investigation",
+          child: Text("✧ $text",
           style: TextStyle(
             fontSize: 16
           ),),
@@ -271,7 +274,7 @@ class _ConsultPadWidgetState extends State<ConsultPadWidget> {
       ),
     );
   }
-  SlidableAction _removeInvestigationAction(String investigation){
+  SlidableAction _removeInvestigationAction(OmrsConcept investigation){
     return SlidableAction(
         onPressed: (context){
           setState(() {

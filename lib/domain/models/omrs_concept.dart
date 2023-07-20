@@ -50,8 +50,6 @@ class OmrsConcept {
         datatype = json['datatype'] == null ? null : OmrsConceptDataType.fromJson(json['datatype'] as Map<String, dynamic>);
 
 
-
-
   Map<String, dynamic> toJson() => {
     'uuid': uuid,
     'display': display,

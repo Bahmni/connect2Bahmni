@@ -22,7 +22,7 @@ class _InvestigationSearchWidgetState extends State<InvestigationSearch> {
   TextEditingController searchController = TextEditingController();
   final Debouncer _debouncer = Debouncer();
   List<OmrsConcept> investigationList = [];
-  String selectedInvestigation = '';
+  late OmrsConcept selectedInvestigation;
 
   @override
 
@@ -88,20 +88,17 @@ class _InvestigationSearchWidgetState extends State<InvestigationSearch> {
                   child:ListView.builder(
     itemCount: investigationList.length,
     itemBuilder: (BuildContext context, int index) {
-    var result=investigationList[index].display.toString();
+    OmrsConcept result=investigationList[index];
     return ListTile(
-    title: Text(result),
+    title: Text(result.display.toString()),
     tileColor: Colors.white70,
     onTap: (){
       setState(() {
         _debouncer.stop();
         selectedInvestigation=result;
-        // print(selectedInvestigationList);
         Navigator.pop(context,selectedInvestigation);
       });
     },
-    // height: 20,
-    // padding: EdgeInsets.symmetric(horizontal: 10,vertical: 2),
     );
     },
     )),

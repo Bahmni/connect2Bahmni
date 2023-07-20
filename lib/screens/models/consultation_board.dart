@@ -82,12 +82,12 @@ class ConsultationBoard extends ChangeNotifier {
     _currentConsultation?.addNotes(consultNotes);
     notifyListeners();
   }
-  void addInvestigation(String investigation){
+  void addInvestigation(OmrsConcept investigation){
     _verifyEditable();
     _currentConsultation?.addInvestigation(investigation);
     notifyListeners();
   }
-  void removeInvestigation(String investigation){
+  void removeInvestigation(OmrsConcept investigation){
     _verifyEditable();
     _currentConsultation?.removeInvestigation(investigation);
   }

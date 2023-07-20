@@ -333,12 +333,11 @@ class ConsultationActions extends StatelessWidget {
     var board = _activeBoardToUpdate(context);
     if (board == null) return;
 
-    String concept = await Navigator.push(context,
+    OmrsConcept concept = await Navigator.push(context,
       MaterialPageRoute(
           builder: (context) => const InvestigationSearch(),
     ));
     if (concept != null) {
-        print(concept);
         board.addInvestigation(concept);
     }
   }

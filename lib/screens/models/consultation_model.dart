@@ -1,3 +1,4 @@
+import 'package:connect2bahmni/domain/models/omrs_concept.dart';
 import 'package:connect2bahmni/utils/app_failures.dart';
 import 'package:uuid/uuid.dart';
 
@@ -21,7 +22,7 @@ class ConsultationModel {
   DateTime? lastUpdateAt;
   List<ConditionModel> problemList = [];
   List<ConditionModel> diagnosisList = [];
-  List<String> investigationList = [];
+  List<OmrsConcept> investigationList = [];
   OmrsVisitType? visitType;
   OmrsEncounterType? encounterType;
 
@@ -102,10 +103,10 @@ class ConsultationModel {
   void addNotes(OmrsObs notes) {
      consultNote = notes;
   }
-  void addInvestigation(String investigation){
+  void addInvestigation(OmrsConcept investigation){
     investigationList.add(investigation);
   }
-  void removeInvestigation(String investigation){
+  void removeInvestigation(OmrsConcept investigation){
     investigationList.remove(investigation);
   }
 }
