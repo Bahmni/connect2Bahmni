@@ -1,14 +1,13 @@
-
-
 import 'dart:convert';
-import 'package:connect2bahmni/services/domain_service.dart';
-import 'package:connect2bahmni/utils/app_failures.dart';
 import 'package:http/http.dart' as http;
+import '../domain/models/omrs_order.dart';
+import '../utils/app_failures.dart';
 import '../utils/app_urls.dart';
 import '../utils/shared_preference.dart';
 import '../domain/models/omrs_patient.dart';
 import '../domain/condition_model.dart';
 import '../screens/models/consultation_model.dart';
+import '../services/domain_service.dart';
 
 class EmrApiService extends DomainService {
   static const errLocationRequired = 'Location is required';
@@ -126,6 +125,35 @@ class EmrApiService extends DomainService {
       });
     }
     return obsList;
+  }
+
+  Future<List<OmrsOrderType>> orderTypes() {
+    return UserPreferences().getSessionId()
+    .then((sessionId) {
+      if (sessionId == null) {
+        throw 'Authentication Failure';
+      }
+      return http.get(
+        Uri.parse(AppUrls.omrs.orderType),
+        headers: <String, String>{
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Cookie': 'JSESSIONID=$sessionId',
+        },
+      );
+    }).then((response) {
+      switch (response.statusCode) {
+        case 200:
+        case 304:
+          var responseJson = jsonDecode(response.body);
+          var resultList = responseJson['results'] ?? [];
+          return List<OmrsOrderType>.from(resultList.map((ot) {
+            return OmrsOrderType.fromJson(ot);
+          }));
+        default:
+          throw handleErrorResponse(response);
+      }
+    });
   }
 
 }

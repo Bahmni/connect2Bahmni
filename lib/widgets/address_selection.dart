@@ -85,6 +85,7 @@ class _AddressScreenState extends State<AddressScreen> {
               decoration: InputDecoration(
                   hintText: lblState
               ),
+              enabled: !widget.readOnly,
               controller: _stateController
           ),
           noItemsFoundBuilder: (context) {
@@ -136,6 +137,7 @@ class _AddressScreenState extends State<AddressScreen> {
               decoration: InputDecoration(
                   hintText: lblDistrict
               ),
+              enabled: !widget.readOnly,
               controller: _districtController
           ),
           noItemsFoundBuilder: (context) {
@@ -178,6 +180,7 @@ class _AddressScreenState extends State<AddressScreen> {
             decoration: InputDecoration(
                 hintText: lblSubDistrict
             ),
+            enabled: !widget.readOnly,
             controller: _subDistrictController
         ),
         noItemsFoundBuilder: (context) {
@@ -220,6 +223,7 @@ class _AddressScreenState extends State<AddressScreen> {
             decoration: InputDecoration(
                 hintText: lblVillage
             ),
+            enabled: !widget.readOnly,
             controller: _villageController
         ),
         noItemsFoundBuilder: (context) {

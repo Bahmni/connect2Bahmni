@@ -1,6 +1,8 @@
-import 'package:connect2bahmni/domain/models/form_definition.dart';
-import 'package:connect2bahmni/domain/models/omrs_identifier_type.dart';
-import 'package:connect2bahmni/domain/models/omrs_person_attribute.dart';
+import '../domain/models/form_definition.dart';
+import '../domain/models/omrs_identifier_type.dart';
+import '../domain/models/omrs_order.dart';
+import '../domain/models/omrs_person_attribute.dart';
+import '../services/emr_api_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import '../domain/models/omrs_concept.dart';
@@ -20,6 +22,7 @@ class MetaProvider with ChangeNotifier {
   List<OmrsIdentifierType>? _patientIdentifierTypes;
   List<OmrsPersonAttributeType>? _personAttrTypes;
   List<FormResource>? _publishedForms;
+  List<OmrsOrderType>? _orderTypes;
 
   OmrsConcept? get conditionCertainty => _conditionCertainty;
 
@@ -31,6 +34,7 @@ class MetaProvider with ChangeNotifier {
   OmrsIdentifierType? get primaryPatientIdentifierType => _patientIdentifierTypes?.firstWhere((element) => element.primary == true);
   List<OmrsPersonAttributeType>? get personAttrTypes => _personAttrTypes;
   List<FormResource>? get publishedForms => _publishedForms;
+  List<OmrsOrderType>? get orderTypes => _orderTypes;
 
   List<OmrsVisitType>? get allowedVisitTypes {
     if (_visitTypes == null) return [];
@@ -96,6 +100,10 @@ class MetaProvider with ChangeNotifier {
       _publishedForms = value;
       notifyListeners();
     }).catchError((e) => _logError(e));
+    EmrApiService().orderTypes().then((value) {
+      _orderTypes = value;
+      notifyListeners();
+    });
   }
 
   _logError(e) {
