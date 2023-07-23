@@ -116,7 +116,7 @@ class _InvestigationSearchWidgetState extends State<InvestigationSearch> {
         });
         return;
       }
-      final Future<List<OmrsConcept>> request = ConceptDictionary().searchConcept(searchController.text);
+      final Future<List<OmrsConcept>> request = ConceptDictionary().searchInvestigation(searchController.text);
       request.then((results) {
         if(mounted) {
           setState(() {

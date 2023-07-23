@@ -41,6 +41,30 @@ class ConceptDictionary {
     if (sessionId == null) {
       throw 'Authentication Failure';
     }
+    String url = '${AppUrls.omrs.concept}?q=$term&v=full';
+    var response = await http.get(
+      Uri.parse(url),
+      headers: <String, String>{
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Cookie': 'JSESSIONID=$sessionId',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      var responseJson = jsonDecode(response.body);
+      var resultList = responseJson['results'] ?? [];
+      var list = List<OmrsConcept>.from(resultList.map((v) => OmrsConcept.fromJson(v)));
+      return List<OmrsConcept>.from(resultList.map((v) => OmrsConcept.fromJson(v)));
+    } else {
+      throw 'Failed to fetch Concept';
+    }
+  }
+  Future<List<OmrsConcept>> searchInvestigation(String term) async {
+    String? sessionId = await UserPreferences().getSessionId();
+    if (sessionId == null) {
+      throw 'Authentication Failure';
+    }
     String url = '${AppUrls.omrs.concept}?q=$term&v=custom:(uuid,name,display,conceptClass:(uuid,name)';
     var response = await http.get(
       Uri.parse(url),
@@ -57,7 +81,7 @@ class ConceptDictionary {
       var list = List<OmrsConcept>.from(resultList.map((v) => OmrsConcept.fromJson(v)));
       return list.where((element) => element.conceptClass?.name == 'Test'||element.conceptClass?.name == 'LabTest'||element.conceptClass?.name == 'Radiology'||element.conceptClass?.name == 'LabSet' || element.conceptClass?.name == 'Procedure').toList();
     } else {
-      throw 'Failed to fetch Concept';
+      throw 'Failed to fetch Investigation';
     }
   }
 
