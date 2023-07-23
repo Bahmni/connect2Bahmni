@@ -1,3 +1,4 @@
+import 'package:connect2bahmni/domain/models/omrs_order.dart';
 import 'package:flutter/foundation.dart';
 
 import 'consultation_model.dart';
@@ -82,12 +83,12 @@ class ConsultationBoard extends ChangeNotifier {
     _currentConsultation?.addNotes(consultNotes);
     notifyListeners();
   }
-  void addInvestigation(OmrsConcept investigation){
+  void addInvestigation(OmrsOrder investigation){
     _verifyEditable();
     _currentConsultation?.addInvestigation(investigation);
     notifyListeners();
   }
-  void removeInvestigation(OmrsConcept investigation){
+  void removeInvestigation(OmrsOrder investigation){
     _verifyEditable();
     _currentConsultation?.removeInvestigation(investigation);
   }

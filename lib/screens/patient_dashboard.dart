@@ -1,3 +1,4 @@
+import 'package:connect2bahmni/domain/models/omrs_order.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
@@ -7,6 +8,7 @@ import '../widgets/app_drawer.dart';
 import '../widgets/bahmniForms/form_view.dart';
 import '../widgets/consult_pad.dart';
 import '../widgets/consultation_notes.dart';
+import '../widgets/investigation_details.dart';
 import '../widgets/investigation_search.dart';
 import '../widgets/jitsi_meeting.dart';
 import '../widgets/patient_chart.dart';
@@ -333,12 +335,22 @@ class ConsultationActions extends StatelessWidget {
     var board = _activeBoardToUpdate(context);
     if (board == null) return;
 
-    OmrsConcept concept = await Navigator.push(context,
+    OmrsConcept? concept = await Navigator.push(context,
       MaterialPageRoute(
           builder: (context) => const InvestigationSearch(),
     ));
+
     if (concept != null) {
-        board.addInvestigation(concept);
+      if (context.mounted) {
+        var newInvestigation = OmrsOrder(concept: concept);
+        OmrsOrder? details = await Navigator.push(context,
+            MaterialPageRoute(
+              builder: (context) => InvestigationDetails(investigation :newInvestigation),
+            ));
+        if (details != null) {
+          board.addInvestigation(details);
+        }
+      }
     }
   }
 

@@ -1,11 +1,15 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:connect2bahmni/domain/models/omrs_order.dart';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 
 import '../domain/models/omrs_concept.dart';
+import '../providers/meta_provider.dart';
 import '../utils/app_urls.dart';
 import '../utils/shared_preference.dart';
+import 'emr_api_service.dart';
 
 class ConceptDictionary {
   Future<List<OmrsConcept>> searchCondition(String term) async {
@@ -52,7 +56,6 @@ class ConceptDictionary {
       var resultList = responseJson['results'] ?? [];
       var list = List<OmrsConcept>.from(resultList.map((v) => OmrsConcept.fromJson(v)));
       return list.where((element) => element.conceptClass?.name == 'Test'||element.conceptClass?.name == 'LabTest'||element.conceptClass?.name == 'Radiology'||element.conceptClass?.name == 'LabSet' || element.conceptClass?.name == 'Procedure').toList();
-      //return list;
     } else {
       throw 'Failed to fetch Concept';
     }
@@ -116,5 +119,4 @@ class ConceptDictionary {
       return OmrsConcept.fromJson(responseJson);
     });
   }
-
 }

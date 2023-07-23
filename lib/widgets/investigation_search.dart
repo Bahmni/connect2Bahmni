@@ -1,15 +1,11 @@
 import 'dart:async';
-import 'dart:convert';
-import 'package:connect2bahmni/screens/models/consultation_board.dart';
-import 'package:connect2bahmni/screens/patient_dashboard.dart';
+import 'package:connect2bahmni/domain/models/omrs_concept.dart';
+import 'package:connect2bahmni/domain/models/omrs_order.dart';
+import 'package:connect2bahmni/services/emr_api_service.dart';
 import 'package:flutter/material.dart';
-
-import '../utils/app_urls.dart';
 import '../utils/debouncer.dart';
 import '../utils/app_failures.dart';
-import '../domain/models/omrs_concept.dart';
 import '../services/concept_dictionary.dart';
-import '../utils/shared_preference.dart';
 class InvestigationSearch extends StatefulWidget {
   const InvestigationSearch({Key? key}) : super(key: key);
 
@@ -40,72 +36,73 @@ class _InvestigationSearchWidgetState extends State<InvestigationSearch> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text('Investigations Page')),
-      body: Column(
-        children: [
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
 
-          Container(
-            width: MediaQuery.of(context).size.width,
-            height: 100,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              border: Border.all(
-                color: const Color(0xFFDBE2E7),
+            Container(
+              width: MediaQuery.of(context).size.width,
+              height: 100,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                border: Border.all(
+                  color: const Color(0xFFDBE2E7),
+                ),
+              ),
+              child: Padding(
+                padding: const EdgeInsetsDirectional.fromSTEB(0, 20, 0, 0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.max,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsetsDirectional.fromSTEB(12, 0, 12, 0),
+                      child: SearchBar(
+                        hintText: "Find labs",
+                        controller: searchController,
+                        leading:IconButton(
+                              icon: Icon(
+                                Icons.search
+                              ),
+                          onPressed: () {
+                                return _searchForInvestigation();
+                        },
+                         )
+
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
-            child: Padding(
-              padding: const EdgeInsetsDirectional.fromSTEB(0, 20, 0, 0),
+            SingleChildScrollView(
               child: Column(
-                mainAxisSize: MainAxisSize.max,
-                children: [
-                  Padding(
-                    padding: const EdgeInsetsDirectional.fromSTEB(12, 0, 12, 0),
-                    child: SearchBar(
-                      hintText: "Find labs",
-                      controller: searchController,
-                      leading:IconButton(
-                            icon: Icon(
-                              Icons.search
-                            )
-                      , onPressed: () {
-                              return _searchForInvestigation();
-                      },
-                       )
-
-                    ),
-                  ),
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                  Container(
+                    height:350,
+                    child:ListView.builder(
+                    itemCount: investigationList.length,
+                    itemBuilder: (BuildContext context, int index) {
+                    OmrsConcept result=investigationList[index];
+                    return ListTile(
+                    title: Text(result.display.toString()),
+                      trailing: IconButton(onPressed: (){
+                        setState(() {
+                          _debouncer.stop();
+                          selectedInvestigation=result;
+                          Navigator.pop(context,selectedInvestigation);
+                        });
+                      }, icon: Icon(Icons.keyboard_arrow_right)),
+                    );
+                    },
+                  )),
+                 // selectedInvestigation!=null ? Text(selectedInvestigation.display.toString()):Text(''),
                 ],
               ),
             ),
-          ),
-          SingleChildScrollView(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                // for (var p in investigationList) _resultRow(p),
-                Container(
-                  height:350,
-                  child:ListView.builder(
-    itemCount: investigationList.length,
-    itemBuilder: (BuildContext context, int index) {
-    OmrsConcept result=investigationList[index];
-    return ListTile(
-    title: Text(result.display.toString()),
-    tileColor: Colors.white70,
-    onTap: (){
-      setState(() {
-        _debouncer.stop();
-        selectedInvestigation=result;
-        Navigator.pop(context,selectedInvestigation);
-      });
-    },
-    );
-    },
-    )),
-              ],
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

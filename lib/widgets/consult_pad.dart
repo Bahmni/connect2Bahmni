@@ -1,4 +1,5 @@
 import 'package:connect2bahmni/domain/models/omrs_concept.dart';
+import 'package:connect2bahmni/domain/models/omrs_order.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:provider/provider.dart';
@@ -188,7 +189,7 @@ class _ConsultPadWidgetState extends State<ConsultPadWidget> {
       ...problemList.map((el) => _conditionWidget(el)).toList()
     ];
   }
-  List<Widget> _investigationList(List<OmrsConcept>? investigationList) {
+  List<Widget> _investigationList(List<OmrsOrder>? investigationList) {
     if (investigationList == null) return [];
     if (investigationList.isEmpty) return [];
     return <Widget>[
@@ -206,8 +207,9 @@ class _ConsultPadWidgetState extends State<ConsultPadWidget> {
       ...investigationList.map((el) => _investigationWidget(el)).toList()
     ];
   }
-  Widget _investigationWidget(OmrsConcept investigation){
-    String? text=investigation.display;
+  Widget _investigationWidget(OmrsOrder investigation){
+    String? text=investigation.concept?.display;
+    String? notes=investigation.commentToFulfiller;
     return Slidable(
       endActionPane: ActionPane(
         motion: const ScrollMotion(),
@@ -221,10 +223,22 @@ class _ConsultPadWidgetState extends State<ConsultPadWidget> {
 
           alignment: Alignment.topLeft,
           padding: const EdgeInsets.fromLTRB(10, 5, 0, 0),
-          child: Text("✧ $text",
-          style: TextStyle(
-            fontSize: 16
-          ),),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text("✧ $text",
+              style: TextStyle(
+                fontSize: 18
+              ),),
+              Text(" Note : $notes",
+                style: TextStyle(
+                    fontSize: 16,
+                  decoration: TextDecoration.underline
+                ),
+
+              ),
+            ],
+          ),
         ),
       )
     );
@@ -274,7 +288,7 @@ class _ConsultPadWidgetState extends State<ConsultPadWidget> {
       ),
     );
   }
-  SlidableAction _removeInvestigationAction(OmrsConcept investigation){
+  SlidableAction _removeInvestigationAction(OmrsOrder investigation){
     return SlidableAction(
         onPressed: (context){
           setState(() {
