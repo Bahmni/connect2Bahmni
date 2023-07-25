@@ -74,6 +74,7 @@ class ConsultationBoard extends ChangeNotifier {
   void removeCondition(ConditionModel condition) {
     _verifyEditable();
     _currentConsultation?.removeCondition(condition);
+    notifyListeners();
   }
 
   void addConsultationNotes(String notes, OmrsConcept? consultNoteConcept) {
@@ -91,6 +92,7 @@ class ConsultationBoard extends ChangeNotifier {
   void removeInvestigation(OmrsOrder investigation){
     _verifyEditable();
     _currentConsultation?.removeInvestigation(investigation);
+    notifyListeners();
   }
 
 }

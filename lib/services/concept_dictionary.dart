@@ -77,9 +77,10 @@ class ConceptDictionary {
 
     if (response.statusCode == 200) {
       var responseJson = jsonDecode(response.body);
+      List<String> orderType = ['test','labtest','radiology','labset','procedure'];
       var resultList = responseJson['results'] ?? [];
       var list = List<OmrsConcept>.from(resultList.map((v) => OmrsConcept.fromJson(v)));
-      return list.where((element) => element.conceptClass?.name == 'Test'||element.conceptClass?.name == 'LabTest'||element.conceptClass?.name == 'Radiology'||element.conceptClass?.name == 'LabSet' || element.conceptClass?.name == 'Procedure').toList();
+      return list.where((element) => orderType.contains(element.conceptClass?.name?.toLowerCase())).toList();
     } else {
       throw 'Failed to fetch Investigation';
     }

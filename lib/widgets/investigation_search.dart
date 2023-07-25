@@ -35,7 +35,7 @@ class _InvestigationSearchWidgetState extends State<InvestigationSearch> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Investigations Page')),
+      appBar: AppBar(title: Text('Search for Investigations')),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -57,7 +57,7 @@ class _InvestigationSearchWidgetState extends State<InvestigationSearch> {
                     Padding(
                       padding: const EdgeInsetsDirectional.fromSTEB(12, 0, 12, 0),
                       child: SearchBar(
-                        hintText: "Find labs",
+                        hintText: "Search for Investigations",
                         controller: searchController,
                         leading:IconButton(
                               icon: Icon(

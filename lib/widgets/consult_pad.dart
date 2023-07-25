@@ -291,10 +291,8 @@ class _ConsultPadWidgetState extends State<ConsultPadWidget> {
   SlidableAction _removeInvestigationAction(OmrsOrder investigation){
     return SlidableAction(
         onPressed: (context){
-          setState(() {
             Provider.of<ConsultationBoard>(context, listen: false)
                 .removeInvestigation(investigation);
-          });
         },
       borderRadius: BorderRadius.all(Radius.circular(100)),
       autoClose: true,
@@ -306,13 +304,9 @@ class _ConsultPadWidgetState extends State<ConsultPadWidget> {
 
   SlidableAction _removeConditionAction(ConditionModel condition) {
     return SlidableAction(
-
       onPressed: (context) {
-        setState(() {
           Provider.of<ConsultationBoard>(context, listen: false)
               .removeCondition(condition);
-        });
-
       },
       backgroundColor: const Color.fromRGBO(240, 39, 22, 0.6),
       foregroundColor: Colors.white,

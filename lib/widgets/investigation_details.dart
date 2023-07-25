@@ -28,46 +28,38 @@ class _InvestigationDetailsState extends State<InvestigationDetails> {
 
   @override
   Widget build(BuildContext context) {
-    var arg = ModalRoute.of(context)!.settings.arguments;
-    if (arg is OmrsOrder) {
-      _omrsOrder = arg;
-    } else {
-      _omrsOrder = widget.investigation;
-    }
-
+    _omrsOrder = widget.investigation;
     return Scaffold(
       appBar: AppBar(
         title: Text("Add Investigation"),
       ),
-      body: Container(
-        child: Column(
-          children: [
-            SizedBox(
-              height: 20,
+      body: Column(
+        children: [
+          SizedBox(
+            height: 20,
+          ),
+          _investigationDisplay(),
+          SizedBox(
+            height: 20,
+          ),
+          _commentToFulfiller(),
+          ElevatedButton(
+            style: ButtonStyle(
+                shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                    RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                        side: const BorderSide(color: Colors.red)
+                    )
+                )
             ),
-            _investigationDisplay(),
-            SizedBox(
-              height: 20,
-            ),
-            _commentToFulfiller(),
-            ElevatedButton(
-              style: ButtonStyle(
-                  shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                      RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10.0),
-                          side: const BorderSide(color: Colors.red)
-                      )
-                  )
-              ),
-              onPressed: () {
-                _debouncer.stop();
-                _omrsOrder.commentToFulfiller = _notesController.text;
-                Navigator.pop(context, _omrsOrder);
-              },
-              child: const Text('Add'),
-            ),
-          ],
-        ),
+            onPressed: () {
+              _debouncer.stop();
+              _omrsOrder.commentToFulfiller = _notesController.text;
+              Navigator.pop(context, _omrsOrder);
+            },
+            child: const Text('Add'),
+          ),
+        ],
       ),
     );
   }
@@ -75,15 +67,13 @@ class _InvestigationDetailsState extends State<InvestigationDetails> {
   Widget _investigationDisplay() {
     String? display = _omrsOrder.concept?.display;
     display ??= '??';
-    return Container(
-      child: Text(display,style: TextStyle(
-        fontSize: 20
-      ),),
-    );
+    return Text(display,style: TextStyle(
+      fontSize: 20
+    ),);
   }
   Widget _commentToFulfiller(){
     return Expanded(
-      child: TextFormField(
+      child: TextField(
         controller: _notesController,
         decoration: InputDecoration(
           hintText: "Enter note for the investigation",
@@ -114,14 +104,5 @@ class _InvestigationDetailsState extends State<InvestigationDetails> {
         textAlign: TextAlign.start,
       ),
     );
-    TextStyle _labelStyle(BuildContext context) {
-      return Theme.of(context).textTheme.bodyLarge!.merge(
-          const TextStyle(
-            fontFamily: 'Lexend Deca',
-            color: Color(0xFF090F13),
-            fontSize: 14,
-            fontWeight: FontWeight.normal,
-          ));
-    }
   }
 }
