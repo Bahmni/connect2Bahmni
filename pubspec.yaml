@@ -55,6 +55,10 @@ dependencies:
   logging: ^1.2.0
   flutter_speed_dial: ^7.0.0
   flutter_typeahead: ^4.6.2
+  camera: ^0.10.5+2
+  path_provider: ^2.0.15
+  path: ^1.8.3
+
 
 
 dev_dependencies:

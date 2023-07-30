@@ -6,9 +6,10 @@ class OmrsProvider {
   final String uuid;
   final String? identifier;
   final String? display;
+  final String? name;
   final List<Map<String, dynamic>>? attributes;
 
-  OmrsProvider({required this.uuid, this.identifier, this.display, this.attributes});
+  OmrsProvider({required this.uuid, this.identifier, this.display, this.name, this.attributes});
   factory OmrsProvider.fromJson(Map<String, dynamic> json) => _$OmrsProviderFromJson(json);
   Map<String, dynamic> toJson() => _$OmrsProviderToJson(this);
 
