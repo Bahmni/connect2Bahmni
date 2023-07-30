@@ -1,7 +1,5 @@
 import 'dart:async';
 import 'package:connect2bahmni/domain/models/omrs_concept.dart';
-import 'package:connect2bahmni/domain/models/omrs_order.dart';
-import 'package:connect2bahmni/services/emr_api_service.dart';
 import 'package:flutter/material.dart';
 import '../utils/debouncer.dart';
 import '../utils/app_failures.dart';
@@ -58,11 +56,22 @@ class _InvestigationSearchWidgetState extends State<InvestigationSearch> {
                       padding: const EdgeInsetsDirectional.fromSTEB(12, 0, 12, 0),
                       child: SearchBar(
                         hintText: "Search for Investigations",
+                        hintStyle:  MaterialStateProperty.resolveWith((states) {
+                            return Theme.of(context).textTheme.bodyLarge?.merge(TextStyle(
+                            fontFamily: 'Lexend Deca',
+                            color: Color(0xFF95A1AC),
+                            fontSize: 15,
+                            fontWeight: FontWeight.normal,
+                          ));
+                          }
+                        ),
+                        backgroundColor: MaterialStateColor.resolveWith((states) => Colors.white),
                         controller: searchController,
                         leading:IconButton(
                               icon: Icon(
                                 Icons.search
                               ),
+                          color: Color(0xFF95A1AC),
                           onPressed: () {
                                 return _searchForInvestigation();
                         },
@@ -79,7 +88,7 @@ class _InvestigationSearchWidgetState extends State<InvestigationSearch> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                  Container(
+                  SizedBox(
                     height:350,
                     child:ListView.builder(
                     itemCount: investigationList.length,

@@ -1,4 +1,3 @@
-import 'package:connect2bahmni/domain/models/omrs_concept.dart';
 import 'package:connect2bahmni/domain/models/omrs_order.dart';
 import 'package:connect2bahmni/utils/app_failures.dart';
 import 'package:uuid/uuid.dart';
@@ -109,6 +108,10 @@ class ConsultationModel {
   }
   void removeInvestigation(OmrsOrder investigation){
     investigationList.remove(investigation);
+  }
+
+  void updateInvestigation(OmrsOrder investigation,int index) {
+    investigationList[index]=investigation;
   }
 }
 

@@ -1,11 +1,9 @@
 import 'package:connect2bahmni/domain/models/omrs_order.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import '../utils/debouncer.dart';
 
 class InvestigationDetails extends StatefulWidget {
   final OmrsOrder investigation;
-  const InvestigationDetails({super.key, required this.investigation});
+  const InvestigationDetails({Key? key, required this.investigation}):super(key:key);
 
   @override
   State<InvestigationDetails> createState() => _InvestigationDetailsState();
@@ -14,8 +12,6 @@ class InvestigationDetails extends StatefulWidget {
 class _InvestigationDetailsState extends State<InvestigationDetails> {
   OmrsOrder _omrsOrder = OmrsOrder();
   final TextEditingController _notesController = TextEditingController();
-  final Debouncer _debouncer = Debouncer();
-  OmrsOrderType? _selectedOrderType;
 @override
   void initState(){
     super.initState();
@@ -23,6 +19,7 @@ class _InvestigationDetailsState extends State<InvestigationDetails> {
 
   @override
   void dispose() {
+    _notesController.dispose();
     super.dispose();
   }
 
@@ -53,11 +50,10 @@ class _InvestigationDetailsState extends State<InvestigationDetails> {
                 )
             ),
             onPressed: () {
-              _debouncer.stop();
               _omrsOrder.commentToFulfiller = _notesController.text;
               Navigator.pop(context, _omrsOrder);
             },
-            child: const Text('Add'),
+            child:_omrsOrder.commentToFulfiller==null? Text('Add'):Text('Update'),
           ),
         ],
       ),
@@ -72,6 +68,7 @@ class _InvestigationDetailsState extends State<InvestigationDetails> {
     ),);
   }
   Widget _commentToFulfiller(){
+    _notesController.text = _omrsOrder.commentToFulfiller ?? '';
     return Expanded(
       child: TextField(
         controller: _notesController,

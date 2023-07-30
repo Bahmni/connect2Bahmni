@@ -89,6 +89,10 @@ class ConsultationBoard extends ChangeNotifier {
     _currentConsultation?.addInvestigation(investigation);
     notifyListeners();
   }
+  void updateInvestigation(OmrsOrder investigation,int index){
+    _currentConsultation?.updateInvestigation(investigation,index);
+    notifyListeners();
+  }
   void removeInvestigation(OmrsOrder investigation){
     _verifyEditable();
     _currentConsultation?.removeInvestigation(investigation);
