@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 
-import 'visit_list.dart';
 import '../screens/models/patient_model.dart';
+import '../widgets/medication_list.dart';
 import 'condition_list.dart';
 import 'patient_info.dart';
+import 'visit_list.dart';
 
 class PatientChartWidget extends StatefulWidget {
   const PatientChartWidget({
@@ -28,6 +29,7 @@ class _PatientChartWidgetState extends State<PatientChartWidget> {
           PatientInfo(patient: widget.patient),
           PatientVisitList(patientUuid: widget.patient.uuid),
           PatientConditionList(patientUuid: widget.patient.uuid),
+          MedicationList(patientUuid: widget.patient.uuid),
         ],
       )
     );
