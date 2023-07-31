@@ -49,6 +49,7 @@ class BahmniRestUrls {
   String get dispensingPatients => '$base/bahmnicore/sql?q=${dotenv.get('bahmni.list.patientsToDispenseMeds', fallback: 'emrapi.sqlSearch.activePatients')}&location_uuid=VISIT_LOCATION';
   String get publishedForms => '$base/bahmniie/form/latestPublishedForms';
   String get drugOrders => '$base/bahmnicore/drugOrders';
+  String get labOrderResults => '$base/bahmnicore/labOrderResults';
 
 }
 
