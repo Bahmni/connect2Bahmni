@@ -211,21 +211,21 @@ class _ConsultPadWidgetState extends State<ConsultPadWidget> {
     ];
   }
   Widget _investigationWidget(OmrsOrder investigation,int index){
-    String? text=investigation.concept?.display;
-    String? notes=investigation.commentToFulfiller;
+    String? text = investigation.concept?.display;
+    String? notes = investigation.commentToFulfiller;
     return Slidable(
       endActionPane: ActionPane(
         motion: const ScrollMotion(),
         children: [
           _removeInvestigationAction(investigation),
-          _editInvestigationAction(investigation,index),
+          _editInvestigationAction(investigation, index),
         ],
       ),
       child: Container(
           color: Theme.of(context).colorScheme.onBackground,
           child: ListTile(
             leading: const Icon(
-              Icons.inventory_sharp,
+              Icons.medical_services_outlined,
               size: 24,
             ),
             title: Text('$text'),

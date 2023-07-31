@@ -1,9 +1,10 @@
 import 'dart:async';
-import 'package:connect2bahmni/domain/models/omrs_concept.dart';
 import 'package:flutter/material.dart';
+import '../domain/models/omrs_concept.dart';
 import '../utils/debouncer.dart';
 import '../utils/app_failures.dart';
 import '../services/concept_dictionary.dart';
+
 class InvestigationSearch extends StatefulWidget {
   const InvestigationSearch({Key? key}) : super(key: key);
 
@@ -13,10 +14,14 @@ class InvestigationSearch extends StatefulWidget {
 
 class _InvestigationSearchWidgetState extends State<InvestigationSearch> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
-  TextEditingController searchController = TextEditingController();
+  final TextEditingController searchController = TextEditingController();
   final Debouncer _debouncer = Debouncer();
-  List<OmrsConcept> investigationList = [];
+  final List<OmrsConcept> investigationList = [];
   late OmrsConcept selectedInvestigation;
+
+  static const lblAddInvestigations = 'Add Investigations';
+  static const lblSearchForInvestigations = "Search for Investigations";
+  static const errInvestigationSearch = 'Error occurred while searching for investigations';
 
   @override
 
@@ -33,19 +38,16 @@ class _InvestigationSearchWidgetState extends State<InvestigationSearch> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Search for Investigations')),
+      appBar: AppBar(title: Text(lblAddInvestigations)),
       body: SingleChildScrollView(
         child: Column(
           children: [
-
             Container(
               width: MediaQuery.of(context).size.width,
               height: 100,
               decoration: BoxDecoration(
                 color: Colors.white,
-                border: Border.all(
-                  color: const Color(0xFFDBE2E7),
-                ),
+                border: Border.all(color: const Color(0xFFDBE2E7)),
               ),
               child: Padding(
                 padding: const EdgeInsetsDirectional.fromSTEB(0, 20, 0, 0),
@@ -55,28 +57,14 @@ class _InvestigationSearchWidgetState extends State<InvestigationSearch> {
                     Padding(
                       padding: const EdgeInsetsDirectional.fromSTEB(12, 0, 12, 0),
                       child: SearchBar(
-                        hintText: "Search for Investigations",
+                        hintText: lblSearchForInvestigations,
                         hintStyle:  MaterialStateProperty.resolveWith((states) {
-                            return Theme.of(context).textTheme.bodyLarge?.merge(TextStyle(
-                            fontFamily: 'Lexend Deca',
-                            color: Color(0xFF95A1AC),
-                            fontSize: 15,
-                            fontWeight: FontWeight.normal,
-                          ));
-                          }
-                        ),
+                            return Theme.of(context).textTheme.bodyLarge?.merge(
+                                TextStyle(fontFamily: 'Lexend Deca', color: Color(0xFF95A1AC), fontSize: 15, fontWeight: FontWeight.normal));
+                        }),
                         backgroundColor: MaterialStateColor.resolveWith((states) => Colors.white),
                         controller: searchController,
-                        leading:IconButton(
-                              icon: Icon(
-                                Icons.search
-                              ),
-                          color: Color(0xFF95A1AC),
-                          onPressed: () {
-                                return _searchForInvestigation();
-                        },
-                         )
-
+                        leading: IconButton(icon: Icon(Icons.search), color: Color(0xFF95A1AC), onPressed: () => _searchForInvestigation())
                       ),
                     ),
                   ],
@@ -106,7 +94,6 @@ class _InvestigationSearchWidgetState extends State<InvestigationSearch> {
                     );
                     },
                   )),
-                 // selectedInvestigation!=null ? Text(selectedInvestigation.display.toString()):Text(''),
                 ],
               ),
             ),
@@ -125,21 +112,19 @@ class _InvestigationSearchWidgetState extends State<InvestigationSearch> {
         });
         return;
       }
-      final Future<List<OmrsConcept>> request = ConceptDictionary().searchInvestigation(searchController.text);
-      request.then((results) {
+      ConceptDictionary().searchInvestigation(searchController.text).then((results) {
         if(mounted) {
           setState(() {
             investigationList.clear();
             investigationList.addAll(results);
           });
         }
-      },
-          onError: (err) {
-            String errorMsg = err is Failure ? err.message : '';
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Search failed. $errorMsg')),
-            );
-          });
+      }).onError((error, stackTrace) {
+        String errorMsg = error is Failure ? error.message : errInvestigationSearch;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Search failed. $errorMsg')),
+        );
+      });
     });
   }
 }

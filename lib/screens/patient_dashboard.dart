@@ -1,8 +1,8 @@
-import 'package:connect2bahmni/domain/models/omrs_order.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
-import '../../domain/models/bahmni_appointment.dart';
+import '../domain/models/omrs_order.dart';
+import '../domain/models/bahmni_appointment.dart';
 import '../utils/app_failures.dart';
 import '../widgets/app_drawer.dart';
 import '../widgets/bahmniForms/form_view.dart';
@@ -288,24 +288,24 @@ class ConsultationActions extends StatelessWidget {
             if (centerLocations.contains(fabLocation)) const Spacer(),
             IconButton(
               tooltip: 'Condition',
-              icon: const Icon(Icons.category),
+              icon: const Icon(Icons.category_outlined),
               onPressed: () {
                 _addConditionToConsultation(context);
               },
             ),
             IconButton(
               tooltip: 'Medication',
-              icon: const Icon(Icons.medication_sharp),
+              icon: const Icon(Icons.medication_outlined),
               onPressed: () {},
             ),
             IconButton(
               tooltip: 'Investigation',
-              icon: const Icon(Icons.assessment),
+              icon: const Icon(Icons.medical_services_outlined),
               onPressed: () => addInvestigationToConsultation(context),
             ),
             IconButton(
               tooltip: 'Notes',
-              icon: const Icon(Icons.description),
+              icon: const Icon(Icons.note_add_outlined),
               onPressed: () => _addConsultationNotes(context),
             ),
             _obsForm(context),
@@ -319,7 +319,7 @@ class ConsultationActions extends StatelessWidget {
     return IconButton(
       tooltip: 'Form',
       icon: Icon(
-        Icons.note_add_outlined,
+        Icons.description_outlined,
         //color: Colors.white,
       ),
       onPressed: () async {
@@ -336,10 +336,7 @@ class ConsultationActions extends StatelessWidget {
     if (board == null) return;
 
     OmrsConcept? concept = await Navigator.push(context,
-      MaterialPageRoute(
-          builder: (context) => const InvestigationSearch(),
-    ));
-
+        MaterialPageRoute(builder: (context) => const InvestigationSearch()));
     if (concept != null) {
       if (context.mounted) {
         var newInvestigation = OmrsOrder(concept: concept);
