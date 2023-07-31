@@ -1,3 +1,5 @@
+import 'package:connect2bahmni/domain/models/omrs_order.dart';
+import 'package:connect2bahmni/widgets/investigation_details.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:provider/provider.dart';
@@ -18,7 +20,6 @@ class ConsultPadWidget extends StatefulWidget {
 
   final Color color = const Color(0xFFFFE306);
   final String? patientUuid;
-
   @override
   State<ConsultPadWidget> createState() => _ConsultPadWidgetState();
 }
@@ -70,6 +71,7 @@ class _ConsultPadWidgetState extends State<ConsultPadWidget> {
             _consultationContext(context, consultation),
             ..._diagnoses(consultation?.diagnosisList),
             ..._problemList(consultation?.problemList),
+            ..._investigationList(consultation?.investigationList),
             (consultation?.consultNote != null) ? _ObsListItem(consultNote: consultation!.consultNote!, sliding: true,) : const SizedBox(height: 1),
           ],
         ));
@@ -186,7 +188,53 @@ class _ConsultPadWidgetState extends State<ConsultPadWidget> {
       ...problemList.map((el) => _conditionWidget(el)).toList()
     ];
   }
-
+  List<Widget> _investigationList(List<OmrsOrder>? investigationList) {
+    if (investigationList == null) return [];
+    if (investigationList.isEmpty) return [];
+    return <Widget>[
+      Align(
+        alignment: Alignment.centerLeft,
+        child: Container(
+          padding: const EdgeInsets.fromLTRB(10, 5, 0, 0),
+          child: Text('Investigation List',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+      ),
+      ...investigationList.asMap().entries.map((el) {
+        final index = el.key;
+        final investigation = el.value;
+        return _investigationWidget(investigation, index);
+      }).toList()
+    ];
+  }
+  Widget _investigationWidget(OmrsOrder investigation,int index){
+    String? text=investigation.concept?.display;
+    String? notes=investigation.commentToFulfiller;
+    return Slidable(
+      endActionPane: ActionPane(
+        motion: const ScrollMotion(),
+        children: [
+          _removeInvestigationAction(investigation),
+          _editInvestigationAction(investigation,index),
+        ],
+      ),
+      child: Container(
+          color: Theme.of(context).colorScheme.onBackground,
+          child: ListTile(
+            leading: const Icon(
+              Icons.inventory_sharp,
+              size: 24,
+            ),
+            title: Text('$text'),
+            subtitle: Text('$notes'),
+            tileColor: Colors.red,
+          ),
+      )
+    );
+  }
   Widget _conditionWidget(ConditionModel condition) {
     String? display = condition.code?.display;
     display ??= '(Unknown)';
@@ -232,12 +280,24 @@ class _ConsultPadWidgetState extends State<ConsultPadWidget> {
       ),
     );
   }
+  SlidableAction _removeInvestigationAction(OmrsOrder investigation){
+    return SlidableAction(
+        onPressed: (context){
+            Provider.of<ConsultationBoard>(context, listen: false)
+                .removeInvestigation(investigation);
+        },
+        icon: Icons.delete,
+        backgroundColor: Color.fromRGBO(240, 39, 22, 0.6),
+      foregroundColor: Colors.white,
+      label: 'Remove',
+    );
+  }
 
   SlidableAction _removeConditionAction(ConditionModel condition) {
     return SlidableAction(
       onPressed: (context) {
-        Provider.of<ConsultationBoard>(context, listen: false)
-            .removeCondition(condition);
+          Provider.of<ConsultationBoard>(context, listen: false)
+              .removeCondition(condition);
       },
       backgroundColor: const Color.fromRGBO(240, 39, 22, 0.6),
       foregroundColor: Colors.white,
@@ -246,6 +306,25 @@ class _ConsultPadWidgetState extends State<ConsultPadWidget> {
     );
   }
 
+  SlidableAction _editInvestigationAction(OmrsOrder investigation,int index) {
+    return SlidableAction(
+      onPressed: (_) async {
+        final edited = await Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => InvestigationDetails(investigation: investigation),
+            ));
+        if (edited != null && context.mounted) {
+          var board = Provider.of<ConsultationBoard>(context, listen: false);
+          board.updateInvestigation(edited, index);
+        }
+      },
+      backgroundColor: Colors.green,
+      foregroundColor: Colors.white,
+      icon: Icons.edit,
+      label: 'Edit',
+    );
+  }
   SlidableAction _editConditionAction(ConditionModel aCondition) {
     return SlidableAction(
       onPressed: (_) async {
@@ -266,7 +345,6 @@ class _ConsultPadWidgetState extends State<ConsultPadWidget> {
     );
   }
 }
-
 class _ObsListItem extends StatelessWidget {
   final OmrsObs consultNote;
   final bool? sliding;

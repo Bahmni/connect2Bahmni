@@ -1,3 +1,4 @@
+import 'package:connect2bahmni/domain/models/omrs_order.dart';
 import 'package:connect2bahmni/utils/app_failures.dart';
 import 'package:uuid/uuid.dart';
 
@@ -16,12 +17,12 @@ class ConsultationModel {
   final User user;
   PatientModel? patient;
   OmrsLocation? location;
-
   ConsultationStatus status = ConsultationStatus.none;
   DateTime? startTime;
   DateTime? lastUpdateAt;
   List<ConditionModel> problemList = [];
   List<ConditionModel> diagnosisList = [];
+  List<OmrsOrder> investigationList = [];
   OmrsVisitType? visitType;
   OmrsEncounterType? encounterType;
 
@@ -70,6 +71,7 @@ class ConsultationModel {
     conditionModel.isEncounterDiagnosis ? diagnosisList.remove(conditionModel) : problemList.remove(conditionModel);
   }
 
+
   List<Failure> validate() {
     return EmrApiService().validate(this);
   }
@@ -100,6 +102,16 @@ class ConsultationModel {
 
   void addNotes(OmrsObs notes) {
      consultNote = notes;
+  }
+  void addInvestigation(OmrsOrder investigation){
+    investigationList.add(investigation);
+  }
+  void removeInvestigation(OmrsOrder investigation){
+    investigationList.remove(investigation);
+  }
+
+  void updateInvestigation(OmrsOrder investigation,int index) {
+    investigationList[index]=investigation;
   }
 }
 

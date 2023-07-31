@@ -55,6 +55,31 @@ class ConceptDictionary {
       throw 'Failed to fetch Concept';
     }
   }
+  Future<List<OmrsConcept>> searchInvestigation(String term) async {
+    String? sessionId = await UserPreferences().getSessionId();
+    if (sessionId == null) {
+      throw 'Authentication Failure';
+    }
+    String url = '${AppUrls.omrs.concept}?q=$term&v=custom:(uuid,name,display,conceptClass:(uuid,name)';
+    var response = await http.get(
+      Uri.parse(url),
+      headers: <String, String>{
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Cookie': 'JSESSIONID=$sessionId',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      var responseJson = jsonDecode(response.body);
+      List<String> orderType = ['test','labtest','radiology','labset','procedure'];
+      var resultList = responseJson['results'] ?? [];
+      var list = List<OmrsConcept>.from(resultList.map((v) => OmrsConcept.fromJson(v)));
+      return list.where((element) => orderType.contains(element.conceptClass?.name?.toLowerCase())).toList();
+    } else {
+      throw 'Failed to fetch Investigation';
+    }
+  }
 
   Future<List<OmrsConcept>> _conceptsByName(String term) async {
     return UserPreferences().getSessionId().then((sessionId) {
@@ -114,5 +139,4 @@ class ConceptDictionary {
       return OmrsConcept.fromJson(responseJson);
     });
   }
-
 }

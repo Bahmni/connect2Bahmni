@@ -1,3 +1,4 @@
+import 'package:connect2bahmni/domain/models/omrs_order.dart';
 import 'package:flutter/foundation.dart';
 
 import 'consultation_model.dart';
@@ -73,6 +74,7 @@ class ConsultationBoard extends ChangeNotifier {
   void removeCondition(ConditionModel condition) {
     _verifyEditable();
     _currentConsultation?.removeCondition(condition);
+    notifyListeners();
   }
 
   void addConsultationNotes(String notes, OmrsConcept? consultNoteConcept) {
@@ -80,6 +82,20 @@ class ConsultationBoard extends ChangeNotifier {
     var obsConcept = consultNoteConcept ?? OmrsConcept();
     var consultNotes = OmrsObs(concept: obsConcept, value: notes);
     _currentConsultation?.addNotes(consultNotes);
+    notifyListeners();
+  }
+  void addInvestigation(OmrsOrder investigation){
+    _verifyEditable();
+    _currentConsultation?.addInvestigation(investigation);
+    notifyListeners();
+  }
+  void updateInvestigation(OmrsOrder investigation,int index){
+    _currentConsultation?.updateInvestigation(investigation,index);
+    notifyListeners();
+  }
+  void removeInvestigation(OmrsOrder investigation){
+    _verifyEditable();
+    _currentConsultation?.removeInvestigation(investigation);
     notifyListeners();
   }
 
