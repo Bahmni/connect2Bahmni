@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
+import '../domain/models/bahmni_drug_order.dart';
 import '../domain/models/omrs_order.dart';
 import '../domain/models/bahmni_appointment.dart';
 import '../utils/app_failures.dart';
@@ -11,6 +12,7 @@ import '../widgets/consultation_notes.dart';
 import '../widgets/investigation_details.dart';
 import '../widgets/investigation_search.dart';
 import '../widgets/jitsi_meeting.dart';
+import '../widgets/medication_search.dart';
 import '../widgets/patient_chart.dart';
 import '../providers/user_provider.dart';
 import '../screens/models/consultation_model.dart';
@@ -296,7 +298,7 @@ class ConsultationActions extends StatelessWidget {
             IconButton(
               tooltip: 'Medication',
               icon: const Icon(Icons.medication_outlined),
-              onPressed: () {},
+              onPressed: () => addMedicationToConsultation(context),
             ),
             IconButton(
               tooltip: 'Investigation',
@@ -349,6 +351,13 @@ class ConsultationActions extends StatelessWidget {
         }
       }
     }
+  }
+  addMedicationToConsultation(BuildContext context) async {
+    var board = _activeBoardToUpdate(context);
+    if (board == null) return;
+
+    DrugConcept? concept = await Navigator.push(context,
+        MaterialPageRoute(builder: (context) => const MedicationSearch()));
   }
 
     Future<void> _addConditionToConsultation(BuildContext context) async {

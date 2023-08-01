@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 
+import '../domain/models/bahmni_drug_order.dart';
 import '../domain/models/omrs_concept.dart';
 import '../utils/app_urls.dart';
 import '../utils/shared_preference.dart';
@@ -78,6 +79,30 @@ class ConceptDictionary {
       return list.where((element) => orderType.contains(element.conceptClass?.name?.toLowerCase())).toList();
     } else {
       throw 'Failed to fetch Investigation';
+    }
+  }
+  Future<List<DrugConcept>> searchMedication(String term) async {
+    String? sessionId = await UserPreferences().getSessionId();
+    if (sessionId == null) {
+      throw 'Authentication Failure';
+    }
+    String url = '${AppUrls.omrs.drug}?q=$term&s=ordered&v=custom:(uuid,strength,name,dosageForm,concept:(uuid,name,names:(name)))';
+    var response = await http.get(
+      Uri.parse(url),
+      headers: <String, String>{
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Cookie': 'JSESSIONID=$sessionId',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      var responseJson = jsonDecode(response.body);
+      var resultList = responseJson['results'] ?? [];
+      var list = List<DrugConcept>.from(resultList.map((v) => DrugConcept.fromJson(v)));
+      return list;
+    } else {
+      throw 'Failed to fetch Medication';
     }
   }
 

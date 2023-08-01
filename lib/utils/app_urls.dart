@@ -18,6 +18,7 @@ class OMRSRestUrls {
   String get patient => '$base/patient';
   String get visit => '$base/visit';
   String get concept => '$base/concept';
+  String get drug => '$base/drug';
   String get visitType => '$base/visittype';
   String get encType => '$base/encountertype';
   String get obs => '$base/obs';
