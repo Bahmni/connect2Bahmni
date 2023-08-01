@@ -35,23 +35,35 @@ class _MedicationListState extends State<MedicationList> {
             meds = snapshot.data ?? [];
           }
           List<BahmniDrugOrder> activeMeds = activeMedications(meds);
-          return Column(
-            children: [
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Container(
-                  padding: const EdgeInsets.fromLTRB(10, 5, 0, 0),
-                  child: const Text(lblActiveMedications,
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ),
-              ...activeMeds.map((med) => _displayMedication(med)).toList(),
-            ],
-            // initiallyExpanded: true,
+          if (activeMeds.isEmpty) {
+            return SizedBox();
+          }
+          return ExpansionTile(
+            title: const Text(lblActiveMedications, style: TextStyle(fontWeight: FontWeight.bold)),
+            // collapsedShape: const RoundedRectangleBorder(
+            //   borderRadius: BorderRadius.all(Radius.circular(15.0)),
+            // ),
+            // collapsedBackgroundColor: Colors.lightBlueAccent,
+            leading: const Icon(Icons.medication_outlined),
+            children: activeMeds.map((med) => _displayMedication(med)).toList(),
           );
+          // return Column(
+          //   children: [
+          //     Align(
+          //       alignment: Alignment.centerLeft,
+          //       child: Container(
+          //         padding: const EdgeInsets.fromLTRB(10, 5, 0, 0),
+          //         child: const Text(lblActiveMedications,
+          //           style: TextStyle(
+          //             fontWeight: FontWeight.bold,
+          //           ),
+          //         ),
+          //       ),
+          //     ),
+          //     ...activeMeds.map((med) => _displayMedication(med)).toList(),
+          //   ],
+          //   // initiallyExpanded: true,
+          // );
         }
     );
   }

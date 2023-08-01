@@ -1,5 +1,5 @@
-import 'package:connect2bahmni/domain/models/omrs_order.dart';
 import 'package:flutter/material.dart';
+import '../domain/models/omrs_order.dart';
 
 class InvestigationDetails extends StatefulWidget {
   final OmrsOrder investigation;
@@ -10,11 +10,16 @@ class InvestigationDetails extends StatefulWidget {
 }
 
 class _InvestigationDetailsState extends State<InvestigationDetails> {
-  OmrsOrder _omrsOrder = OmrsOrder();
+  late OmrsOrder _investigation;
   final TextEditingController _notesController = TextEditingController();
-@override
-  void initState(){
+  static const lblAddInvestigation = "Add Investigation";
+  static const lblEnterInvestigationNote = "Enter note for the investigation";
+
+  @override
+  void initState() {
     super.initState();
+    _investigation = widget.investigation;
+    _notesController.text = _investigation.commentToFulfiller ?? '';
   }
 
   @override
@@ -25,35 +30,31 @@ class _InvestigationDetailsState extends State<InvestigationDetails> {
 
   @override
   Widget build(BuildContext context) {
-    _omrsOrder = widget.investigation;
     return Scaffold(
       appBar: AppBar(
-        title: Text("Add Investigation"),
+        title: Text(lblAddInvestigation),
       ),
       body: Column(
         children: [
-          SizedBox(
-            height: 20,
-          ),
+          SizedBox(height: 20),
           _investigationDisplay(),
-          SizedBox(
-            height: 20,
-          ),
+          SizedBox(height: 20),
           _commentToFulfiller(),
-          ElevatedButton(
-            style: ButtonStyle(
-                shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                    RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10.0),
-                        side: const BorderSide(color: Colors.red)
-                    )
-                )
+          SizedBox(height: 20),
+          Container(
+            height: 40,
+            width: 100,
+            decoration: BoxDecoration(
+                color: Colors.blue,
+                borderRadius: BorderRadius.circular(50)),
+            child: TextButton(
+              autofocus: false,
+              onPressed: () {
+                _investigation.commentToFulfiller = _notesController.text;
+                Navigator.pop(context, _investigation);
+              },
+              child: const Text('Update', style: TextStyle(color: Colors.white)),
             ),
-            onPressed: () {
-              _omrsOrder.commentToFulfiller = _notesController.text;
-              Navigator.pop(context, _omrsOrder);
-            },
-            child:_omrsOrder.commentToFulfiller==null? Text('Add'):Text('Update'),
           ),
         ],
       ),
@@ -61,19 +62,15 @@ class _InvestigationDetailsState extends State<InvestigationDetails> {
   }
 
   Widget _investigationDisplay() {
-    String? display = _omrsOrder.concept?.display;
-    display ??= '??';
-    return Text(display,style: TextStyle(
-      fontSize: 20
-    ),);
+    String? display = _investigation.concept?.display ?? '';
+    return Text(display, style: TextStyle(fontSize: 20));
   }
-  Widget _commentToFulfiller(){
-    _notesController.text = _omrsOrder.commentToFulfiller ?? '';
-    return Expanded(
-      child: TextField(
+
+  Widget _commentToFulfiller() {
+    return TextField(
         controller: _notesController,
         decoration: InputDecoration(
-          hintText: "Enter note for the investigation",
+          hintText: lblEnterInvestigationNote,
           enabledBorder: OutlineInputBorder(
             borderSide: const BorderSide(
               color: Color(0xFFDBE2E7),
@@ -99,7 +96,6 @@ class _InvestigationDetailsState extends State<InvestigationDetails> {
               fontWeight: FontWeight.normal,
             )),
         textAlign: TextAlign.start,
-      ),
-    );
+      );
   }
 }
