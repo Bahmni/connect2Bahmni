@@ -1,13 +1,13 @@
-import 'package:connect2bahmni/widgets/patient_list.dart';
 import 'package:fhir/r4.dart';
 import 'package:flutter/material.dart';
 
 import '../screens/patient_profile_view.dart';
+import '../screens/models/patient_model.dart';
 import '../services/patients.dart';
 import '../utils/debouncer.dart';
-import '../screens/models/patient_model.dart';
 import '../utils/app_routes.dart';
 import '../utils/app_failures.dart';
+import '../widgets/patient_list.dart';
 
 
 class PatientSearch extends StatefulWidget {
@@ -68,15 +68,17 @@ class _PatientsSearchWidgetState extends State<PatientSearch> {
     return Scaffold(
       appBar: AppBar(
         title: Text(headingText),
-        actions: [IconButton(
-          tooltip: 'New Patient',
-          icon: const Icon(
-            Icons.add,
-          ),
-          onPressed: () async {
-            _primaryAction();
-          },
-        )],
+        actions: [
+          //_switchStatus(),
+          IconButton(
+            tooltip: 'New Patient',
+            icon: const Icon(
+              Icons.add,
+            ),
+            onPressed: () async {
+              _primaryAction();
+            },
+          )],
       ),
       body: Column(
         children: [
@@ -118,6 +120,18 @@ class _PatientsSearchWidgetState extends State<PatientSearch> {
       ),
     );
   }
+
+  // bool _showActive = true;
+  // Switch _switchStatus() {
+  //   return Switch(
+  //           activeColor: Colors.white70,
+  //           value: _showActive,
+  //           onChanged: (val) {
+  //             setState(() {
+  //               _showActive = val;
+  //             });
+  //       });
+  // }
 
   void _primaryAction() async {
     Navigator.of(context).pushReplacementNamed(AppRoutes.registerPatient);

@@ -3,6 +3,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
+import '../../domain/models/common.dart';
 import 'profile_age.dart';
 import 'profile_controller.dart';
 import '../models/person_age.dart';
@@ -54,7 +55,6 @@ class _BasicProfileState extends State<BasicProfile> {
 
   @override
   void initState() {
-    debugPrint('BasicProfile: initState. firstName - ${widget.basicDetails?.firstName}, lastName = ${widget.basicDetails?.lastName}');
     _firstName = widget.basicDetails?.firstName ?? '';
     _lastName = widget.basicDetails?.lastName ?? '';
     _gender = widget.basicDetails?.gender?.name ?? '';
@@ -95,7 +95,6 @@ class _BasicProfileState extends State<BasicProfile> {
   }
 
   Widget _basicDetails() {
-    debugPrint('BasicProfile: build. firstName - ${widget.basicDetails?.firstName}, lastName = ${widget.basicDetails?.lastName}');
     return Form(
       key: widget.formKey ?? _basicProfileFormKey,
       child: Column(

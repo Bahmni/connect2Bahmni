@@ -259,7 +259,6 @@ class _AddressScreenState extends State<AddressScreen> {
   }
 
   void _updateAddress() {
-    debugPrint('updating address: district = ${_districtController.text}, subDistrict = ${_subDistrictController.text}, village = ${_villageController.text}');
     if (widget.controller != null) {
        ProfileAddress? address = widget.controller?.getData();
        if (address != null) {

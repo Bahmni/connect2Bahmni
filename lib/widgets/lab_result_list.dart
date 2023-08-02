@@ -17,6 +17,7 @@ class _LabResultsViewState extends State<LabResultsView> {
   Future<List<LabResult>>? labResultsFuture;
   static const errFailedToFetchLabResults = "Failed to fetch lab results";
   static const lblLabInvestigations = 'Lab Investigations';
+  static const lblNoInvestigationsFound = 'None found';
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +42,7 @@ class _LabResultsViewState extends State<LabResultsView> {
             // ),
             // collapsedBackgroundColor: Colors.lightBlueAccent,
             leading: const Icon(Icons.medical_services_outlined),
-            children: results.map((investigation) => _displayResult(investigation)).toList(),
+            children: results.isEmpty ? [_displayEmpty()] : results.map((investigation) => _displayResult(investigation)).toList(),
           );
         }
     );
@@ -74,6 +75,13 @@ class _LabResultsViewState extends State<LabResultsView> {
       title: Text.rich(textSpan),
       subtitle: investigation.accessionDateTime != null ? Text(formattedDate(investigation.accessionDateTime)) : const Text(''),
       //dense: true,
+    );
+  }
+
+  Widget _displayEmpty() {
+    return ListTile(
+      title: Text(lblNoInvestigationsFound),
+      dense: true,
     );
   }
 

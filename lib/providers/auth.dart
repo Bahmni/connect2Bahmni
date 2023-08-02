@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:connect2bahmni/services/domain_service.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -52,7 +53,7 @@ class AuthProvider with ChangeNotifier {
           }
           Session session = Session.fromJson(responseData);
           var cookie = Cookie.fromSetCookieValue(response.headers['set-cookie'] ?? "");
-          debugPrint('cookie - name=${cookie.name}, value=${cookie.value}, domain = ${cookie.domain}, httpOnly = ${cookie.httpOnly}, expires= ${cookie.expires}');
+          //debugPrint('cookie - name=${cookie.name}, value=${cookie.value}, domain = ${cookie.domain}, httpOnly = ${cookie.httpOnly}, expires= ${cookie.expires}');
           if (cookie.name == 'JSESSIONID') {
             session.sessionId = cookie.value;
           } else {
@@ -66,13 +67,12 @@ class AuthProvider with ChangeNotifier {
           UserPreferences().saveSession(session);
           _loggedInStatus = Status.loggedIn;
           notifyListeners();
-          return AuthResponse(
-              status: true, session: session, message: 'Successful');
+          return AuthResponse(status: true, session: session, message: 'Successful');
         } else {
+          var error = DomainService().handleErrorResponse(response);
           _loggedInStatus = Status.notLoggedIn;
           notifyListeners();
-          return AuthResponse(
-              status: false, message: json.decode(response.body)['error']);
+          return AuthResponse(status: false, message: error.message);
         }
     } finally {
         client.close();
@@ -109,8 +109,6 @@ class AuthProvider with ChangeNotifier {
     if (sessionId == null) {
         throw 'Invalid Session!';
     }
-    debugPrint('updateSessionLocation: updating session $sessionId');
-    debugPrint('calling URL ${AppUrls.omrs.session}');
     var httpClient = _httpClient();
     try {
         var response = await httpClient.post(

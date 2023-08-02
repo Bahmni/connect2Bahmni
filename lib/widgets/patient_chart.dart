@@ -5,6 +5,7 @@ import '../services/order_service.dart';
 import '../widgets/medication_list.dart';
 import 'condition_list.dart';
 import 'lab_result_list.dart';
+import 'obs_flow_sheet_view.dart';
 import 'patient_info.dart';
 import 'visit_list.dart';
 
@@ -33,6 +34,8 @@ class _PatientChartWidgetState extends State<PatientChartWidget> {
           PatientConditionList(patientUuid: widget.patient.uuid),
           MedicationList(patientUuid: widget.patient.uuid),
           LabResultsView(patientUuid: widget.patient.uuid),
+          ObsFlowSheetView(patientUuid: widget.patient.uuid),
+          SizedBox(height: 60),
         ],
       )
     );

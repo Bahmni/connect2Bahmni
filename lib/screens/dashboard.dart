@@ -412,8 +412,7 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                 size: 40,
               ),
               Padding(
-                padding: const EdgeInsetsDirectional.fromSTEB(
-                    0, 8, 0, 0),
+                padding: const EdgeInsetsDirectional.fromSTEB(0, 8, 0, 0),
                 child: Text(
                   'Dispense',
                   style: Theme.of(context).textTheme.bodyLarge?.merge(const TextStyle(

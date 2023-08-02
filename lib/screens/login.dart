@@ -78,7 +78,7 @@ class _LoginState extends State<Login> {
             Navigator.pushNamed(context, AppRoutes.loginLocations,);
           }
         } else {
-          showLoginFailure(context);
+          showLoginFailure(context, response: response);
         }
       });
     } else {
@@ -206,9 +206,13 @@ class _LoginState extends State<Login> {
     return formElements;
   }
 
-  void showLoginFailure(BuildContext context) {
+  void showLoginFailure(BuildContext context, { AuthResponse? response }) {
+    String errorMessage = msgLoginFailed;
+    if (response != null && response.message != null) {
+      errorMessage = response.message!;
+    }
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text(msgLoginFailed)),
+      SnackBar(content: Text(errorMessage)),
     );
   }
 

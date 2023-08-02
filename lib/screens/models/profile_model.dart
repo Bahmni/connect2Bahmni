@@ -2,6 +2,7 @@ import 'package:connect2bahmni/domain/models/omrs_identifier_type.dart';
 import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
 
+import '../../domain/models/common.dart';
 import '../../domain/models/omrs_person_attribute.dart';
 
 class ProfileModel extends ChangeNotifier {
@@ -26,7 +27,6 @@ class ProfileModel extends ChangeNotifier {
   bool get isNewPatient => uuid == null;
 
   updateBasicDetails(ProfileBasics basics) {
-    debugPrint('Updating profile basics - ${basics.firstName} ${basics.lastName}');
     basicDetails = ProfileBasics(
       firstName: basics.firstName,
       lastName: basics.lastName,
@@ -221,18 +221,17 @@ class ProfileModel extends ChangeNotifier {
         return false;
       }
     }
-    debugPrint('validated model');
     return true;
   }
 
 }
 
-enum Gender {
-  male,
-  female,
-  other,
-  unknown,
-}
+// enum Gender {
+//   male,
+//   female,
+//   other,
+//   unknown,
+// }
 
 class ProfileIdentifier {
   String name;
@@ -317,33 +316,6 @@ class ProfileAttributeType {
       description: attributeType.description,
       dataType: OmrsPersonAttributeType.dataType(attributeType.format)
     );
-  }
-}
-
-
-Gender? toGenderType(String? gender) {
-  var where = Gender.values.where((element) => element.name == gender!.toLowerCase());
-  return where.isEmpty ? null : where.first;
-}
-
-String toGenderPrefix(Gender gender) {
-  return gender.name.substring(0,1).toUpperCase();
-}
-
-Gender? fromGenderPrefix(String? value) {
-  if (value == null || value.isEmpty) {
-    return null;
-  }
-  var genderPrefix = value.substring(0,1).toUpperCase();
-  switch (genderPrefix) {
-    case 'M':
-      return Gender.male;
-    case 'F':
-      return Gender.female;
-    case 'O':
-      return Gender.other;
-    default:
-      return Gender.unknown;
   }
 }
 

@@ -50,6 +50,7 @@ class BahmniRestUrls {
   String get publishedForms => '$base/bahmniie/form/latestPublishedForms';
   String get drugOrders => '$base/bahmnicore/drugOrders';
   String get labOrderResults => '$base/bahmnicore/labOrderResults';
+  String get diseaseSummary => '$base/bahmnicore/diseaseSummaryData';
 
 }
 

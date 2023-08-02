@@ -26,6 +26,7 @@ As of now, this project is experimental, only a starting point and far from bein
 | app.conceptCodedDiagnosis          | uuid of the obs concept on server (datatype = text) for recording coded diagnosis             | 81d6e852-3f10-11e4-adec-0800271c1b75                                                |
 | app.additionalIdentifiers          | additional identifiers for patient to be captured, matched by name                            | ABHA Number,RCH_ID                                                                  |
 | app.patientAttributes              | additional attributes for patient to be captured, matched by name (* denotes mandatory)       | phoneNumber*,email                                                                  |
+| app.flowSheet.concepts             | list of Concept names (FSN) to display in flowSheet style by date                             | Pulse,Respiratory rate,Temperature,Systolic blood pressure,Diastolic blood pressure |
 | abdm.identifiers                   | Linkages for ABHA  identifiers (India Only). If enabled triggers ABHA linking. Not modifiable | ABHA Number,ABHA Address                                                            |
 
 

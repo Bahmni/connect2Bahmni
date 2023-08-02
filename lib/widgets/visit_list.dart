@@ -14,6 +14,8 @@ class PatientVisitList extends StatefulWidget {
 
 class _PatientVisitListState extends State<PatientVisitList> {
   late Future<List<OmrsVisit>> patientVisits;
+  static const lblVisits = 'Visits';
+  static const lblNoVisitFound ='None found';
 
   @override
   void initState() {
@@ -37,23 +39,29 @@ class _PatientVisitListState extends State<PatientVisitList> {
           if (snapshot.hasData) {
             visits = snapshot.data ?? [];
           }
-          return Column(
-            children: [
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Container(
-                  padding: const EdgeInsets.fromLTRB(10, 5, 0, 0),
-                  child: const Text('Visits',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-              ),
-              ..._buildVisitList(visits),
-            ],
-            // initiallyExpanded: true,
+          return ExpansionTile(
+            title: const Text(lblVisits, style: TextStyle(fontWeight: FontWeight.bold)),
+            leading: const Image(image: AssetImage('assets/facility_1.png'), width: 24.0, height: 24.0,),
+            initiallyExpanded: true,
+            children: visits.isEmpty ? [_displayEmpty()] : _buildVisitList(visits),
           );
+          // return Column(
+          //   children: [
+          //     Align(
+          //       alignment: Alignment.centerLeft,
+          //       child: Container(
+          //         padding: const EdgeInsets.fromLTRB(10, 5, 0, 0),
+          //         child: const Text(lblVisits,
+          //             style: TextStyle(
+          //               fontWeight: FontWeight.bold,
+          //             ),
+          //           ),
+          //         ),
+          //     ),
+          //     ..._buildVisitList(visits),
+          //   ],
+          //   // initiallyExpanded: true,
+          // );
         }
     );
   }
@@ -65,12 +73,19 @@ class _PatientVisitListState extends State<PatientVisitList> {
       columnContent.add(
         ListTile(
           title: Text('${v.location!.name} - $visitTime'),
-          leading: const Image(image: AssetImage('assets/facility_1.png'), width: 24.0, height: 24.0,),
+          leading: const Icon(Icons.arrow_right),
           dense: true,
         ),
       );
     }
     return columnContent;
+  }
+
+  Widget _displayEmpty() {
+    return ListTile(
+      title: Text(lblNoVisitFound),
+      dense: true,
+    );
   }
 
 }

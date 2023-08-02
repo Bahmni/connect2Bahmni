@@ -14,6 +14,8 @@ class PatientConditionList extends StatefulWidget {
 }
 
 class _PatientConditionListState extends State<PatientConditionList> {
+  static const lblEncounterDiagnoses = 'Encounter Diagnoses';
+  static const lblNoEncounterDiagnosisFound = 'None found';
   @override
   Widget build(BuildContext context) {
     Future<List<ConditionModel>> futureDiagnoses = EmrApiService().searchCondition(OmrsPatient(uuid: widget.patientUuid));
@@ -31,22 +33,10 @@ class _PatientConditionListState extends State<PatientConditionList> {
           if (snapshot.hasData) {
             diagnoses = snapshot.data ?? [];
           }
-          return Column(
-            children: [
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Container(
-                  padding: const EdgeInsets.fromLTRB(10, 5, 0, 0),
-                  child: const Text('Encounter Diagnoses',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ),
-              ..._encounterDiagnoses(diagnoses),
-            ],
-            // initiallyExpanded: true,
+          return ExpansionTile(
+            title: const Text(lblEncounterDiagnoses, style: TextStyle(fontWeight: FontWeight.bold)),
+            leading: const Icon(Icons.category),
+            children: diagnoses.isEmpty ? [_displayEmpty()] : _encounterDiagnoses(diagnoses),
           );
         }
     );
@@ -73,21 +63,9 @@ class _PatientConditionListState extends State<PatientConditionList> {
         ],
       );
 
-      // The following does not work with scrolling.
-      // TODO try with  https://pub.dev/packages/expandable or plain Expanded
-      //   ExpansionTile(
-      //     tilePadding: const EdgeInsets.fromLTRB(10,1,0,0),
-      //     leading: const Icon(Icons.category),
-      //     title: Text(displayText),
-      //     children: dia.note == null ? []
-      //     : <Widget>[
-      //       ListTile(title: Text(dia.note!, style: Theme.of(context).textTheme.caption)),
-      //     ],
-      //   )
 
       widgets.add(
         ListTile(
-          //title: Text('$displayCode \n$info'),
           leading: const Icon(Icons.category),
           title: Text.rich(textSpan),
           subtitle: Text(conditionNotes),
@@ -97,6 +75,13 @@ class _PatientConditionListState extends State<PatientConditionList> {
       );
     }
     return widgets;
+  }
+
+  Widget _displayEmpty() {
+    return ListTile(
+      title: Text(lblNoEncounterDiagnosisFound),
+      dense: true,
+    );
   }
 
 }

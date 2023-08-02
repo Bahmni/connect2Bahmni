@@ -61,7 +61,7 @@ class PatientModel {
   }
 
   String? getVisitDrugIds() {
-    var visitDrugOrderIds = _patient.extension_?.where((element) => element.url.toString() == ModelExtensions.patientVisitDrugOrderIds).first;
+    var visitDrugOrderIds = _patient.extension_?.where((element) => element.url.toString() == ModelExtensions.patientVisitDrugOrderIds).firstOrNull;
     return visitDrugOrderIds != null ? (visitDrugOrderIds.valueString ?? '') : '';
   }
 

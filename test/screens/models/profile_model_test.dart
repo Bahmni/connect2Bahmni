@@ -1,3 +1,4 @@
+import 'package:connect2bahmni/domain/models/common.dart';
 import 'package:connect2bahmni/screens/models/profile_model.dart';
 import 'package:flutter_test/flutter_test.dart';
 

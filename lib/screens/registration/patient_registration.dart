@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -8,6 +6,7 @@ import '../../providers/meta_provider.dart';
 import '../../screens/registration/profile_attributes.dart';
 import '../../domain/models/omrs_identifier_type.dart';
 import '../../services/address_hierarchy.dart';
+import '../../services/visits.dart';
 import '../../utils/app_failures.dart';
 import '../../widgets/address_selection.dart';
 import '../../services/registrations.dart';
@@ -47,6 +46,8 @@ class _PatientRegistration extends State<PatientRegistration> {
   final ValueNotifier<bool> _profileSaved = ValueNotifier<bool>(false);
   late ProfileModel profile;
   final List<AddressEntry> addressHierarchy = [];
+
+  static const errStartingVisit = "Error occurred while trying to start visit";
 
   @override
   void dispose() {
@@ -253,15 +254,7 @@ class _PatientRegistration extends State<PatientRegistration> {
               valueListenable: _profileSaved,
               builder: (context, saved, child) {
                 if (saved) {
-                  return VisitTypesFab(
-                    label: lblStartVisit,
-                    icon: Icons.start_outlined,
-                    onSelect: (visitType) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text("Not yet Implemented")),
-                      );
-                    },
-                  );
+                  return _showVisitStartOption();
                 }
                 return FloatingActionButton(
                     onPressed: () async {
@@ -301,9 +294,25 @@ class _PatientRegistration extends State<PatientRegistration> {
     );
   }
 
+  VisitTypesFab _showVisitStartOption() {
+    return VisitTypesFab(
+              label: lblStartVisit,
+              icon: Icons.start_outlined,
+              onSelect: (visitType) async {
+                try {
+                  await Visits().startVisit(profile.uuid!, visitType.uuid!);
+                  if (!mounted) return;
+                  Navigator.of(context).pop();
+                } catch (e) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text(errStartingVisit)),
+                  );
+                }
+              },
+            );
+  }
+
   void _pageAction(int pageNumber) {
-    debugPrint('Page clicked $pageNumber');
-    debugPrint('Existing page ${_pageIndex.value}');
     bool pageValidated = false;
     switch (_pageIndex.value) {
       case 0:
@@ -326,20 +335,12 @@ class _PatientRegistration extends State<PatientRegistration> {
   }
 
   bool _validateAndUpdateBasicDetails() {
-    debugPrint('Details before save: first name - ${_basicDetailsController.getData()?.firstName}');
     if (_basicDetailsFormKey.currentState!.validate()) {
       _basicDetailsFormKey.currentState!.save();
     } else {
       return false;
     }
-    debugPrint('Basic Details validated and saved');
     var data = _basicDetailsController.getData();
-    debugPrint('Basic Details, Name: ${data?.firstName}, lastName = ${data?.lastName}, dob = ${data?.dateOfBirth}, gender = ${data?.gender}');
-    data?.identifiers?.forEach((element) {
-      debugPrint('Identifier: ${element.name} - ${element.value}');
-    });
-
-
     if (data?.identifiers != null) {
       profile.updateIdentifiers(data!.identifiers!);
     }
@@ -353,7 +354,6 @@ class _PatientRegistration extends State<PatientRegistration> {
   }
 
   bool _validateAndUpdateAttributes() {
-    debugPrint('Attributes before save: ${_attributesController.getData()}');
     if (_profileAttributeFormKey.currentState!.validate()) {
       _profileAttributeFormKey.currentState!.save();
     } else {
@@ -373,7 +373,6 @@ class _PatientRegistration extends State<PatientRegistration> {
       return false;
     }
     var data = _addressController.getData();
-    debugPrint('updating profile address. District = ${data?.countyDistrict}');
     if (data != null) {
       profile.updateProfileAddress(data);
     }
@@ -395,8 +394,6 @@ class _PatientRegistration extends State<PatientRegistration> {
       );
       return false;
     }
-    var profileJson = profile.toProfileJson();
-    debugPrint(jsonEncode(profileJson));
     if (profile.isNewPatient) {
       return Registrations().createPatient(profile)
           .then((value) => profile.updateFrom(value))
@@ -409,6 +406,7 @@ class _PatientRegistration extends State<PatientRegistration> {
               return false;
             });
     } else {
+      ///TODO: update patient
       // var response = await Registrations().updatePatient(profile.toProfileJson());
       // debugPrint('Profile post response: $response');
       // var serverResponse = ProfileModel.fromProfileJson(response);
