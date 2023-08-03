@@ -1,9 +1,9 @@
-import 'package:connect2bahmni/domain/models/omrs_order.dart';
-import 'package:connect2bahmni/widgets/investigation_details.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:provider/provider.dart';
 import 'condition.dart';
+import 'consultation_notes.dart';
+import '../domain/models/omrs_order.dart';
 import '../utils/date_time.dart';
 import '../utils/string_utils.dart';
 import '../screens/models/consultation_model.dart';
@@ -11,6 +11,7 @@ import '../screens/models/consultation_board.dart';
 import '../widgets/consultation_context.dart';
 import '../domain/condition_model.dart';
 import '../domain/models/omrs_obs.dart';
+import '../widgets/investigation_details.dart';
 
 class ConsultPadWidget extends StatefulWidget {
   const ConsultPadWidget({
@@ -72,7 +73,7 @@ class _ConsultPadWidgetState extends State<ConsultPadWidget> {
             ..._diagnoses(consultation?.diagnosisList),
             ..._problemList(consultation?.problemList),
             ..._investigationList(consultation?.investigationList),
-            (consultation?.consultNote != null) ? _ObsListItem(consultNote: consultation!.consultNote!, sliding: true,) : const SizedBox(height: 1),
+            (consultation?.consultNote != null) ? _ConsultationNote(consultNote: consultation!.consultNote!, sliding: true,) : const SizedBox(height: 1),
           ],
         ));
   }
@@ -345,11 +346,11 @@ class _ConsultPadWidgetState extends State<ConsultPadWidget> {
     );
   }
 }
-class _ObsListItem extends StatelessWidget {
+class _ConsultationNote extends StatelessWidget {
   final OmrsObs consultNote;
   final bool? sliding;
 
-  const _ObsListItem({Key? key, required this.consultNote, this.sliding})
+  const _ConsultationNote({Key? key, required this.consultNote, this.sliding})
       : super(key: key);
 
   @override
@@ -392,7 +393,17 @@ class _ObsListItem extends StatelessWidget {
         children: [
           SlidableAction(
             onPressed: (_) async {
-              //debugPrint('Edit note slide');
+              var board = Provider.of<ConsultationBoard>(context, listen: false);
+              var consultNote = board.currentConsultation?.consultNote;
+              var notes = await showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return ConsultationNotesWidget(notes: consultNote?.valueAsString);
+                  }
+              );
+              if (notes != null && context.mounted) {
+                board.updateConsultationNotes(notes);
+              }
             },
             backgroundColor: Colors.green,
             foregroundColor: Colors.white,

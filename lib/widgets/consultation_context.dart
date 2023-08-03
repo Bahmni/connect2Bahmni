@@ -1,10 +1,10 @@
-import 'package:connect2bahmni/services/visits.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../domain/models/omrs_encounter_type.dart';
 import '../domain/models/omrs_visit_type.dart';
 import '../providers/meta_provider.dart';
 import '../screens/models/patient_model.dart';
+import '../services/visits.dart';
 import '../widgets/patient_info.dart';
 
 class ConsultationContext extends StatefulWidget {
@@ -29,6 +29,11 @@ class _ConsultationContextState extends State<ConsultationContext> {
   static const lblEncounterType = 'Encounter Type';
   final ValueNotifier<bool> _visitChangeAllowed = ValueNotifier<bool>(true);
 
+  static const errInfoMissing = 'Please provide the required info';
+  static const hdrConsultationContext = 'Consultation Context';
+  static const lblAdd = 'Add';
+  static const lblUpdate = 'Update';
+  static const lblUnknown = 'unknown';
 
   @override
   void initState() {
@@ -67,7 +72,7 @@ class _ConsultationContextState extends State<ConsultationContext> {
   Widget build(BuildContext context) {
     var isNewConsultation = widget.isNew ?? false;
     return Scaffold(
-        appBar: AppBar(title: const Text('Consultation Context'),),
+        appBar: AppBar(title: const Text(hdrConsultationContext),),
         body: Container(
             padding: const EdgeInsets.all(10),
             child: Column(
@@ -80,29 +85,29 @@ class _ConsultationContextState extends State<ConsultationContext> {
                 ..._buildEncType(),
                 const SizedBox(height: 20),
                 Align(
-                  alignment: Alignment.center,
-                  child: ElevatedButton(
-                    style: ButtonStyle(
-                        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                            RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10.0),
-                                side: const BorderSide(color: Colors.red)
-                            )
-                        )
-                    ),
-                    onPressed: () {
-                      if ((_selectedEncType == null) || (_selectedVisitType == null)) {
-                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please provide the required info')));
-                      } else {
-                        Navigator.pop(context, {
-                          'encounterType' : _selectedEncType,
-                          'visitType' : _selectedVisitType,
-                          'existingVisit' : !_visitChangeAllowed.value,
-                        });
-                      }
-                    },
-                    child: isNewConsultation ? const Text('Start') : const Text('Update'),
-                  ),
+                  child: Container(
+                          height: 40,
+                          width: 100,
+                          decoration: BoxDecoration(
+                              color: Colors.blue,
+                              borderRadius: BorderRadius.circular(50)),
+                          child: TextButton(
+                            autofocus: false,
+                            onPressed: () {
+                              if ((_selectedEncType == null) || (_selectedVisitType == null)) {
+
+                                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(errInfoMissing)));
+                              } else {
+                                Navigator.pop(context, {
+                                  'encounterType' : _selectedEncType,
+                                  'visitType' : _selectedVisitType,
+                                  'existingVisit' : !_visitChangeAllowed.value,
+                                });
+                              }
+                            },
+                            child: Text(isNewConsultation ? lblAdd : lblUpdate, style: TextStyle(color: Colors.white)),
+                          ),
+                        ),
                 ),
               ],
             )
@@ -125,7 +130,9 @@ class _ConsultationContextState extends State<ConsultationContext> {
                 });
               } : null,
               items: (_allowedVisitTypes ?? [])
-                  .map<DropdownMenuItem<OmrsVisitType>>((vt) => DropdownMenuItem(value: vt, child: Text(vt.display ?? 'unknown'))).toList()
+                  .map<DropdownMenuItem<OmrsVisitType>>((vt) {
+                    return DropdownMenuItem(value: vt, child: Text(vt.display ?? lblUnknown));
+                  }).toList()
           );
         },
         valueListenable: _visitChangeAllowed,
@@ -146,7 +153,7 @@ class _ConsultationContextState extends State<ConsultationContext> {
             });
           },
           items: (_allowedEncTypes ?? [])
-              .map<DropdownMenuItem<OmrsEncounterType>>((et) => DropdownMenuItem(value: et, child: Text(et.display ?? 'unknown'))).toList()
+              .map<DropdownMenuItem<OmrsEncounterType>>((et) => DropdownMenuItem(value: et, child: Text(et.display ?? lblUnknown))).toList()
       )
     ];
   }

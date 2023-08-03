@@ -55,18 +55,24 @@ class _LabResultsViewState extends State<LabResultsView> {
   }
 
   Widget _displayResult(LabResult investigation) {
-    var resultText = '';
+    String resultText = '';
+    TextStyle resultStyle = TextStyle(fontSize: 15, fontStyle: FontStyle.italic);
     if (investigation.result != null) {
         resultText = investigation.result.toString();
+        if (investigation.abnormal != null && investigation.abnormal!) {
+          resultStyle = const TextStyle(fontSize: 15, fontStyle: FontStyle.italic, color: Colors.red);
+        }
     } else {
       resultText = '(pending)';
+      resultStyle = const TextStyle(fontSize: 15, fontStyle: FontStyle.italic, color: Colors.grey);
     }
+
 
     var textSpan = TextSpan(
       text: investigation.name,
       style: const TextStyle(color: Colors.black),
       children: <TextSpan>[
-        TextSpan(text: ' - $resultText', style: const TextStyle(fontSize: 15, color: Colors.blueAccent))
+          TextSpan(text: ' - $resultText', style: resultStyle),
       ],
     );
 

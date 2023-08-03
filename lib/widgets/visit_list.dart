@@ -41,27 +41,11 @@ class _PatientVisitListState extends State<PatientVisitList> {
           }
           return ExpansionTile(
             title: const Text(lblVisits, style: TextStyle(fontWeight: FontWeight.bold)),
-            leading: const Image(image: AssetImage('assets/facility_1.png'), width: 24.0, height: 24.0,),
+            leading: const Icon(Icons.health_and_safety_outlined),
+            //leading: const Image(image: AssetImage('assets/facility_1.png'), width: 24.0, height: 24.0,),
             initiallyExpanded: true,
             children: visits.isEmpty ? [_displayEmpty()] : _buildVisitList(visits),
           );
-          // return Column(
-          //   children: [
-          //     Align(
-          //       alignment: Alignment.centerLeft,
-          //       child: Container(
-          //         padding: const EdgeInsets.fromLTRB(10, 5, 0, 0),
-          //         child: const Text(lblVisits,
-          //             style: TextStyle(
-          //               fontWeight: FontWeight.bold,
-          //             ),
-          //           ),
-          //         ),
-          //     ),
-          //     ..._buildVisitList(visits),
-          //   ],
-          //   // initiallyExpanded: true,
-          // );
         }
     );
   }

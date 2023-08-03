@@ -2,18 +2,17 @@ import 'package:connect2bahmni/screens/models/patient_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
-import 'package:provider/provider.dart';
 
 import '../../domain/models/form_definition.dart';
 import '../../domain/models/omrs_concept.dart';
-import '../../providers/meta_provider.dart';
 import '../../services/forms.dart';
 import '../form_fields.dart';
 import '../patient_info.dart';
 
 class ObservationForm extends StatefulWidget {
   final PatientModel patient;
-  const ObservationForm({super.key, required this.patient});
+  final FormResource formToDisplay;
+  const ObservationForm({super.key, required this.patient, required this.formToDisplay});
 
   @override
   State<ObservationForm> createState() => _ObservationFormState();
@@ -35,8 +34,7 @@ class _ObservationFormState extends State<ObservationForm> {
   @override
   void initState() {
     super.initState();
-    FormResource form = Provider.of<MetaProvider>(context, listen: false).observationForms.firstWhere((form) => form.name.toLowerCase() == 'Vitals'.toLowerCase());
-    _formInitialized = BahmniForms().fetch(form.uuid).then((value) => value.definition).then((value) => _initObservationInstances(value));
+    _formInitialized = BahmniForms().fetch(widget.formToDisplay.uuid).then((value) => value.definition).then((value) => _initObservationInstances(value));
   }
 
   @override
@@ -93,6 +91,20 @@ class _ObservationFormState extends State<ObservationForm> {
                         ..._buildRowActions(_observationInstances[rowNum], rowNum),
                       ],
                     ),
+                  // Container(
+                  //   height: 40,
+                  //   width: 100,
+                  //   decoration: BoxDecoration(
+                  //       color: Colors.blue,
+                  //       borderRadius: BorderRadius.circular(50)),
+                  //   child: TextButton(
+                  //     autofocus: false,
+                  //     onPressed: () {
+                  //     },
+                  //     child: const Text('Save',
+                  //         style: TextStyle(color: Colors.white)),
+                  //   ),
+                  // ),
                 ],
               ),
             ),
@@ -139,7 +151,6 @@ class _ObservationFormState extends State<ObservationForm> {
   }
 
   Widget _buildObservationFields(ObservationInstance observationInstance, int i) {
-    debugPrint('Observation Instance $i fields: ${observationInstance.fields?.length}');
     return Column(
       children: observationInstance.fields!.map((field) => _buildObservationField(field, observationInstance)).toList(),
     );
@@ -160,13 +171,11 @@ class _ObservationFormState extends State<ObservationForm> {
           return _buildCodedField(field);
         case ConceptDataType.na:
             if (field.definition.type == obsGroupControlType) {
-              debugPrint('building composite field');
               return _buildCompositeFields(field, observationInstance);
             }
             return SizedBox();
         case ConceptDataType.complex:
           String? conceptHandler = field.definition.concept?.conceptHandler;
-          debugPrint('${field.dataType}. Handler - $conceptHandler');
           if (conceptHandler == imageHandler) {
             return _buildImageUploadField(field);
           }
@@ -187,21 +196,12 @@ class _ObservationFormState extends State<ObservationForm> {
           enabled: isEditing,
           decoration: InputDecoration(
             labelText: '${field.label} ${field.required ? '*' : ''}',
-            // enabledBorder: OutlineInputBorder(
-            //   // borderSide: const BorderSide(color: Colors.blue, width: 2),
-            //   borderRadius: BorderRadius.circular(20),
-            // ),
-            // border: OutlineInputBorder(
-            //   borderSide: const BorderSide(color: Colors.blue, width: 2),
-            //   borderRadius: BorderRadius.circular(20),
-            // ),
           ),
           keyboardType: TextInputType.number,
           inputFormatters: <TextInputFormatter>[
             FilteringTextInputFormatter.digitsOnly
           ],
           onChanged: (value) {
-            debugPrint('Saving value $value to field');
             field.value = value;
           },
           initialValue: field.value,
@@ -240,7 +240,6 @@ class _ObservationFormState extends State<ObservationForm> {
           items: field.definition.concept?.answers ?? [],
           enabled: isEditing,
           onChanged: (value) {
-            debugPrint('Saving value $value to field');
             field.value = value;
           },
           onSaved: (value) {
@@ -259,14 +258,6 @@ class _ObservationFormState extends State<ObservationForm> {
           enabled: isEditing,
           decoration: InputDecoration(
             labelText: '${field.label} ${field.required ? '*' : ''}',
-            // enabledBorder: OutlineInputBorder(
-            //   // borderSide: const BorderSide(color: Colors.blue, width: 2),
-            //   borderRadius: BorderRadius.circular(20),
-            // ),
-            // border: OutlineInputBorder(
-            //   borderSide: const BorderSide(color: Colors.blue, width: 2),
-            //   borderRadius: BorderRadius.circular(20),
-            // ),
           ),
           keyboardType: TextInputType.text,
           onChanged: (value) => field.value = value,
@@ -426,7 +417,6 @@ class _ObservationFormState extends State<ObservationForm> {
               subFieldsDefinitions.sort((a, b) => a.position?.row.compareTo(b.position?.row ?? 0) ?? 0);
               var groupFields = <ObservationField>[];
               for (var controlDef in subFieldsDefinitions) {
-                debugPrint('subcontrol type =  ${controlDef.type}');
                 groupFields.add(_createFieldInstance(controlDef));
               }
               _observationInstances.add(ObservationInstance(fields: groupFields, definition: fieldDefinition));
@@ -445,7 +435,6 @@ class _ObservationFormState extends State<ObservationForm> {
         subFieldsDefinitions.sort((a, b) => a.position?.row.compareTo(b.position?.row ?? 0) ?? 0);
         var groupFields = <ObservationField>[];
         for (var controlDef in subFieldsDefinitions) {
-          debugPrint('subcontrol type =  ${controlDef.type}');
           groupFields.add(_createFieldInstance(controlDef));
         }
         return ObservationField(

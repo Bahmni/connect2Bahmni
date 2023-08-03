@@ -81,6 +81,7 @@ class EmrApiService extends DomainService {
         }],
         'bahmniDiagnoses': _diagnosesPayload(consultation, encounterDateTime),
         'observations': _obsPayload(consultation, encounterDateTime),
+        'orders': _txOrders(consultation, encounterDateTime),
       };
   }
 
@@ -154,6 +155,21 @@ class EmrApiService extends DomainService {
           throw handleErrorResponse(response);
       }
     });
+  }
+
+  List<Map<String, dynamic>> _txOrders(ConsultationModel consultation, DateTime encounterDateTime) {
+    List<Map<String, dynamic>> orders = [];
+    for (var investigation in consultation.investigationList) {
+      orders.add({
+        'action': investigation.action,
+        'commentToFulfiller': investigation.commentToFulfiller,
+        'urgency': investigation.urgency,
+        'concept': {
+          'uuid': investigation.concept?.uuid,
+        } //TODO 'previousOrderUuid': investigation.previousOrderUuid
+      });
+    }
+    return orders;
   }
 
 }

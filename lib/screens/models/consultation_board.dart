@@ -84,6 +84,14 @@ class ConsultationBoard extends ChangeNotifier {
     _currentConsultation?.addNotes(consultNotes);
     notifyListeners();
   }
+
+  void updateConsultationNotes(String notes) {
+    _verifyEditable();
+    var obsConcept = _currentConsultation?.consultNote?.concept ?? OmrsConcept();
+    _currentConsultation?.addNotes(OmrsObs(concept: obsConcept, value: notes));
+    notifyListeners();
+  }
+
   void addInvestigation(OmrsOrder investigation){
     _verifyEditable();
     _currentConsultation?.addInvestigation(investigation);

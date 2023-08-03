@@ -25,6 +25,7 @@ import '../domain/models/omrs_location.dart';
 import '../providers/auth.dart';
 import '../widgets/consultation_context.dart';
 import '../providers/meta_provider.dart';
+import '../widgets/select_obs_form.dart';
 
 
 class PatientDashboard extends StatefulWidget {
@@ -325,9 +326,16 @@ class ConsultationActions extends StatelessWidget {
       onPressed: () async {
         var board = _activeBoardToUpdate(context);
         if (board == null) return;
-        Navigator.push(context,
-          MaterialPageRoute(builder: (context) => ObservationForm(patient: patient)),
-        );
+        showDialog(
+          context: context,
+          builder: (BuildContext context) => SelectObsFormWidget(),
+        ).then((form) {
+          if (form != null) {
+            Navigator.push(context,
+              MaterialPageRoute(builder: (context) => ObservationForm(patient: patient, formToDisplay: form)),
+            );
+          }
+        });
       },
     );
   }
@@ -377,8 +385,7 @@ class ConsultationActions extends StatelessWidget {
     if (board == null) return;
     var notes = await showDialog(
         context: ctx,
-        builder: (BuildContext context) => ConsultationNotesWidget(
-            notes: board.currentConsultation?.consultationNotes)
+        builder: (BuildContext context) => ConsultationNotesWidget(notes: board.currentConsultation?.consultationNotes)
     );
     if (notes != null && ctx.mounted) {
       var consultNoteConcept = Provider.of<MetaProvider>(ctx, listen: false).consultNoteConcept;

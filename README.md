@@ -20,6 +20,7 @@ As of now, this project is experimental, only a starting point and far from bein
 | bahmni.server                      | HTTPS and without trailing slash                                                              | https://dev.lite.mybahmni.in (use https://10.0.2.2 if running on https://localhost) |
 | bahmni.list.patientsToDispenseMeds | ref to the list queue identifier for active patients with med request                         | emrapi.sqlSearch.activePatientsWithMeds                                             |
 | bahmni.list.activePatients         | ref to the list queue identifier on Bahmni                                                    | emrapi.sqlSearch.activePatients                                                     |
+| fhir.support                       | whether to use FHIR APIs                                                                      | true                                                                                |
 | app.allowedVisitTypes              | subset of visit types on server, matched by name                                              | OPD,IPD,FIELD                                                                       |  
 | app.allowedEncTypes                | subset of encounter types on server, matched by name                                          | Consultation,REG,TRANSFER                                                           |  
 | app.conceptConsultationNotes       | uuid of the obs concept on server (datatype = text) for recording consult notes               | 81d6e852-3f10-11e4-adec-0800271c1b75                                                |
@@ -28,6 +29,7 @@ As of now, this project is experimental, only a starting point and far from bein
 | app.patientAttributes              | additional attributes for patient to be captured, matched by name (* denotes mandatory)       | phoneNumber*,email                                                                  |
 | app.flowSheet.concepts             | list of Concept names (FSN) to display in flowSheet style by date                             | Pulse,Respiratory rate,Temperature,Systolic blood pressure,Diastolic blood pressure |
 | abdm.identifiers                   | Linkages for ABHA  identifiers (India Only). If enabled triggers ABHA linking. Not modifiable | ABHA Number,ABHA Address                                                            |
+| bahmni.obsForms                    | List of templates/forms practitioner can fill in                                              | History and Examination, Vitals                                                     | 
 
 
 ## Build
