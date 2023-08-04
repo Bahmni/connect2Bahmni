@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:connect2bahmni/domain/models/omrs_concept.dart';
 import 'package:http/http.dart';
 
 import '../services/domain_service.dart';
@@ -25,14 +26,22 @@ class DiseaseSummaryService extends DomainService {
         var responseJson = jsonDecode(response.body);
         var concepts = responseJson['conceptDetails'];
         var dateGroups = responseJson['tabularData'];
+        List<OmrsConcept> resultConcepts = (concepts as List).map((json) {
+          return OmrsConcept(
+            display: json['name'],
+            name: OmrsConceptName(name: json['fullName'], conceptNameType: 'FSN'),
+          );
+        }).toList();
+        resultConcepts.sort((a, b) => conceptNames.indexOf(a.name?.name ?? '').compareTo(conceptNames.indexOf(b.name?.name ?? '')));
+        Map<OmrsConcept, List<ObsData>> conceptsMap = Map.fromEntries(resultConcepts.map((e) => MapEntry(e, [])));
         List<DateTime> obsDates = [];
-        Map<String, List<ObsData>> conceptsMap = Map.fromEntries((concepts as List).map((json) => MapEntry(json['name'], [])));
         dateGroups.forEach((dateStr, data) {
           var obsDate = DateTime.parse(dateStr as String);
           obsDates.add(obsDate);
           (data as Map).forEach((name, obs) {
             var conceptName = (name as String);
-            var values = conceptsMap[conceptName];
+            var conceptInMap = conceptsMap.keys.singleWhere((element) => element.display == conceptName);
+            List<ObsData>? values = conceptsMap[conceptInMap];
             values?.add(ObsData(
               dateTime: obsDate,
               value: obs['value'],
@@ -40,7 +49,7 @@ class DiseaseSummaryService extends DomainService {
             ));
           });
         });
-        ObsFlowSheet obsFlowSheet = ObsFlowSheet(dates: obsDates, conceptsDataMap: conceptsMap);
+        ObsFlowSheet obsFlowSheet = ObsFlowSheet(dates: obsDates, conceptsData: conceptsMap);
         return obsFlowSheet;
       } else {
         throw handleErrorResponse(response);
@@ -52,7 +61,8 @@ class DiseaseSummaryService extends DomainService {
 class ObsFlowSheet {
   List<DateTime>? dates;
   Map<String, List<ObsData>>? conceptsDataMap;
-  ObsFlowSheet({this.dates, this.conceptsDataMap});
+  Map<OmrsConcept, List<ObsData>>? conceptsData;
+  ObsFlowSheet({this.dates, this.conceptsDataMap, this.conceptsData});
 }
 
 class ObsData {

@@ -45,7 +45,7 @@ class _ObsFlowSheetViewState extends State<ObsFlowSheetView> {
           if (snapshot.hasData) {
             obsFlowSheet = snapshot.data;
           }
-          if (obsFlowSheet == null || obsFlowSheet.conceptsDataMap == null) {
+          if (obsFlowSheet == null || obsFlowSheet.conceptsData == null) {
             return SizedBox();
           }
           if (obsFlowSheet.dates == null || obsFlowSheet.dates!.isEmpty) {
@@ -53,12 +53,16 @@ class _ObsFlowSheetViewState extends State<ObsFlowSheetView> {
           }
 
           obsFlowSheet.dates!.sort((a, b) => a.compareTo(b));
-          for (var element in obsFlowSheet.conceptsDataMap!.values) {
+          for (var element in obsFlowSheet.conceptsData!.values) {
             element.sort((a, b) => a.dateTime!.compareTo(b.dateTime!));
           }
 
           var headers = [DataColumn(label: Text('Date'))];
           headers.addAll(obsFlowSheet.dates!.map((e) => DataColumn(label: _columnHeader(e))).toList());
+          if (obsFlowSheet.dates!.length < 2) {
+            headers.add(DataColumn(label: Text('')));
+            headers.add(DataColumn(label: Text('')));
+          }
           return SingleChildScrollView(
             padding: EdgeInsets.fromLTRB(5, 2, 2, 5),
             scrollDirection: Axis.vertical,
@@ -71,7 +75,7 @@ class _ObsFlowSheetViewState extends State<ObsFlowSheetView> {
                       return Theme.of(context).colorScheme.surfaceTint.withOpacity(0.3);
                     }),
                 rows: List<DataRow>.generate(
-                    obsFlowSheet.conceptsDataMap!.length,
+                    obsFlowSheet.conceptsData!.length,
                       (int index) => DataRow(
                     color: MaterialStateProperty.resolveWith<Color?>(
                             (Set<MaterialState> states) {
@@ -112,10 +116,10 @@ class _ObsFlowSheetViewState extends State<ObsFlowSheetView> {
   }
 
   List<DataCell> _getRowCells(ObsFlowSheet obsFlowSheet, int index, int columnLength) {
-    var conceptName = obsFlowSheet.conceptsDataMap!.keys.elementAt(index);
-    List<ObsData> obsDataList = obsFlowSheet.conceptsDataMap!.values.elementAt(index);
+    var concept = obsFlowSheet.conceptsData!.keys.elementAt(index);
+    List<ObsData> obsDataList = obsFlowSheet.conceptsData!.values.elementAt(index);
     List<DataCell> rowCells = [];
-    rowCells.add(DataCell(Text(conceptName)));
+    rowCells.add(DataCell(Text(concept.display!)));
     for (var obs in obsDataList) {
       var obsValue = obs.value;
       rowCells.add(DataCell(Text(obsValue)));
