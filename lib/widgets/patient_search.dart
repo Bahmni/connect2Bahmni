@@ -24,6 +24,7 @@ class _PatientsSearchWidgetState extends State<PatientSearch> {
   final Debouncer _debouncer = Debouncer();
   late List<PatientModel> _initialPatientList;
   final ValueNotifier<List<PatientModel>> patientListNotifier = ValueNotifier<List<PatientModel>>([]);
+  static const lblAddNewPatient = 'New Patient';
 
   @override
   void initState() {
@@ -69,9 +70,8 @@ class _PatientsSearchWidgetState extends State<PatientSearch> {
       appBar: AppBar(
         title: Text(headingText),
         actions: [
-          //_switchStatus(),
           IconButton(
-            tooltip: 'New Patient',
+            tooltip: lblAddNewPatient,
             icon: const Icon(
               Icons.add,
             ),
@@ -121,21 +121,8 @@ class _PatientsSearchWidgetState extends State<PatientSearch> {
     );
   }
 
-  // bool _showActive = true;
-  // Switch _switchStatus() {
-  //   return Switch(
-  //           activeColor: Colors.white70,
-  //           value: _showActive,
-  //           onChanged: (val) {
-  //             setState(() {
-  //               _showActive = val;
-  //             });
-  //       });
-  // }
-
   void _primaryAction() async {
     Navigator.of(context).pushReplacementNamed(AppRoutes.registerPatient);
-    // Navigator.of(context).pushReplacementNamed('registerNewPatient');
   }
 
   void _onActionPatient(PatientModel patient) async {

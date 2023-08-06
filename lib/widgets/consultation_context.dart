@@ -20,6 +20,7 @@ class ConsultationContext extends StatefulWidget {
 }
 
 class _ConsultationContextState extends State<ConsultationContext> {
+  final _formKey = GlobalKey<FormState>();
   List<OmrsEncounterType>? _allowedEncTypes;
   List<OmrsVisitType>? _allowedVisitTypes;
 
@@ -29,8 +30,9 @@ class _ConsultationContextState extends State<ConsultationContext> {
   static const lblEncounterType = 'Encounter Type';
   final ValueNotifier<bool> _visitChangeAllowed = ValueNotifier<bool>(true);
 
-  static const errInfoMissing = 'Please provide the required info';
   static const hdrConsultationContext = 'Consultation Context';
+  static const errEncounterTypeRequired = 'Encounter Type is required';
+  static const errVisitTypeRequired = 'Visit Type is required';
   static const lblAdd = 'Add';
   static const lblUpdate = 'Update';
   static const lblUnknown = 'unknown';
@@ -75,41 +77,42 @@ class _ConsultationContextState extends State<ConsultationContext> {
         appBar: AppBar(title: const Text(hdrConsultationContext),),
         body: Container(
             padding: const EdgeInsets.all(10),
-            child: Column(
-              mainAxisSize: MainAxisSize.max,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height:10),
-                PatientInfo(patient: widget.patient),
-                ..._buildVisitType(),
-                ..._buildEncType(),
-                const SizedBox(height: 20),
-                Align(
-                  child: Container(
-                          height: 40,
-                          width: 100,
-                          decoration: BoxDecoration(
-                              color: Colors.blue,
-                              borderRadius: BorderRadius.circular(50)),
-                          child: TextButton(
-                            autofocus: false,
-                            onPressed: () {
-                              if ((_selectedEncType == null) || (_selectedVisitType == null)) {
-
-                                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(errInfoMissing)));
-                              } else {
+            child: Form(
+              key: _formKey,
+              child: Column(
+                mainAxisSize: MainAxisSize.max,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height:10),
+                  PatientInfo(patient: widget.patient),
+                  ..._buildVisitType(),
+                  ..._buildEncType(),
+                  const SizedBox(height: 20),
+                  Align(
+                    child: Container(
+                            height: 40,
+                            width: 100,
+                            decoration: BoxDecoration(
+                                color: Colors.blue,
+                                borderRadius: BorderRadius.circular(50)),
+                            child: TextButton(
+                              autofocus: false,
+                              onPressed: () {
+                                if (!_formKey.currentState!.validate()) {
+                                  return;
+                                }
                                 Navigator.pop(context, {
                                   'encounterType' : _selectedEncType,
                                   'visitType' : _selectedVisitType,
                                   'existingVisit' : !_visitChangeAllowed.value,
                                 });
-                              }
-                            },
-                            child: Text(isNewConsultation ? lblAdd : lblUpdate, style: TextStyle(color: Colors.white)),
+                              },
+                              child: Text(isNewConsultation ? lblAdd : lblUpdate, style: TextStyle(color: Colors.white)),
+                            ),
                           ),
-                        ),
-                ),
-              ],
+                  ),
+                ],
+              ),
             )
         )
     );
@@ -121,7 +124,7 @@ class _ConsultationContextState extends State<ConsultationContext> {
       const Text(lblVisitType),
       ValueListenableBuilder<bool>(
         builder: (BuildContext context, bool allowChange, Widget? child) {
-          return DropdownButton<OmrsVisitType>(
+          return DropdownButtonFormField<OmrsVisitType>(
               value: _selectedVisitType,
               isExpanded: true,
               onChanged: allowChange ? (newVal)  {
@@ -129,10 +132,10 @@ class _ConsultationContextState extends State<ConsultationContext> {
                   _selectedVisitType = newVal;
                 });
               } : null,
-              items: (_allowedVisitTypes ?? [])
-                  .map<DropdownMenuItem<OmrsVisitType>>((vt) {
+              items: (_allowedVisitTypes ?? []).map<DropdownMenuItem<OmrsVisitType>>((vt) {
                     return DropdownMenuItem(value: vt, child: Text(vt.display ?? lblUnknown));
-                  }).toList()
+                  }).toList(),
+              validator: (value) => value == null ? errVisitTypeRequired : null,
           );
         },
         valueListenable: _visitChangeAllowed,
@@ -144,7 +147,7 @@ class _ConsultationContextState extends State<ConsultationContext> {
     return [
       const SizedBox(height: 10.0),
       const Text(lblEncounterType),
-      DropdownButton<OmrsEncounterType>(
+      DropdownButtonFormField<OmrsEncounterType>(
           value: _selectedEncType,
           isExpanded: true,
           onChanged: (newVal)  {
@@ -153,7 +156,8 @@ class _ConsultationContextState extends State<ConsultationContext> {
             });
           },
           items: (_allowedEncTypes ?? [])
-              .map<DropdownMenuItem<OmrsEncounterType>>((et) => DropdownMenuItem(value: et, child: Text(et.display ?? lblUnknown))).toList()
+              .map<DropdownMenuItem<OmrsEncounterType>>((et) => DropdownMenuItem(value: et, child: Text(et.display ?? lblUnknown))).toList(),
+          validator: (value) => value == null ? errEncounterTypeRequired : null,
       )
     ];
   }

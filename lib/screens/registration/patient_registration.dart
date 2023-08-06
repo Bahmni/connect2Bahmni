@@ -68,7 +68,29 @@ class _PatientRegistration extends State<PatientRegistration> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: const Text(lblPatientProfile,),
+        actions:  [
+          ValueListenableBuilder<int>(
+            builder: (BuildContext context, int pageIndex, Widget? child) {
+              if (pageIndex != 0) {
+                return IconButton(onPressed: () { _pageAction(pageIndex-1); }, icon: Icon(Icons.navigate_before));
+              }
+              return SizedBox();
+            },
+            valueListenable: _pageIndex,
+          ),
+          // SizedBox(width: MediaQuery.of(context).size.width*0.75),
+          ValueListenableBuilder<int>(
+            builder: (BuildContext context, int pageIndex, Widget? child) {
+              if (pageIndex != 3) {
+                return IconButton(onPressed: () { _pageAction(pageIndex+1); }, icon: Icon(Icons.navigate_next));
+              }
+              return SizedBox();
+            },
+            valueListenable: _pageIndex,
+          ),
+        ],
       ),
       body: ValueListenableBuilder<int>(
           builder: (BuildContext context, int pageIndex, Widget? child) {
@@ -91,8 +113,8 @@ class _PatientRegistration extends State<PatientRegistration> {
             selectedItemColor: Colors.amber[800],
             currentIndex: value,
             items: const [
-              BottomNavigationBarItem(icon: Icon(Icons.details),label: 'Basics'),
-              BottomNavigationBarItem(icon: Icon(Icons.edit_attributes_outlined),label: 'Attributes'),
+              BottomNavigationBarItem(icon: Icon(Icons.info_outline_rounded),label: 'Basics'),
+              BottomNavigationBarItem(icon: Icon(Icons.more_horiz_outlined),label: 'Additional'),
               BottomNavigationBarItem(icon: Icon(Icons.pin_drop_rounded),label: 'Address'),
               BottomNavigationBarItem(icon: Icon(Icons.summarize_outlined),label: 'Summary'),
             ],
