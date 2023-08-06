@@ -105,6 +105,46 @@ class ConceptDictionary {
       throw 'Failed to fetch Medication';
     }
   }
+  Future<Map> dosageInstruction() async{
+    String? sessionId = await UserPreferences().getSessionId();
+    if (sessionId == null) {
+      throw 'Authentication Failure';
+    }
+    String url = AppUrls.omrs.dosageInstructions;
+    var response = await http.get(
+      Uri.parse(url),
+      headers: <String, String>{
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Cookie': 'JSESSIONID=$sessionId',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      var responseJson = jsonDecode(response.body);
+      var doseUnits = responseJson['doseUnits'];
+      var routes = responseJson['routes'];
+      var durationUnits = responseJson['durationUnits'];
+      var dosingInstructions = responseJson['dosingInstructions'];
+      var frequencies = responseJson['frequencies'];
+      // var resultList=[];
+      // resultList.add(doseUnits);
+      // resultList.add(routes);
+      // resultList.add(durationUnits);
+      // resultList.add(frequencies);
+      var details = {};
+      details.addAll({'doseUnits':doseUnits,'routes':routes,'durationUnits':durationUnits,'dosingInstructions':dosingInstructions,'frequencies':frequencies});
+      // details['routes']=routes;
+      // details['durationUnits']=durationUnits;
+      // details['dosingInstructions']=dosingInstructions;
+      // details['frequencies']=frequencies;
+      return details;
+      // print(List<DosingInstructions>.from(resultList.map((v) => DosingInstructions.fromJson(v))));
+      // return List<DosingInstructions>.from(resultList.map((v) => DosingInstructions.fromJson(v)));
+    } else {
+      throw 'Failed to fetch Dosing Instructions';
+    }
+  }
 
   Future<List<OmrsConcept>> _conceptsByName(String term) async {
     return UserPreferences().getSessionId().then((sessionId) {

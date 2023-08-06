@@ -12,6 +12,7 @@ import '../widgets/consultation_notes.dart';
 import '../widgets/investigation_details.dart';
 import '../widgets/investigation_search.dart';
 import '../widgets/jitsi_meeting.dart';
+import '../widgets/medication_details.dart';
 import '../widgets/medication_search.dart';
 import '../widgets/patient_chart.dart';
 import '../providers/user_provider.dart';
@@ -358,6 +359,18 @@ class ConsultationActions extends StatelessWidget {
 
     DrugConcept? concept = await Navigator.push(context,
         MaterialPageRoute(builder: (context) => const MedicationSearch()));
+    if (concept != null) {
+      if (context.mounted) {
+        var newMedication = BahmniDrugOrder(concept: concept);
+        BahmniDrugOrder? details = await Navigator.push(context,
+            MaterialPageRoute(
+              builder: (context) => MedicationDetails(medication: newMedication),
+            ));
+        if (details != null) {
+          board.addMedication(details);
+        }
+      }
+    }
   }
 
     Future<void> _addConditionToConsultation(BuildContext context) async {

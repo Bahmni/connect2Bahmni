@@ -1,3 +1,4 @@
+import 'package:connect2bahmni/domain/models/bahmni_drug_order.dart';
 import 'package:connect2bahmni/domain/models/omrs_order.dart';
 import 'package:connect2bahmni/utils/app_failures.dart';
 import 'package:uuid/uuid.dart';
@@ -23,6 +24,7 @@ class ConsultationModel {
   List<ConditionModel> problemList = [];
   List<ConditionModel> diagnosisList = [];
   List<OmrsOrder> investigationList = [];
+  List<BahmniDrugOrder> medicationList = [];
   OmrsVisitType? visitType;
   OmrsEncounterType? encounterType;
 
@@ -112,6 +114,18 @@ class ConsultationModel {
 
   void updateInvestigation(OmrsOrder investigation,int index) {
     investigationList[index]=investigation;
+  }
+
+  void addMedication(BahmniDrugOrder medication) {
+    medicationList.add(medication);
+  }
+
+  void removeMedication(BahmniDrugOrder medication) {
+    medicationList.remove(medication);
+  }
+
+  void updateMedication(BahmniDrugOrder medication, int index) {
+    medicationList[index]=medication;
   }
 }
 

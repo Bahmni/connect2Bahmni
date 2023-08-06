@@ -1,3 +1,4 @@
+import 'package:connect2bahmni/domain/models/bahmni_drug_order.dart';
 import 'package:connect2bahmni/domain/models/omrs_order.dart';
 import 'package:flutter/foundation.dart';
 
@@ -99,4 +100,20 @@ class ConsultationBoard extends ChangeNotifier {
     notifyListeners();
   }
 
+  void addMedication(BahmniDrugOrder medication) {
+    _verifyEditable();
+    _currentConsultation?.addMedication(medication);
+    notifyListeners();
+  }
+
+  void removeMedication(BahmniDrugOrder medication){
+    _verifyEditable();
+    _currentConsultation?.removeMedication(medication);
+    notifyListeners();
+  }
+
+  void updateMedication(BahmniDrugOrder medication, int index) {
+    _currentConsultation?.updateMedication(medication,index);
+    notifyListeners();
+  }
 }
