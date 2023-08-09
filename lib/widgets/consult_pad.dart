@@ -3,6 +3,7 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:provider/provider.dart';
 import 'condition.dart';
 import 'consultation_notes.dart';
+import '../domain/models/form_definition.dart';
 import '../domain/models/omrs_order.dart';
 import '../utils/date_time.dart';
 import '../utils/string_utils.dart';
@@ -74,6 +75,7 @@ class _ConsultPadWidgetState extends State<ConsultPadWidget> {
             ..._problemList(consultation?.problemList),
             ..._investigationList(consultation?.investigationList),
             (consultation?.consultNote != null) ? _ConsultationNote(consultNote: consultation!.consultNote!, sliding: true,) : const SizedBox(height: 1),
+            ..._formList(consultation?.observationForms),
           ],
         ));
   }
@@ -189,6 +191,7 @@ class _ConsultPadWidgetState extends State<ConsultPadWidget> {
       ...problemList.map((el) => _conditionWidget(el)).toList()
     ];
   }
+
   List<Widget> _investigationList(List<OmrsOrder>? investigationList) {
     if (investigationList == null) return [];
     if (investigationList.isEmpty) return [];
@@ -211,6 +214,7 @@ class _ConsultPadWidgetState extends State<ConsultPadWidget> {
       }).toList()
     ];
   }
+
   Widget _investigationWidget(OmrsOrder investigation,int index){
     String? text = investigation.concept?.display;
     String? notes = investigation.commentToFulfiller;
@@ -236,6 +240,7 @@ class _ConsultPadWidgetState extends State<ConsultPadWidget> {
       )
     );
   }
+
   Widget _conditionWidget(ConditionModel condition) {
     String? display = condition.code?.display;
     display ??= '(Unknown)';
@@ -345,7 +350,76 @@ class _ConsultPadWidgetState extends State<ConsultPadWidget> {
       label: 'Edit',
     );
   }
+
+  List<Widget> _formList(Map<FormResource, List<OmrsObs>>? formObservations) {
+    if (formObservations == null) return [];
+    if (formObservations.isEmpty) return [];
+    return <Widget>[
+      Align(
+        alignment: Alignment.centerLeft,
+        child: Container(
+          padding: const EdgeInsets.fromLTRB(10, 5, 0, 0),
+          child: Text('Form List',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+        ),
+      ),
+      ...formObservations.keys.map((form) { return _obsFormWidget(form);}).toList()
+    ];
+  }
+
+  Widget _obsFormWidget(FormResource form){
+    String? text = form.name;
+    return Slidable(
+        endActionPane: ActionPane(
+          motion: const ScrollMotion(),
+          children: [
+            _removeObsForm(form),
+            _editObsForm(form),
+          ],
+        ),
+        child: Container(
+          color: Theme.of(context).colorScheme.onBackground,
+          child: ListTile(
+            leading: const Icon(
+              Icons.description_outlined,
+              size: 24,
+            ),
+            title: Text(text),
+            //subtitle: Text('$notes'),
+            tileColor: Colors.red,
+          ),
+        )
+    );
+  }
+
+  SlidableAction _removeObsForm(FormResource form){
+    return SlidableAction (
+      onPressed: (context){
+        Provider.of<ConsultationBoard>(context, listen: false).removeObsForm(form);
+      },
+      icon: Icons.delete,
+      backgroundColor: Color.fromRGBO(240, 39, 22, 0.6),
+      foregroundColor: Colors.white,
+      label: 'Remove',
+    );
+  }
+
+  SlidableAction _editObsForm(FormResource form) {
+    return SlidableAction(
+      onPressed: (_) async {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Not yet Implemented")),
+        );
+      },
+      backgroundColor: Colors.green,
+      foregroundColor: Colors.white,
+      icon: Icons.edit,
+      label: 'Edit',
+    );
+  }
 }
+
 class _ConsultationNote extends StatelessWidget {
   final OmrsObs consultNote;
   final bool? sliding;

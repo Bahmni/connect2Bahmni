@@ -210,8 +210,7 @@ class _DashboardWidgetState extends State<_DashboardWidget> {
             var message = value
                 ? 'Consultation Saved'
                 : 'Could not save consultation';
-            ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(message)));
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
             if (value && (widget.onConsultationSave != null)) {
               widget.onConsultationSave!();
             }
@@ -329,11 +328,14 @@ class ConsultationActions extends StatelessWidget {
         showDialog(
           context: context,
           builder: (BuildContext context) => SelectObsFormWidget(),
-        ).then((form) {
+        ).then((form) async {
           if (form != null) {
-            Navigator.push(context,
+            final obsList = await Navigator.push(context,
               MaterialPageRoute(builder: (context) => ObservationForm(patient: patient, formToDisplay: form)),
             );
+            if (obsList != null) {
+              board.addFormObsList(form, obsList);
+            }
           }
         });
       },

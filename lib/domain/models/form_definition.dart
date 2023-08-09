@@ -41,8 +41,9 @@ class FormResource {
 class FormDefinition {
   final String uuid;
   final String name;
+  final String? referenceVersion;
   final List<ControlDefinition>? controls;
-  const FormDefinition({required this.uuid, required this.name, this.controls});
+  const FormDefinition({required this.uuid, required this.name, this.referenceVersion, this.controls});
 
   factory FormDefinition.fromJson(Map<String, dynamic> json) => _$FormDefinitionFromJson(json);
   Map<String, dynamic> toJson() => _$FormDefinitionToJson(this);

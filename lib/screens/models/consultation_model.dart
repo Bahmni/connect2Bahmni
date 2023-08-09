@@ -1,15 +1,15 @@
-import 'package:connect2bahmni/domain/models/omrs_order.dart';
-import 'package:connect2bahmni/utils/app_failures.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../domain/models/form_definition.dart';
 import '../../domain/models/omrs_location.dart';
+import '../../domain/models/omrs_order.dart';
 import '../../domain/condition_model.dart';
-import '../../screens/models/patient_model.dart';
-
 import '../../domain/models/user.dart';
 import '../../domain/models/omrs_encounter_type.dart';
 import '../../domain/models/omrs_obs.dart';
 import '../../domain/models/omrs_visit_type.dart';
+import '../../utils/app_failures.dart';
+import '../../screens/models/patient_model.dart';
 import '../../services/emr_api_service.dart';
 
 class ConsultationModel {
@@ -25,6 +25,7 @@ class ConsultationModel {
   List<OmrsOrder> investigationList = [];
   OmrsVisitType? visitType;
   OmrsEncounterType? encounterType;
+  Map<FormResource, List<OmrsObs>> observationForms = {};
 
   OmrsObs? consultNote;
 
@@ -112,6 +113,19 @@ class ConsultationModel {
 
   void updateInvestigation(OmrsOrder investigation,int index) {
     investigationList[index]=investigation;
+  }
+
+  void addObservationForm(FormResource form, List<OmrsObs> obsList) {
+    if (observationForms.keys.isNotEmpty) {
+      var key = observationForms.keys.where((element) => element.uuid == form.uuid).firstOrNull;
+      key == null ? observationForms[form] = obsList : observationForms[key] = obsList;
+    } else {
+      observationForms[form] = obsList;
+    }
+  }
+
+  void removeObservationForm(FormResource form) {
+    observationForms.removeWhere((key, value) => key.uuid == form.uuid);
   }
 }
 

@@ -1,16 +1,16 @@
-import 'package:connect2bahmni/domain/models/omrs_order.dart';
 import 'package:flutter/foundation.dart';
-
-import 'consultation_model.dart';
-import 'patient_model.dart';
 
 import '../../domain/condition_model.dart';
 import '../../domain/models/omrs_encounter_type.dart';
+import '../../domain/models/form_definition.dart';
 import '../../domain/models/omrs_location.dart';
+import '../../domain/models/omrs_order.dart';
 import '../../domain/models/omrs_visit_type.dart';
 import '../../domain/models/user.dart';
 import '../../domain/models/omrs_concept.dart';
 import '../../domain/models/omrs_obs.dart';
+import 'consultation_model.dart';
+import 'patient_model.dart';
 
 class ConsultationBoard extends ChangeNotifier {
   final User user;
@@ -61,7 +61,10 @@ class ConsultationBoard extends ChangeNotifier {
     if (results.isNotEmpty) {
       return Future.error(results);
     }
-    return _currentConsultation!.save();
+    return _currentConsultation!.save().then((value) {
+      notifyListeners();
+      return true;
+    });
   }
 
   void updateConsultContext(OmrsVisitType vType, OmrsEncounterType eType) {
@@ -104,6 +107,18 @@ class ConsultationBoard extends ChangeNotifier {
   void removeInvestigation(OmrsOrder investigation){
     _verifyEditable();
     _currentConsultation?.removeInvestigation(investigation);
+    notifyListeners();
+  }
+
+  void addFormObsList(FormResource form, List<OmrsObs> obsList) {
+    _verifyEditable();
+    _currentConsultation?.addObservationForm(form, obsList);
+    notifyListeners();
+  }
+
+  void removeObsForm(FormResource form){
+    _verifyEditable();
+    _currentConsultation?.removeObservationForm(form);
     notifyListeners();
   }
 
