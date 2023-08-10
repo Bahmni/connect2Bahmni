@@ -20,6 +20,7 @@ class BahmniAppointment {
   final DateTime? startDateTime;
   @JsonKey(fromJson: _fromJsonDateTime)
   final DateTime? endDateTime;
+  final List<AppointmentProviderDetail>? providers;
 
   BahmniAppointment({
     this.uuid,
@@ -34,7 +35,8 @@ class BahmniAppointment {
     this.teleconsultationLink,
     this.comments,
     this.startDateTime,
-    this.endDateTime
+    this.endDateTime,
+    this.providers
   });
   factory BahmniAppointment.fromJson(Map<String, dynamic> json) => _$BahmniAppointmentFromJson(json);
   Map<String, dynamic> toJson() => _$BahmniAppointmentToJson(this);
@@ -56,12 +58,12 @@ class Subject {
 
 @JsonSerializable()
 class AppointmentService {
-  final String uuid;
+  final String? uuid;
   final String? name;
   final ServiceSpeciality? speciality;
   final String? startTime;
   final String? endTime;
-  AppointmentService({required this.uuid, this.name, this.speciality, this.startTime, this.endTime});
+  AppointmentService({this.uuid, this.name, this.speciality, this.startTime, this.endTime});
   factory AppointmentService.fromJson(Map<String, dynamic> json) => _$AppointmentServiceFromJson(json);
   Map<String, dynamic> toJson() => _$AppointmentServiceToJson(this);
 
@@ -84,5 +86,17 @@ class ServiceLocation {
   ServiceLocation({required this.uuid, this.name});
   factory ServiceLocation.fromJson(Map<String, dynamic> json) => _$ServiceLocationFromJson(json);
   Map<String, dynamic> toJson() => _$ServiceLocationToJson(this);
+}
+
+@JsonSerializable()
+class AppointmentProviderDetail {
+  final String? uuid;
+  final String? name;
+  final String? response;
+  final String? comments;
+
+  AppointmentProviderDetail({this.uuid, this.name, this.response, this.comments});
+  factory AppointmentProviderDetail.fromJson(Map<String, dynamic> json) => _$AppointmentProviderDetailFromJson(json);
+  Map<String, dynamic> toJson() => _$AppointmentProviderDetailToJson(this);
 }
 

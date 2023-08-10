@@ -5,10 +5,11 @@ import '../domain/models/bahmni_appointment.dart';
 import '../utils/shared_preference.dart';
 import '../utils/app_urls.dart';
 import '../utils/app_failures.dart';
+import 'domain_service.dart';
 
-class Appointments {
+class Appointments extends DomainService {
   static const errorInvalidSession = 'Invalid session';
-  final errorLoadingAppointments = 'Failed to load appointments';
+  static const errorLoadingAppointments = 'Failed to load appointments';
   static const errorUnAuthorized = 'Session expired please re-login.';
   static const errorForbiddenAccess = 'Access denied. Try to re-login.';
 
@@ -47,9 +48,9 @@ class Appointments {
     }
   }
 
-  Future<List<BahmniAppointment>> forPractitioner(String? uuid, DateTime fromDate, DateTime tillDate) async {
+  Future<List<BahmniAppointment>> forPractitioner(String? uuid, DateTime fromDate, DateTime? tillDate) async {
     var startDate = DateTime(fromDate.year, fromDate.month, fromDate.day).toIso8601String();
-    var endDate = tillDate.toIso8601String();
+    var endDate = tillDate != null ? tillDate.toIso8601String() : '';
     String url = '${AppUrls.bahmni.appointments}/search';
     String? sessionId = await UserPreferences().getSessionId();
     if (sessionId == null) {
@@ -65,11 +66,40 @@ class Appointments {
       body: jsonEncode({
         'providerUuid': uuid,
         'startDate': startDate,
-        'endDate': endDate
+        if (endDate.isNotEmpty)
+          'endDate': endDate
       }),
     );
 
     return _handleResponse(response);
+  }
+
+  Future<List<BahmniAppointment>> forPatient(String patientUuid, DateTime fromDate) async {
+    String url = '${AppUrls.bahmni.appointments}/search';
+    var startDate = DateTime(fromDate.year, fromDate.month, fromDate.day).toIso8601String();
+    return UserPreferences().getSessionId().then((sessionId) {
+      if (sessionId == null) {
+        throw Failure(errorUnAuthorized, 401);
+      }
+      return post(
+        Uri.parse(url),
+        headers: <String, String>{
+          'Content-Type': 'application/json',
+          "Accept": "application/json",
+          'Cookie': 'JSESSIONID=$sessionId',
+        },
+        body: jsonEncode({
+          'patientUuid': patientUuid,
+          'startDate': startDate,
+        }),
+      ).then((response) {
+        if (response.statusCode == 200) {
+          return _mapToList(response);
+        } else {
+          throw handleErrorResponse(response);
+        }
+      });
+    });
   }
 
   List<BahmniAppointment> _mapToList(Response response) {

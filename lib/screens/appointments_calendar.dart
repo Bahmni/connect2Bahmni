@@ -84,7 +84,9 @@ class _AppointmentsCalendarState extends State<AppointmentsCalendar> {
     });
   }
 
-  Future<List<BahmniAppointment>> fetchAppointments() => Appointments().allAppointments(_forDate);
+  Future<List<BahmniAppointment>> fetchAppointments() {
+    return Appointments().allAppointments(_forDate);
+  }
 
   String _snapshotError(Object error) {
     if (error is Failure) {

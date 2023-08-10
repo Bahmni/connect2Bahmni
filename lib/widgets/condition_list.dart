@@ -66,7 +66,7 @@ class _PatientConditionListState extends State<PatientConditionList> {
 
       widgets.add(
         ListTile(
-          leading: const Icon(Icons.category),
+          leading: const Icon(Icons.arrow_right),
           title: Text.rich(textSpan),
           subtitle: Text(conditionNotes),
           //dense: true,

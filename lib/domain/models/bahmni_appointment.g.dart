@@ -28,6 +28,10 @@ BahmniAppointment _$BahmniAppointmentFromJson(Map<String, dynamic> json) =>
           BahmniAppointment._fromJsonDateTime(json['startDateTime'] as int),
       endDateTime:
           BahmniAppointment._fromJsonDateTime(json['endDateTime'] as int),
+      providers: (json['providers'] as List<dynamic>?)
+          ?.map((e) =>
+              AppointmentProviderDetail.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
 
 Map<String, dynamic> _$BahmniAppointmentToJson(BahmniAppointment instance) =>
@@ -45,6 +49,7 @@ Map<String, dynamic> _$BahmniAppointmentToJson(BahmniAppointment instance) =>
       'comments': instance.comments,
       'startDateTime': instance.startDateTime?.toIso8601String(),
       'endDateTime': instance.endDateTime?.toIso8601String(),
+      'providers': instance.providers,
     };
 
 Subject _$SubjectFromJson(Map<String, dynamic> json) => Subject(
@@ -61,7 +66,7 @@ Map<String, dynamic> _$SubjectToJson(Subject instance) => <String, dynamic>{
 
 AppointmentService _$AppointmentServiceFromJson(Map<String, dynamic> json) =>
     AppointmentService(
-      uuid: json['uuid'] as String,
+      uuid: json['uuid'] as String?,
       name: json['name'] as String?,
       speciality: json['speciality'] == null
           ? null
@@ -102,4 +107,22 @@ Map<String, dynamic> _$ServiceLocationToJson(ServiceLocation instance) =>
     <String, dynamic>{
       'uuid': instance.uuid,
       'name': instance.name,
+    };
+
+AppointmentProviderDetail _$AppointmentProviderDetailFromJson(
+        Map<String, dynamic> json) =>
+    AppointmentProviderDetail(
+      uuid: json['uuid'] as String?,
+      name: json['name'] as String?,
+      response: json['response'] as String?,
+      comments: json['comments'] as String?,
+    );
+
+Map<String, dynamic> _$AppointmentProviderDetailToJson(
+        AppointmentProviderDetail instance) =>
+    <String, dynamic>{
+      'uuid': instance.uuid,
+      'name': instance.name,
+      'response': instance.response,
+      'comments': instance.comments,
     };

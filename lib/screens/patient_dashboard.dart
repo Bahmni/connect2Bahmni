@@ -50,9 +50,7 @@ class _PatientDashboardWidgetState extends State<PatientDashboard> {
       create: (context) => ConsultationBoard(user!),
       child: _DashboardWidget(
           patient: argument as PatientModel,
-          onConsultationSave: () {
-            setState(() {});
-          },
+          onConsultationSave: null,
       ),
     );
   }
@@ -74,9 +72,7 @@ class _DashboardWidgetState extends State<_DashboardWidget> {
 
   @override
   Widget build(BuildContext context) {
-    _currentLocation = Provider
-        .of<AuthProvider>(context)
-        .sessionLocation;
+    _currentLocation = Provider.of<AuthProvider>(context).sessionLocation;
     return Scaffold(
       key: _widgetState,
       //floatingActionButton: _floatingActions(),
@@ -105,8 +101,9 @@ class _DashboardWidgetState extends State<_DashboardWidget> {
         Consumer<ConsultationBoard>(
             builder: (context, board, child) {
               //good case for Selector?
-              return board.currentConsultation == null ? _startNewConsultAction(
-                  context) : _saveConsultAction(context);
+              return board.currentConsultation == null
+                  ? _startNewConsultAction(context)
+                  : (board.currentConsultation!.status != ConsultationStatus.finalized) ? _saveConsultAction(context) : SizedBox();
             }
         ),
         _moreOptions()
