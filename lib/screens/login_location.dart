@@ -125,7 +125,6 @@ class _LoginLocationState extends State<LoginLocation> {
     return Future.delayed(const Duration(seconds: 2), () => locationList,);
   }
   Future<List<DropdownMenuItem<String>>> _fetchAllLoginLocations() {
-    debugPrint("Calling Fetching all locations API");
     var completer = Completer<List<DropdownMenuItem<String>>>();
     Locations().allOmrsLoginLocations().then((values) {
       var list = List<DropdownMenuItem<String>>.of(values.map((loc) => DropdownMenuItem(value: loc.uuid, child: Text(loc.name!))));

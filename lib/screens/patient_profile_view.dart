@@ -43,7 +43,6 @@ class _PatientProfileView extends State<PatientProfileView> {
 
   @override
   Widget build(BuildContext context) {
-    debugPrint("PatientProfileView.build");
     return FutureBuilder<PatientWithVisit>(
         future: profileFuture,
         initialData: null,
@@ -122,27 +121,6 @@ class _PatientProfileView extends State<PatientProfileView> {
       );
     }
 
-    // return Column(
-    //   mainAxisAlignment: MainAxisAlignment.end,
-    //   crossAxisAlignment: CrossAxisAlignment.end,
-    //   children: [
-    //     FloatingActionButton(
-    //       onPressed: () {},
-    //       child: Icon(Icons.edit_outlined),
-    //     ),
-    //     SizedBox(height: 10,),
-    //     SpeedDial(
-    //         icon: Icons.start_outlined,
-    //         label: Text(lblStartVisit),
-    //         buttonSize: Size(50, 48),
-    //         backgroundColor: Colors.pink,
-    //         children: [
-    //           ..._startVisitOptions(),
-    //         ]
-    //     ),
-    //   ],
-    // );
-
     return
       SpeedDial(
           icon: Icons.start_outlined,
@@ -153,19 +131,6 @@ class _PatientProfileView extends State<PatientProfileView> {
             ..._startVisitOptions(),
           ]
       );
-    // return ExpandableFab(
-    //   distance: 160,
-    //   icon: Icon(Icons.start_outlined),
-    //   label: lblStartVisit,
-    //   showText: true,
-    //   backgroundColor: Colors.pink,
-    //   children: [
-    //     ActionButton(
-    //       onPressed: () => debugPrint('Pressed 1'),
-    //       icon: const Icon(Icons.open_in_new),
-    //     ),
-    //   ],
-    // );
   }
 
   List<SpeedDialChild> _startVisitOptions() {

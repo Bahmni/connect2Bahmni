@@ -1,6 +1,7 @@
-import 'package:connect2bahmni/screens/models/profile_model.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
+
+import '../domain/models/common.dart';
 
 class GenderFormField extends FormField<String> {
 

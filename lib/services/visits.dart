@@ -1,8 +1,6 @@
-
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
 import 'package:http/http.dart';
 
 import '../utils/app_urls.dart';
@@ -57,7 +55,6 @@ class Visits {
     );
 
     if ([200, 201].contains (response.statusCode)){
-      debugPrint(response.body);
       return OmrsVisit.fromJson(jsonDecode(response.body));
     } else {
       throw 'Failed to start Visit';

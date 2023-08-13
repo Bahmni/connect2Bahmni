@@ -1,7 +1,6 @@
-
-import 'package:flutter/foundation.dart';
 import 'package:http/http.dart';
 import 'package:fhir/r4.dart';
+import 'package:logging/logging.dart';
 import 'dart:convert';
 
 import '../utils/shared_preference.dart';
@@ -9,6 +8,8 @@ import '../utils/app_urls.dart';
 import '../utils/app_failures.dart';
 
 class FhirInterface {
+  Logger logger = Logger('FhirInterface');
+
   Future<Bundle> fetch(String url, [Map<String, String> params = const {}]) async {
     String? sessionId = await UserPreferences().getSessionId();
     if (sessionId == null) {
@@ -27,8 +28,7 @@ class FhirInterface {
       try {
         return Bundle.fromJson(jsonDecode(response.body));
       } catch(err, stacktrace) {
-        debugPrint('Error: $err');
-        debugPrint('stacktrace: $stacktrace');
+        logger.severe('Error while deserializing FHIR resource. - ${err.toString()}', stacktrace);
         throw Failure('Error occurred during deserialization', 1500);
       }
     }

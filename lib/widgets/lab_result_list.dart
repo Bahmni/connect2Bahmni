@@ -17,6 +17,7 @@ class _LabResultsViewState extends State<LabResultsView> {
   Future<List<LabResult>>? labResultsFuture;
   static const errFailedToFetchLabResults = "Failed to fetch lab results";
   static const lblLabInvestigations = 'Lab Investigations';
+  static const lblNoInvestigationsFound = 'None found';
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +42,7 @@ class _LabResultsViewState extends State<LabResultsView> {
             // ),
             // collapsedBackgroundColor: Colors.lightBlueAccent,
             leading: const Icon(Icons.medical_services_outlined),
-            children: results.map((investigation) => _displayResult(investigation)).toList(),
+            children: results.isEmpty ? [_displayEmpty()] : results.map((investigation) => _displayResult(investigation)).toList(),
           );
         }
     );
@@ -54,18 +55,24 @@ class _LabResultsViewState extends State<LabResultsView> {
   }
 
   Widget _displayResult(LabResult investigation) {
-    var resultText = '';
+    String resultText = '';
+    TextStyle resultStyle = TextStyle(fontSize: 15, fontStyle: FontStyle.italic);
     if (investigation.result != null) {
         resultText = investigation.result.toString();
+        if (investigation.abnormal != null && investigation.abnormal!) {
+          resultStyle = const TextStyle(fontSize: 15, fontStyle: FontStyle.italic, color: Colors.red);
+        }
     } else {
       resultText = '(pending)';
+      resultStyle = const TextStyle(fontSize: 15, fontStyle: FontStyle.italic, color: Colors.grey);
     }
+
 
     var textSpan = TextSpan(
       text: investigation.name,
       style: const TextStyle(color: Colors.black),
       children: <TextSpan>[
-        TextSpan(text: ' - $resultText', style: const TextStyle(fontSize: 15, color: Colors.blueAccent))
+          TextSpan(text: ' - $resultText', style: resultStyle),
       ],
     );
 
@@ -74,6 +81,13 @@ class _LabResultsViewState extends State<LabResultsView> {
       title: Text.rich(textSpan),
       subtitle: investigation.accessionDateTime != null ? Text(formattedDate(investigation.accessionDateTime)) : const Text(''),
       //dense: true,
+    );
+  }
+
+  Widget _displayEmpty() {
+    return ListTile(
+      title: Text(lblNoInvestigationsFound),
+      dense: true,
     );
   }
 

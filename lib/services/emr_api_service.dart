@@ -1,11 +1,14 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
+import '../domain/models/omrs_concept.dart';
+import '../domain/models/omrs_obs.dart';
 import '../domain/models/omrs_order.dart';
+import '../domain/models/omrs_patient.dart';
+import '../domain/condition_model.dart';
 import '../utils/app_failures.dart';
 import '../utils/app_urls.dart';
 import '../utils/shared_preference.dart';
-import '../domain/models/omrs_patient.dart';
-import '../domain/condition_model.dart';
 import '../screens/models/consultation_model.dart';
 import '../services/domain_service.dart';
 
@@ -44,7 +47,7 @@ class EmrApiService extends DomainService {
     return UserPreferences().getSessionId()
       .then((sessionId) {
         var payload = jsonEncode(_encounterTxPayload(consultation, encounterDateTime));
-        //print('posting consultation: $payload');
+        _debugInfo(payload);
         return http.post(
           Uri.parse(AppUrls.bahmni.bahmniEncounter),
           headers: <String, String>{
@@ -55,6 +58,8 @@ class EmrApiService extends DomainService {
           body: payload,
         );
       }).then((response) {
+        debugPrint('response : ${response.statusCode}');
+        _debugInfo(response.body);
         switch (response.statusCode) {
           case 200:
           case 201:
@@ -69,6 +74,13 @@ class EmrApiService extends DomainService {
     });
   }
 
+  void _debugInfo(String info) {
+    debugPrint("******************");
+    final RegExp pattern = RegExp('.{1,800}'); // 800 is the size of each chunk
+    pattern.allMatches(info).forEach((RegExpMatch match) =>   debugPrint(match.group(0)));
+    debugPrint("******************");
+  }
+
   Map<String, Object?> _encounterTxPayload(ConsultationModel consultation, DateTime encounterDateTime) {
     return {
         'patientUuid': consultation.patient?.uuid,
@@ -80,7 +92,8 @@ class EmrApiService extends DomainService {
           'uuid': consultation.user.provider?.uuid
         }],
         'bahmniDiagnoses': _diagnosesPayload(consultation, encounterDateTime),
-        'observations': _obsPayload(consultation, encounterDateTime),
+        'observations': [..._obsPayload(consultation, encounterDateTime), ..._formObservations(consultation, encounterDateTime)],
+        'orders': _txOrders(consultation, encounterDateTime),
       };
   }
 
@@ -125,6 +138,49 @@ class EmrApiService extends DomainService {
       });
     }
     return obsList;
+  }
+
+  List<Map<String, dynamic>> _formObservations(ConsultationModel consultation, DateTime encounterDateTime) {
+    List<Map<String, dynamic>> obsList = [];
+    if (consultation.observationForms.isNotEmpty) {
+      consultation.observationForms.forEach((form, values) {
+        if (values.isNotEmpty) {
+          for (var obs in values) {
+            obsList.add(_getObservation(obs));
+          }
+        }
+      });
+    }
+    return obsList;
+  }
+
+  Map<String, dynamic> _getObservation(OmrsObs obs) {
+    bool isObsGroup = (obs.groupMembers != null && obs.groupMembers!.isNotEmpty);
+    if (!isObsGroup) {
+      return {
+        'concept': {
+          'uuid': obs.concept.uuid,
+        },
+        'value': _getObservationValue(obs),
+      };
+    } else {
+      return {
+        'concept': {
+          'uuid': obs.concept.uuid,
+        },
+        'groupMembers': obs.groupMembers!.map((e) => _getObservation(e)).toList(),
+        'value': null,
+      };
+    }
+  }
+
+  Object _getObservationValue(OmrsObs obs) {
+    if (obs.value is OmrsConcept) {
+      return {
+        'uuid': (obs.value as OmrsConcept).uuid,
+      };
+    }
+    return obs.value;
   }
 
   Future<List<OmrsOrderType>> orderTypes() {
@@ -182,6 +238,21 @@ class EmrApiService extends DomainService {
           throw handleErrorResponse(response);
       }
     });
+  }
+
+  List<Map<String, dynamic>> _txOrders(ConsultationModel consultation, DateTime encounterDateTime) {
+    List<Map<String, dynamic>> orders = [];
+    for (var investigation in consultation.investigationList) {
+      orders.add({
+        'action': investigation.action,
+        'commentToFulfiller': investigation.commentToFulfiller,
+        'urgency': investigation.urgency,
+        'concept': {
+          'uuid': investigation.concept?.uuid,
+        } //TODO 'previousOrderUuid': investigation.previousOrderUuid
+      });
+    }
+    return orders;
   }
 
 }

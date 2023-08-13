@@ -233,14 +233,16 @@ class _ConceptSearchWidgetState extends State<ConceptSearch> {
                     Row(
                       mainAxisSize: MainAxisSize.max,
                       children: [
-                        Text(
-                          concept.display ?? 'unknown',
-                          style: Theme.of(context).textTheme.titleMedium?.merge(const TextStyle(
-                            fontFamily: 'Lexend Deca',
-                            color: Color(0xFF15212B),
-                            fontSize: 18,
-                            fontWeight: FontWeight.w500,
-                          )),
+                        Expanded(
+                          child: Text(
+                            concept.display ?? 'unknown',
+                            style: Theme.of(context).textTheme.titleMedium?.merge(const TextStyle(
+                              fontFamily: 'Lexend Deca',
+                              color: Color(0xFF15212B),
+                              fontSize: 18,
+                              fontWeight: FontWeight.w500,
+                            )),
+                          ),
                         ),
                       ],
                     ),

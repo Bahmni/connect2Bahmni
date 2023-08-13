@@ -1,7 +1,4 @@
-
 import 'dart:convert';
-
-import 'package:flutter/foundation.dart';
 import 'package:http/http.dart';
 
 import '../screens/models/profile_model.dart';
@@ -15,7 +12,6 @@ class Registrations extends DomainService {
       if (sessionId == null) {
         throw 'Authentication Failure';
       }
-      debugPrint('calling - ${AppUrls.bahmni.fetchProfile}/$patientUuid?v=full');
       return get(
         Uri.parse('${AppUrls.bahmni.fetchProfile}/$patientUuid?v=full'),
         headers: <String, String>{
@@ -39,7 +35,6 @@ class Registrations extends DomainService {
       if (sessionId == null) {
         throw 'Authentication Failure';
       }
-      debugPrint('calling POST - ${AppUrls.bahmni.profile}');
       return post(
         Uri.parse(AppUrls.bahmni.profile),
         headers: <String, String>{

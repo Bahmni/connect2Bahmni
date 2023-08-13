@@ -57,20 +57,21 @@ class _ConditionWidgetState extends State<ConditionWidget> {
             _rowOrder(),
             _notesSection(context),
             const SizedBox(height: 20),
-            ElevatedButton(
-              style: ButtonStyle(
-                  shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                      RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10.0),
-                          side: const BorderSide(color: Colors.red)
-                      )
-                  )
+            Container(
+              height: 40,
+              width: 100,
+              decoration: BoxDecoration(
+                  color: Colors.blue,
+                  borderRadius: BorderRadius.circular(50)),
+              child: TextButton(
+                autofocus: false,
+                onPressed: () {
+                  _conditionModel.note = _notesController.text;
+                  Navigator.pop(context, _conditionModel);
+                },
+                child: const Text('Add',
+                    style: TextStyle(color: Colors.white)),
               ),
-              onPressed: () {
-                _conditionModel.note = _notesController.text;
-                Navigator.pop(context, _conditionModel);
-              },
-              child: const Text('Add'),
             ),
           ],
         )
@@ -80,7 +81,7 @@ class _ConditionWidgetState extends State<ConditionWidget> {
 
   Widget _notesSection(BuildContext context) {
     _notesController.text = _conditionModel.note ?? '';
-    return Expanded(
+    return Flexible(
       child: Padding(
         padding: const EdgeInsetsDirectional.fromSTEB(0, 16, 0, 0),
         child: TextFormField(
@@ -114,7 +115,7 @@ class _ConditionWidgetState extends State<ConditionWidget> {
               fontWeight: FontWeight.normal,
             )),
           textAlign: TextAlign.start,
-          maxLines: 4,
+          maxLines: 10,
         )
       )
     );
@@ -126,7 +127,7 @@ class _ConditionWidgetState extends State<ConditionWidget> {
             fontFamily: 'Lexend Deca',
             color: Color(0xFF090F13),
             fontSize: 14,
-            fontWeight: FontWeight.normal,
+            fontWeight: FontWeight.w100,
           ));
   }
 

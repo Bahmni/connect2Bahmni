@@ -57,7 +57,6 @@ class PatientListWidget extends StatelessWidget {
                       decoration: const BoxDecoration(shape: BoxShape.circle,),
                       child: InkWell(
                         onTap: () {
-                          debugPrint('patient search clicked');
                           if (onSelect != null) {
                             onSelect!(patient);
                           }

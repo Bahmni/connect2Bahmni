@@ -36,6 +36,7 @@ class _ConsultationNotesWidgetState extends State<ConsultationNotesWidget> {
         decoration: const InputDecoration(
             border: OutlineInputBorder()
         ),
+        minLines: 10,
       ) ,
       actions: <Widget>[
         TextButton(

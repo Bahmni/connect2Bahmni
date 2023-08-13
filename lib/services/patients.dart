@@ -1,9 +1,8 @@
 import 'dart:convert';
-
-import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:fhir/r4.dart';
 
+import '../domain/models/common.dart';
 import '../domain/models/omrs_patient.dart';
 import '../domain/models/omrs_identifier_type.dart';
 import '../domain/models/omrs_person_attribute.dart';
@@ -21,7 +20,6 @@ class Patients extends DomainService {
   }
 
   Future<Bundle> getActivePatients() async {
-    debugPrint('Patients ... fetching ActivePatients');
     var session = await UserPreferences().getSession();
     if (session?.sessionId == null) {
       throw 'Authentication Failure';
@@ -42,7 +40,6 @@ class Patients extends DomainService {
 
     if (response.statusCode == 200) {
       var responseJson = jsonDecode(response.body);
-      debugPrint('Patients ... ActivePatients responseJson: $responseJson');
       if (responseJson != null && responseJson is List) {
         var patients = responseJson.map((p) =>
           Patient(
@@ -63,8 +60,11 @@ class Patients extends DomainService {
     }
   }
 
-  String _getGenderCode(String gender) {
-    return gender == 'M' ? 'male' : 'female';
+  String? _getGenderCode(String? gender) {
+    if (gender == null) {
+      return null;
+    }
+    return fromGenderPrefix(gender)?.name;
   }
 
   Future<List<OmrsPatient>?> searchOmrsByName(String name) async {
@@ -121,18 +121,29 @@ class Patients extends DomainService {
       var responseJson = jsonDecode(response.body);
       if (responseJson != null && responseJson is List) {
         var patients = responseJson.map((p) {
+          int? timestamp = p['birthdate'] as int?;
+          FhirDate? dob = timestamp != null ? FhirDate.fromDateTime(DateTime.fromMillisecondsSinceEpoch(timestamp)) : null;
+          String? genderCode = _getGenderCode(p['gender'] as String?);
+          List<FhirExtension> extensions = [];
+          if (p['drugOrderIds'] != null) {
+            extensions.add(FhirExtension(
+              url: FhirUri(ModelExtensions.patientVisitDrugOrderIds),
+              valueString: p['drugOrderIds'],
+            ));
+          }
+          if (p['activeVisitUuid'] != null) {
+            extensions.add(FhirExtension(
+              url: FhirUri(ModelExtensions.patientActiveVisitId),
+              valueString: p['activeVisitUuid'],
+            ));
+          }
           return Patient(
               fhirId: p['uuid'],
               name: [HumanName(given:  [p['name']])],
               identifier: [Identifier(value: p['identifier'])],
-              birthDate: FhirDate.fromDateTime(DateTime.fromMillisecondsSinceEpoch(p['birthdate'] as int)),
-              gender: FhirCode(_getGenderCode(p['gender'])),
-              extension_: p['drugOrderIds'] != null ? [
-                FhirExtension(
-                  url: FhirUri(ModelExtensions.patientVisitDrugOrderIds),
-                  valueString: p['drugOrderIds'],
-                )
-              ] : [],
+              birthDate: dob,
+              gender: genderCode != null ? FhirCode(genderCode) : null,
+              extension_: extensions,
             );
         }).toList();
         Bundle bundle = Bundle(

@@ -58,7 +58,9 @@ class _AddressScreenState extends State<AddressScreen> {
 
   @override
   Widget build(BuildContext context) {
-      return Form(
+    return SingleChildScrollView(
+      reverse: true,
+      child: Form(
         key: widget.formKey ?? _addressFormKey,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -73,7 +75,8 @@ class _AddressScreenState extends State<AddressScreen> {
             _buildVillageField(context),
           ],
         ),
-      );
+      )
+    );
   }
 
   TypeAheadFormField<String> _buildStateProvinceField(BuildContext context) {
@@ -130,7 +133,7 @@ class _AddressScreenState extends State<AddressScreen> {
           enabled: !widget.readOnly,
           //initialValue: selectedDistrict,
           textFieldConfiguration: TextFieldConfiguration(
-              autofocus: true,
+              //autofocus: true,
               // style: DefaultTextStyle.of(context).style.copyWith(
               //     fontStyle: FontStyle.italic
               // ),
@@ -176,7 +179,7 @@ class _AddressScreenState extends State<AddressScreen> {
     return TypeAheadFormField(
         enabled: !widget.readOnly,
         textFieldConfiguration: TextFieldConfiguration(
-            autofocus: true,
+            //autofocus: true,
             decoration: InputDecoration(
                 hintText: lblSubDistrict
             ),
@@ -219,7 +222,7 @@ class _AddressScreenState extends State<AddressScreen> {
     return TypeAheadFormField(
         enabled: !widget.readOnly,
         textFieldConfiguration: TextFieldConfiguration(
-            autofocus: true,
+            //autofocus: true,
             decoration: InputDecoration(
                 hintText: lblVillage
             ),
@@ -259,7 +262,6 @@ class _AddressScreenState extends State<AddressScreen> {
   }
 
   void _updateAddress() {
-    debugPrint('updating address: district = ${_districtController.text}, subDistrict = ${_subDistrictController.text}, village = ${_villageController.text}');
     if (widget.controller != null) {
        ProfileAddress? address = widget.controller?.getData();
        if (address != null) {

@@ -1,19 +1,20 @@
-import 'package:connect2bahmni/screens/models/patient_model.dart';
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
-import 'package:provider/provider.dart';
 
 import '../../domain/models/form_definition.dart';
 import '../../domain/models/omrs_concept.dart';
-import '../../providers/meta_provider.dart';
+import '../../domain/models/omrs_obs.dart';
+import '../../screens/models/patient_model.dart';
 import '../../services/forms.dart';
 import '../form_fields.dart';
 import '../patient_info.dart';
 
 class ObservationForm extends StatefulWidget {
   final PatientModel patient;
-  const ObservationForm({super.key, required this.patient});
+  final FormResource formToDisplay;
+  const ObservationForm({super.key, required this.patient, required this.formToDisplay});
 
   @override
   State<ObservationForm> createState() => _ObservationFormState();
@@ -30,13 +31,16 @@ class _ObservationFormState extends State<ObservationForm> {
   static const msgEnterMandatory = 'This is a required field';
   static const imageHandler = 'ImageUrlHandler';
   static const videoHandler = 'VideoUrlHandler';
-
+  static const decimalFormat = r'[0-9]+[,.]{0,1}[0-9]*';
+  late FormDefinition? _formDefinition;
 
   @override
   void initState() {
     super.initState();
-    FormResource form = Provider.of<MetaProvider>(context, listen: false).observationForms.firstWhere((form) => form.name.toLowerCase() == 'Vitals'.toLowerCase());
-    _formInitialized = BahmniForms().fetch(form.uuid).then((value) => value.definition).then((value) => _initObservationInstances(value));
+    _formInitialized = BahmniForms().fetch(widget.formToDisplay.uuid).then((value) {
+      _formDefinition = value.definition;
+      return _initObservationInstances(value.definition);
+    });
   }
 
   @override
@@ -84,15 +88,29 @@ class _ObservationFormState extends State<ObservationForm> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              _buildObservationFields(_observationInstances[rowNum], rowNum),
+                              _buildObservationFields(_observationInstances[rowNum]),
                               SizedBox(height: 16.0),
                             ],
                           ),
                         ),
-                        _buildObservationInstanceHeader(_observationInstances[rowNum], rowNum),
+                        _buildObservationInstanceHeader(_observationInstances[rowNum]),
                         ..._buildRowActions(_observationInstances[rowNum], rowNum),
                       ],
                     ),
+                  // Container(
+                  //   height: 40,
+                  //   width: 100,
+                  //   decoration: BoxDecoration(
+                  //       color: Colors.blue,
+                  //       borderRadius: BorderRadius.circular(50)),
+                  //   child: TextButton(
+                  //     autofocus: false,
+                  //     onPressed: () {
+                  //     },
+                  //     child: const Text('Save',
+                  //         style: TextStyle(color: Colors.white)),
+                  //   ),
+                  // ),
                 ],
               ),
             ),
@@ -138,8 +156,7 @@ class _ObservationFormState extends State<ObservationForm> {
     return control.properties!.addMore != null && control.properties!.addMore!;
   }
 
-  Widget _buildObservationFields(ObservationInstance observationInstance, int i) {
-    debugPrint('Observation Instance $i fields: ${observationInstance.fields?.length}');
+  Widget _buildObservationFields(ObservationInstance observationInstance) {
     return Column(
       children: observationInstance.fields!.map((field) => _buildObservationField(field, observationInstance)).toList(),
     );
@@ -160,13 +177,11 @@ class _ObservationFormState extends State<ObservationForm> {
           return _buildCodedField(field);
         case ConceptDataType.na:
             if (field.definition.type == obsGroupControlType) {
-              debugPrint('building composite field');
               return _buildCompositeFields(field, observationInstance);
             }
             return SizedBox();
         case ConceptDataType.complex:
           String? conceptHandler = field.definition.concept?.conceptHandler;
-          debugPrint('${field.dataType}. Handler - $conceptHandler');
           if (conceptHandler == imageHandler) {
             return _buildImageUploadField(field);
           }
@@ -187,23 +202,13 @@ class _ObservationFormState extends State<ObservationForm> {
           enabled: isEditing,
           decoration: InputDecoration(
             labelText: '${field.label} ${field.required ? '*' : ''}',
-            // enabledBorder: OutlineInputBorder(
-            //   // borderSide: const BorderSide(color: Colors.blue, width: 2),
-            //   borderRadius: BorderRadius.circular(20),
-            // ),
-            // border: OutlineInputBorder(
-            //   borderSide: const BorderSide(color: Colors.blue, width: 2),
-            //   borderRadius: BorderRadius.circular(20),
-            // ),
           ),
-          keyboardType: TextInputType.number,
+          keyboardType: TextInputType.numberWithOptions(decimal: true),
           inputFormatters: <TextInputFormatter>[
-            FilteringTextInputFormatter.digitsOnly
+            FilteringTextInputFormatter.allow(RegExp(decimalFormat)),
           ],
-          onChanged: (value) {
-            debugPrint('Saving value $value to field');
-            field.value = value;
-          },
+          onChanged: (value) => field.value = value,
+          onSaved: (value) => field.value = value,
           initialValue: field.value,
         );
   }
@@ -240,7 +245,6 @@ class _ObservationFormState extends State<ObservationForm> {
           items: field.definition.concept?.answers ?? [],
           enabled: isEditing,
           onChanged: (value) {
-            debugPrint('Saving value $value to field');
             field.value = value;
           },
           onSaved: (value) {
@@ -259,17 +263,10 @@ class _ObservationFormState extends State<ObservationForm> {
           enabled: isEditing,
           decoration: InputDecoration(
             labelText: '${field.label} ${field.required ? '*' : ''}',
-            // enabledBorder: OutlineInputBorder(
-            //   // borderSide: const BorderSide(color: Colors.blue, width: 2),
-            //   borderRadius: BorderRadius.circular(20),
-            // ),
-            // border: OutlineInputBorder(
-            //   borderSide: const BorderSide(color: Colors.blue, width: 2),
-            //   borderRadius: BorderRadius.circular(20),
-            // ),
           ),
           keyboardType: TextInputType.text,
           onChanged: (value) => field.value = value,
+          onSaved: (value) => field.value = value,
           initialValue: field.value,
         );
   }
@@ -315,45 +312,87 @@ class _ObservationFormState extends State<ObservationForm> {
   }
 
   void _submitForm() {
+    List<OmrsObs> obsList = [];
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
-      // Process and save the observation data here
+      String formFieldPathPrefix = '${_formDefinition!.name}.${_formDefinition!.referenceVersion ?? '0'}/';
       for (var instance in _observationInstances) {
+        var isGroupedInstance = instance.definition?.type == obsGroupControlType;
+        ConceptDefinition? groupConcept;
+        String? instanceFieldPath = '$formFieldPathPrefix${instance.definition?.id}-${instance.serial}';
+        if (isGroupedInstance) {
+          groupConcept = instance.definition?.concept;
+        }
+        List<OmrsObs> observations = [];
         for (var field in instance.fields!) {
-            var value = field.value ?? '';
-            debugPrint('${field.label}: $value');
+          var fieldValue = _getFieldValue(field);
+          if (fieldValue == null) continue;
+          if (fieldValue is String) {
+            if (fieldValue.isEmpty) continue;
+          }
+          var fieldPath = isGroupedInstance
+              ? '$instanceFieldPath/${field.definition.id}-${field.serial}'
+              : '$formFieldPathPrefix${field.definition.id}-${field.serial}';
+          observations.add(
+              OmrsObs(
+                  concept: OmrsConcept(uuid: field.definition.concept?.uuid, display: field.label),
+                  value: fieldValue,
+                  formFieldPath: fieldPath,
+              )
+          );
+        }
+        if (observations.isEmpty) continue;
+        if (!isGroupedInstance) {
+          obsList.add(observations.first);
+        } else {
+          obsList.add(OmrsObs(
+              concept: OmrsConcept(uuid: groupConcept?.uuid, display: groupConcept?.name ),
+              groupMembers: observations,
+              formFieldPath: instanceFieldPath,
+          ));
         }
       }
-
-      // Clear the form fields
-      //_formKey.currentState!.reset();
-
-      // Show a success message or navigate to another screen
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('Observation Submitted'),
-            content: Text('Observation submitted successfully.'),
-            actions: <Widget>[
-              TextButton(
-                child: Text('OK'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        },
-      );
-
-      setState(() {
-        isEditing = false;
-      });
+      //_debugFormObs(obsList);
+      Navigator.pop(context, obsList);
     }
   }
 
-  Widget _buildObservationInstanceHeader(ObservationInstance observationInstance, int rowNum) {
+  // ignore: unused_element
+  List<Map<String, Object>> _debugFormObs(List<OmrsObs> obsList) {
+    var resultList = obsList.map((e) => {
+      'concept': { 'uuid': e.concept.uuid, 'name': e.concept.display},
+      if (e.groupMembers != null && e.groupMembers!.isNotEmpty)
+        'groupMembers': e.groupMembers!.map((gm) => {
+          'concept': { 'uuid': '${gm.concept.uuid}', 'name' : '${gm.concept.display}'},
+          'formFieldPath': '${gm.formFieldPath}',
+          'value': '${gm.value}',
+        }).toList(),
+      if (e.groupMembers == null || e.groupMembers!.isEmpty)
+        'value': '${e.value}',
+      'formFieldPath': '${e.formFieldPath}'
+    }).toList();
+    var jsonEncode2 = jsonEncode(resultList);
+    debugPrint("************************");
+    final RegExp pattern = RegExp('.{1,800}'); // 800 is the size of each chunk
+    pattern.allMatches(jsonEncode2).forEach((RegExpMatch match) =>   debugPrint(match.group(0)));
+    debugPrint("************************");
+    debugPrint('obs list size: ${obsList.length}');
+    return resultList;
+  }
+
+  dynamic _getFieldValue(ObservationField field) {
+    if (field.value == null) {
+      return null;
+    }
+    if (field.dataType == ConceptDataType.coded) {
+      var answerConceptUuid = (field.value as ConceptAnswerDefinition).uuid;
+      return OmrsConcept(uuid: answerConceptUuid);
+    } else {
+      return field.value;
+    }
+  }
+
+  Widget _buildObservationInstanceHeader(ObservationInstance observationInstance) {
     String? labelText;
     if (observationInstance.definition?.type == obsGroupControlType) {
       labelText = observationInstance.definition?.label?.value;
@@ -405,6 +444,9 @@ class _ObservationFormState extends State<ObservationForm> {
     return actions;
   }
 
+  ///Right now handles only one level of nested groups
+  ///Only deals with obsControl and ObsGroup control types
+  ///No support for form event scripts yet
   bool _initObservationInstances(FormDefinition? formDef) {
     _observationInstances.clear();
     if (formDef == null) {
@@ -416,8 +458,8 @@ class _ObservationFormState extends State<ObservationForm> {
         controls.sort((a, b) => a.position?.row.compareTo(b.position?.row ?? 0) ?? 0);
         for (ControlDefinition fieldDefinition in controls) {
           if (fieldDefinition.type == obsControlType) {
-            _observationInstances.add(ObservationInstance(fields: [
-              _createFieldInstance(fieldDefinition)],
+            _observationInstances.add(ObservationInstance(
+              fields: [_createFieldInstance(fieldDefinition)],
               definition: fieldDefinition,
             ));
           } else if (fieldDefinition.type == obsGroupControlType) {
@@ -426,7 +468,6 @@ class _ObservationFormState extends State<ObservationForm> {
               subFieldsDefinitions.sort((a, b) => a.position?.row.compareTo(b.position?.row ?? 0) ?? 0);
               var groupFields = <ObservationField>[];
               for (var controlDef in subFieldsDefinitions) {
-                debugPrint('subcontrol type =  ${controlDef.type}');
                 groupFields.add(_createFieldInstance(controlDef));
               }
               _observationInstances.add(ObservationInstance(fields: groupFields, definition: fieldDefinition));
@@ -445,7 +486,6 @@ class _ObservationFormState extends State<ObservationForm> {
         subFieldsDefinitions.sort((a, b) => a.position?.row.compareTo(b.position?.row ?? 0) ?? 0);
         var groupFields = <ObservationField>[];
         for (var controlDef in subFieldsDefinitions) {
-          debugPrint('subcontrol type =  ${controlDef.type}');
           groupFields.add(_createFieldInstance(controlDef));
         }
         return ObservationField(
@@ -470,8 +510,18 @@ class _ObservationFormState extends State<ObservationForm> {
   }
 
   void _addObservationInstance(ObservationInstance obsInstance, int rowNum) {
+    int serial = 0;
+    for (var element in _observationInstances) {
+      if (element.definition?.id == obsInstance.definition?.id) {
+          if (element.serial > serial) {
+            serial = element.serial;
+          }
+      }
+    }
+    var newInstance = obsInstance.clone();
+    newInstance.serial = serial + 1;
     setState(() {
-      _observationInstances.insert(rowNum, obsInstance.clone());
+      _observationInstances.insert(rowNum, newInstance);
     });
   }
 
@@ -494,10 +544,11 @@ class _ObservationFormState extends State<ObservationForm> {
 class ObservationInstance {
   List<ObservationField>? fields;
   ControlDefinition? definition;
-  ObservationInstance({this.fields, this.definition});
+  int serial;
+  ObservationInstance({this.fields, this.definition, this.serial = 0});
 
   ObservationInstance clone() {
-    var clone = ObservationInstance(fields: fields?.map((e) => e.clone()).toList(), definition: definition);
+    var clone = ObservationInstance(fields: fields?.map((e) => e.clone()).toList(), definition: definition, serial: serial + 1);
     return clone;
   }
 }
@@ -508,12 +559,14 @@ class ObservationField {
   final FormFieldValidator<dynamic>? validationRule;
   final ControlDefinition definition;
   dynamic value;
+  int serial;
 
   ObservationField({
     required this.definition,
     this.subFields,
     this.validationRule,
     this.value,
+    this.serial = 0,
   });
 
   bool get required => definition.properties?.mandatory ?? false;
@@ -525,6 +578,7 @@ class ObservationField {
       definition: definition,
       subFields: subFields?.map((e) => e.clone()).toList(),
       validationRule: validationRule,
+      serial: serial,
     );
     return clone;
   }

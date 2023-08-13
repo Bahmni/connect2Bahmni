@@ -21,11 +21,12 @@ const lblUserName = 'User name';
 const lblPassword = 'Password';
 const msgEnterPwd = 'Please enter password';
 const msgLoginFailed = 'Login failed';
+const lblTitle = 'Connect2 Bahmni';
 
 class _LoginState extends State<Login> {
   final _formKey = GlobalKey<FormState>();
 
-  String? _username = '', _password = '', _serverUrl = '';
+  String? _username = '', _password = '';
   bool _passwordVisible = false;
 
   AuthProvider? _authProvider;
@@ -37,7 +38,7 @@ class _LoginState extends State<Login> {
       child: Scaffold(
           appBar: AppBar(
             automaticallyImplyLeading: false,
-            title: const Text('Connect2 Bahmni'),
+            title: const Text(lblTitle),
             elevation: 0.1,
           ),
           body: Container(
@@ -47,7 +48,7 @@ class _LoginState extends State<Login> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: _formWidgets(''),
+                children: _formWidgets(),
               ),
             ),
           ),
@@ -78,7 +79,7 @@ class _LoginState extends State<Login> {
             Navigator.pushNamed(context, AppRoutes.loginLocations,);
           }
         } else {
-          showLoginFailure(context);
+          showLoginFailure(context, response: response);
         }
       });
     } else {
@@ -110,20 +111,6 @@ class _LoginState extends State<Login> {
     );
   }
 
-  TextFormField _serverUrlField() {
-    return TextFormField(
-      autofocus: false,
-      initialValue: _serverUrl,
-      validator: (value) {
-        return validateUrl(value);
-      },
-      onSaved: (value) => _serverUrl = value,
-      decoration: const InputDecoration(
-        hintText: 'enter server url',
-      ),
-    );
-  }
-
   TextFormField _passwordField() {
     return TextFormField(
       autofocus: false,
@@ -138,19 +125,13 @@ class _LoginState extends State<Login> {
       decoration: InputDecoration(
         //suffixIcon: Icon(Icons.visibility, color: Color.fromRGBO(50, 62, 72, 1.0)),
         hintText: lblPassword,
-        suffixIcon: GestureDetector(
-          onLongPress: () {
-            setState(() {
-              _passwordVisible = true;
-            });
-          },
-          onLongPressUp: () {
-            setState(() {
-              _passwordVisible = false;
-            });
-          },
-          child: Icon(
-              _passwordVisible ? Icons.visibility : Icons.visibility_off),
+        suffixIcon:  IconButton(
+            icon: Icon(_passwordVisible ? Icons.visibility : Icons.visibility_off),
+            onPressed: () {
+              setState(() {
+                _passwordVisible = !_passwordVisible;
+              });
+            }
         ),
       ),
     );
@@ -182,15 +163,8 @@ class _LoginState extends State<Login> {
     );
   }
 
-  List<Widget> _formWidgets(String? serverInfo) {
+  List<Widget> _formWidgets() {
     List<Widget> formElements = [];
-    if (serverInfo == null) {
-      formElements.addAll([
-        const SizedBox(height: 10.0),
-        const Text('Server'),
-        _serverUrlField()
-      ]);
-    }
     formElements.addAll([
       const SizedBox(height: 10.0),
       _userNameField(),
@@ -206,9 +180,13 @@ class _LoginState extends State<Login> {
     return formElements;
   }
 
-  void showLoginFailure(BuildContext context) {
+  void showLoginFailure(BuildContext context, { AuthResponse? response }) {
+    String errorMessage = msgLoginFailed;
+    if (response != null && response.message != null) {
+      errorMessage = response.message!;
+    }
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text(msgLoginFailed)),
+      SnackBar(content: Text(errorMessage)),
     );
   }
 

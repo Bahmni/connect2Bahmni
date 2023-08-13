@@ -28,6 +28,7 @@ import '../domain/models/omrs_location.dart';
 import '../providers/auth.dart';
 import '../widgets/consultation_context.dart';
 import '../providers/meta_provider.dart';
+import '../widgets/select_obs_form.dart';
 
 
 class PatientDashboard extends StatefulWidget {
@@ -52,9 +53,7 @@ class _PatientDashboardWidgetState extends State<PatientDashboard> {
       create: (context) => ConsultationBoard(user!),
       child: _DashboardWidget(
           patient: argument as PatientModel,
-          onConsultationSave: () {
-            setState(() {});
-          },
+          onConsultationSave: null,
       ),
     );
   }
@@ -76,9 +75,7 @@ class _DashboardWidgetState extends State<_DashboardWidget> {
 
   @override
   Widget build(BuildContext context) {
-    _currentLocation = Provider
-        .of<AuthProvider>(context)
-        .sessionLocation;
+    _currentLocation = Provider.of<AuthProvider>(context).sessionLocation;
     return Scaffold(
       key: _widgetState,
       //floatingActionButton: _floatingActions(),
@@ -107,8 +104,9 @@ class _DashboardWidgetState extends State<_DashboardWidget> {
         Consumer<ConsultationBoard>(
             builder: (context, board, child) {
               //good case for Selector?
-              return board.currentConsultation == null ? _startNewConsultAction(
-                  context) : _saveConsultAction(context);
+              return board.currentConsultation == null
+                  ? _startNewConsultAction(context)
+                  : (board.currentConsultation!.status != ConsultationStatus.finalized) ? _saveConsultAction(context) : SizedBox();
             }
         ),
         _moreOptions()
@@ -212,8 +210,7 @@ class _DashboardWidgetState extends State<_DashboardWidget> {
             var message = value
                 ? 'Consultation Saved'
                 : 'Could not save consultation';
-            ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(message)));
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
             if (value && (widget.onConsultationSave != null)) {
               widget.onConsultationSave!();
             }
@@ -328,9 +325,19 @@ class ConsultationActions extends StatelessWidget {
       onPressed: () async {
         var board = _activeBoardToUpdate(context);
         if (board == null) return;
-        Navigator.push(context,
-          MaterialPageRoute(builder: (context) => ObservationForm(patient: patient)),
-        );
+        showDialog(
+          context: context,
+          builder: (BuildContext context) => SelectObsFormWidget(),
+        ).then((form) async {
+          if (form != null) {
+            final obsList = await Navigator.push(context,
+              MaterialPageRoute(builder: (context) => ObservationForm(patient: patient, formToDisplay: form)),
+            );
+            if (obsList != null) {
+              board.addFormObsList(form, obsList);
+            }
+          }
+        });
       },
     );
   }
@@ -399,8 +406,7 @@ class ConsultationActions extends StatelessWidget {
     if (board == null) return;
     var notes = await showDialog(
         context: ctx,
-        builder: (BuildContext context) => ConsultationNotesWidget(
-            notes: board.currentConsultation?.consultationNotes)
+        builder: (BuildContext context) => ConsultationNotesWidget(notes: board.currentConsultation?.consultationNotes)
     );
     if (notes != null && ctx.mounted) {
       var consultNoteConcept = Provider.of<MetaProvider>(ctx, listen: false).consultNoteConcept;

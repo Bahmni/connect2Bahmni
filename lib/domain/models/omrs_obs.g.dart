@@ -18,6 +18,10 @@ OmrsObs _$OmrsObsFromJson(Map<String, dynamic> json) => OmrsObs(
           ? null
           : OmrsEncounter.fromJson(json['encounter'] as Map<String, dynamic>),
       value: json['value'],
+      groupMembers: (json['groupMembers'] as List<dynamic>?)
+          ?.map((e) => OmrsObs.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      formFieldPath: json['formFieldPath'] as String?,
     );
 
 Map<String, dynamic> _$OmrsObsToJson(OmrsObs instance) => <String, dynamic>{
@@ -28,4 +32,6 @@ Map<String, dynamic> _$OmrsObsToJson(OmrsObs instance) => <String, dynamic>{
       'comment': instance.comment,
       'encounter': instance.encounter,
       'value': instance.value,
+      'groupMembers': instance.groupMembers,
+      'formFieldPath': instance.formFieldPath,
     };

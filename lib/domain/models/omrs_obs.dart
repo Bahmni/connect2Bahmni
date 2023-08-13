@@ -15,9 +15,11 @@ class OmrsObs {
   final String? comment;
   final OmrsEncounter? encounter;
   final dynamic value;
+  final List<OmrsObs>? groupMembers;
+  final String? formFieldPath;
 
   OmrsObs({this.uuid, this.display, required this.concept, this.obsDatetime, this.comment,
-      this.encounter, this.value});
+      this.encounter, this.value, this.groupMembers, this.formFieldPath});
   factory OmrsObs.fromJson(Map<String, dynamic> json) => _$OmrsObsFromJson(json);
   Map<String, dynamic> toJson() => _$OmrsObsToJson(this);
 

@@ -31,6 +31,7 @@ FormDefinition _$FormDefinitionFromJson(Map<String, dynamic> json) =>
     FormDefinition(
       uuid: json['uuid'] as String,
       name: json['name'] as String,
+      referenceVersion: json['referenceVersion'] as String?,
       controls: (json['controls'] as List<dynamic>?)
           ?.map((e) => ControlDefinition.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -40,6 +41,7 @@ Map<String, dynamic> _$FormDefinitionToJson(FormDefinition instance) =>
     <String, dynamic>{
       'uuid': instance.uuid,
       'name': instance.name,
+      'referenceVersion': instance.referenceVersion,
       'controls': instance.controls,
     };
 

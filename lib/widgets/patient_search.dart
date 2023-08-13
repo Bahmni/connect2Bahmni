@@ -1,13 +1,13 @@
-import 'package:connect2bahmni/widgets/patient_list.dart';
 import 'package:fhir/r4.dart';
 import 'package:flutter/material.dart';
 
 import '../screens/patient_profile_view.dart';
+import '../screens/models/patient_model.dart';
 import '../services/patients.dart';
 import '../utils/debouncer.dart';
-import '../screens/models/patient_model.dart';
 import '../utils/app_routes.dart';
 import '../utils/app_failures.dart';
+import '../widgets/patient_list.dart';
 
 
 class PatientSearch extends StatefulWidget {
@@ -24,6 +24,7 @@ class _PatientsSearchWidgetState extends State<PatientSearch> {
   final Debouncer _debouncer = Debouncer();
   late List<PatientModel> _initialPatientList;
   final ValueNotifier<List<PatientModel>> patientListNotifier = ValueNotifier<List<PatientModel>>([]);
+  static const lblAddNewPatient = 'New Patient';
 
   @override
   void initState() {
@@ -68,15 +69,16 @@ class _PatientsSearchWidgetState extends State<PatientSearch> {
     return Scaffold(
       appBar: AppBar(
         title: Text(headingText),
-        actions: [IconButton(
-          tooltip: 'New Patient',
-          icon: const Icon(
-            Icons.add,
-          ),
-          onPressed: () async {
-            _primaryAction();
-          },
-        )],
+        actions: [
+          IconButton(
+            tooltip: lblAddNewPatient,
+            icon: const Icon(
+              Icons.add,
+            ),
+            onPressed: () async {
+              _primaryAction();
+            },
+          )],
       ),
       body: Column(
         children: [
@@ -121,7 +123,6 @@ class _PatientsSearchWidgetState extends State<PatientSearch> {
 
   void _primaryAction() async {
     Navigator.of(context).pushReplacementNamed(AppRoutes.registerPatient);
-    // Navigator.of(context).pushReplacementNamed('registerNewPatient');
   }
 
   void _onActionPatient(PatientModel patient) async {

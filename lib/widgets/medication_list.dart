@@ -17,6 +17,7 @@ class _MedicationListState extends State<MedicationList> {
   Future<List<BahmniDrugOrder>>? drugListFuture;
   static const errFailedToFetchMedications = "Failed to fetch medication list";
   static const lblActiveMedications = 'Active Medications';
+  static const lblNoMedRequestFound = 'None found';
 
   @override
   Widget build(BuildContext context) {
@@ -40,12 +41,8 @@ class _MedicationListState extends State<MedicationList> {
           }
           return ExpansionTile(
             title: const Text(lblActiveMedications, style: TextStyle(fontWeight: FontWeight.bold)),
-            // collapsedShape: const RoundedRectangleBorder(
-            //   borderRadius: BorderRadius.all(Radius.circular(15.0)),
-            // ),
-            // collapsedBackgroundColor: Colors.lightBlueAccent,
             leading: const Icon(Icons.medication_outlined),
-            children: activeMeds.map((med) => _displayMedication(med)).toList(),
+            children: activeMeds.isEmpty ? [_displayEmpty()] : activeMeds.map((med) => _displayMedication(med)).toList(),
           );
           // return Column(
           //   children: [
@@ -100,10 +97,17 @@ class _MedicationListState extends State<MedicationList> {
     );
 
     return ListTile(
-      leading: const Icon(Icons.medication),
+      leading: const Icon(Icons.arrow_right),
       title: Text.rich(textSpan),
       //subtitle: Text(conditionNotes),
       //dense: true,
+    );
+  }
+
+  Widget _displayEmpty() {
+    return ListTile(
+      title: Text(lblNoMedRequestFound),
+      dense: true,
     );
   }
 

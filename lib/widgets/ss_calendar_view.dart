@@ -79,26 +79,38 @@ class AppointmentsDayView extends StatefulWidget {
 
 class _AppointmentsDayViewState extends State<AppointmentsDayView> {
   final Map<String, bool> history = <String, bool>{};
-
   final EventController<BahmniAppointment> controller = EventController<BahmniAppointment>();
-
   User? _user;
+  final heightPerMinute = 1.7;
+
+  @override
+  void initState() {
+    super.initState();
+    _user = Provider.of<UserProvider>(context, listen: false).user;
+  }
+
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    _user = Provider.of<UserProvider>(context).user;
     if (widget.initialList != null) {
       controller.addAll(_eventList(widget.initialList));
       //TODO, pass the initialdate as state
       history.putIfAbsent(keyForDate(DateTime.now()), () => true);
     }
-
+    var currentHour = DateTime.now().hour;
     return DayView<BahmniAppointment>(
       onPageChange: (date, page) => browseToDate(date),
       key: widget.state,
       controller: controller,
       width: widget.width,
-      heightPerMinute: 1.7,
+      heightPerMinute: heightPerMinute,
+      scrollOffset: heightPerMinute*60*currentHour,
       eventTileBuilder: _defaultEventTileBuilder,
       onEventTap: (events, date) {
         if (events.isNotEmpty) {
@@ -163,8 +175,8 @@ class _AppointmentsDayViewState extends State<AppointmentsDayView> {
       var dateKey = keyForDate(date);
       bool alreadyFetched = history[dateKey] ?? false;
       if (!alreadyFetched) {
-        Appointments().allAppointments(date)
-            .then((response) {
+        var endDate = DateTime(date.year, date.month, date.day, 23, 59, 59);
+        Appointments().forPractitioner(_user?.provider?.uuid, date, endDate).then((response) {
           if (response.isNotEmpty) {
             controller.addAll(_eventList(response));
           }
@@ -211,7 +223,5 @@ Widget _defaultEventTileBuilder(
 }
 
 String truncateWithEllipsis(int cutoff, String myString) {
-  return (myString.length <= cutoff)
-      ? myString
-      : '${myString.substring(0, cutoff)}...';
+  return (myString.length <= cutoff) ? myString : '${myString.substring(0, cutoff)}...';
 }
