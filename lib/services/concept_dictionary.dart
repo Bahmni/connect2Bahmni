@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../domain/models/bahmni_drug_order.dart';
 import '../domain/models/omrs_concept.dart';
@@ -110,6 +111,13 @@ class ConceptDictionary {
     if (sessionId == null) {
       throw 'Authentication Failure';
     }
+    String cacheKey = 'dosage_instructions';
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    if (prefs.containsKey(cacheKey)) {
+      String? cachedData = prefs.getString(cacheKey);
+      var resultList = jsonDecode(cachedData!) as Map;
+      return resultList;
+    }
     String url = AppUrls.omrs.dosageInstructions;
     var response = await http.get(
       Uri.parse(url),
@@ -129,6 +137,7 @@ class ConceptDictionary {
       var frequencies = responseJson['frequencies'];
       var details = {};
       details.addAll({'doseUnits':doseUnits,'routes':routes,'durationUnits':durationUnits,'dosingInstructions':dosingInstructions,'frequencies':frequencies});
+      await prefs.setString(cacheKey, jsonEncode(details));
       return details;
     } else {
       throw 'Failed to fetch Dosing Instructions';

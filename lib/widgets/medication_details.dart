@@ -467,6 +467,7 @@ class _MedicationDetailsState extends State<MedicationDetails> {
       } else if (_selectedDurationType == 'Years') {
         _quantityCalculate(365, value1, value2);
       }
+      _medication.dosingInstructions?.quantity = totalQuantity;
     });
   }
 
@@ -594,7 +595,6 @@ class _MedicationDetailsState extends State<MedicationDetails> {
   }
 
   Future<Map?>? fetchFromApi() async {
-    await Future.delayed(Duration(seconds: 2));
     return ConceptDictionary().dosageInstruction().then((value) {
       setState(() {
         _dosageInstructions = value;
