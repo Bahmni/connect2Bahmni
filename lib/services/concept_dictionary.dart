@@ -127,20 +127,9 @@ class ConceptDictionary {
       var durationUnits = responseJson['durationUnits'];
       var dosingInstructions = responseJson['dosingInstructions'];
       var frequencies = responseJson['frequencies'];
-      // var resultList=[];
-      // resultList.add(doseUnits);
-      // resultList.add(routes);
-      // resultList.add(durationUnits);
-      // resultList.add(frequencies);
       var details = {};
       details.addAll({'doseUnits':doseUnits,'routes':routes,'durationUnits':durationUnits,'dosingInstructions':dosingInstructions,'frequencies':frequencies});
-      // details['routes']=routes;
-      // details['durationUnits']=durationUnits;
-      // details['dosingInstructions']=dosingInstructions;
-      // details['frequencies']=frequencies;
       return details;
-      // print(List<DosingInstructions>.from(resultList.map((v) => DosingInstructions.fromJson(v))));
-      // return List<DosingInstructions>.from(resultList.map((v) => DosingInstructions.fromJson(v)));
     } else {
       throw 'Failed to fetch Dosing Instructions';
     }

@@ -268,7 +268,7 @@ class _ConsultPadWidgetState extends State<ConsultPadWidget> {
     String? doseUnits = medication.dosingInstructions?.doseUnits;
     String? startDate = medication.effectiveStartDate!=null ? DateFormat('dd-MMM-yyy').format(medication.effectiveStartDate!).toString():'  ';
     String? frequency = medication.dosingInstructions?.frequency;
-    String? quantity = medication.dosingInstructions?.quantity.toString();
+    String? quantity = medication.dosingInstructions?.quantity?.floor().toString();
     String? quantityUnits = medication.dosingInstructions?.quantityUnits;
     String? route = medication.dosingInstructions?.route;
     String? duration = medication.duration.toString();
@@ -295,33 +295,11 @@ class _ConsultPadWidgetState extends State<ConsultPadWidget> {
               tileColor: Colors.red,
             ),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 40.0),
+                padding: const EdgeInsets.symmetric(horizontal: 32.0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('$units $doseUnits'),
-                    Text('From: $startDate')
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 40.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text('$frequency'),
-                    Text('Total: $quantity $quantityUnits')
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 40.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text('$route'),
-                    Text('➤: $duration $durationUnits'),
-                    Text('$administrationInstructions')
+                    Text('$units $doseUnits,  $frequency,   $administrationInstructions'),
                   ],
                 ),
               ),
@@ -330,7 +308,25 @@ class _ConsultPadWidgetState extends State<ConsultPadWidget> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('Note: $notes'),
+                    Text('$route,   Total: $quantity $quantityUnits'),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 32.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(child: Text('From: $startDate  ➤ $duration $durationUnits')),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 22.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(child: Text('Note: $notes',maxLines: 4)),
                   ],
                 ),
               ),
