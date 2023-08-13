@@ -8,7 +8,6 @@ import 'package:provider/provider.dart';
 import 'condition.dart';
 import 'consultation_notes.dart';
 import '../domain/models/form_definition.dart';
-import '../domain/models/omrs_order.dart';
 import '../utils/date_time.dart';
 import '../utils/string_utils.dart';
 import '../screens/models/consultation_model.dart';
@@ -17,7 +16,6 @@ import '../widgets/consultation_context.dart';
 import '../domain/condition_model.dart';
 import '../domain/models/omrs_obs.dart';
 import 'medication_details.dart';
-import '../widgets/investigation_details.dart';
 
 class ConsultPadWidget extends StatefulWidget {
   const ConsultPadWidget({
@@ -80,7 +78,6 @@ class _ConsultPadWidgetState extends State<ConsultPadWidget> {
             ..._problemList(consultation?.problemList),
             ..._investigationList(consultation?.investigationList),
             ..._medicationList(consultation?.medicationList),
-            (consultation?.consultNote != null) ? _ObsListItem(consultNote: consultation!.consultNote!, sliding: true,) : const SizedBox(height: 1),
             (consultation?.consultNote != null) ? _ConsultationNote(consultNote: consultation!.consultNote!, sliding: true,) : const SizedBox(height: 1),
             ..._formList(consultation?.observationForms),
           ],

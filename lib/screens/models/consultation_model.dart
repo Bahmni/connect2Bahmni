@@ -4,13 +4,11 @@ import 'package:connect2bahmni/utils/app_failures.dart';
 import 'package:uuid/uuid.dart';
 import '../../domain/models/form_definition.dart';
 import '../../domain/models/omrs_location.dart';
-import '../../domain/models/omrs_order.dart';
 import '../../domain/condition_model.dart';
 import '../../domain/models/user.dart';
 import '../../domain/models/omrs_encounter_type.dart';
 import '../../domain/models/omrs_obs.dart';
 import '../../domain/models/omrs_visit_type.dart';
-import '../../utils/app_failures.dart';
 import '../../screens/models/patient_model.dart';
 import '../../services/emr_api_service.dart';
 
@@ -127,7 +125,8 @@ class ConsultationModel {
   }
 
   void updateMedication(BahmniDrugOrder medication, int index) {
-    medicationList[index]=medication;
+    medicationList[index] = medication;
+  }
 
   void addObservationForm(FormResource form, List<OmrsObs> obsList) {
     if (observationForms.keys.isNotEmpty) {

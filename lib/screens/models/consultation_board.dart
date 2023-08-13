@@ -5,7 +5,6 @@ import '../../domain/condition_model.dart';
 import '../../domain/models/omrs_encounter_type.dart';
 import '../../domain/models/form_definition.dart';
 import '../../domain/models/omrs_location.dart';
-import '../../domain/models/omrs_order.dart';
 import '../../domain/models/omrs_visit_type.dart';
 import '../../domain/models/user.dart';
 import '../../domain/models/omrs_concept.dart';
@@ -127,7 +126,6 @@ class ConsultationBoard extends ChangeNotifier {
     _currentConsultation?.updateMedication(medication,index);
     notifyListeners();
   }
-=======
   void addFormObsList(FormResource form, List<OmrsObs> obsList) {
     _verifyEditable();
     _currentConsultation?.addObservationForm(form, obsList);
