@@ -14,11 +14,12 @@ class MedicationDetails extends StatefulWidget {
 }
 
 class _MedicationDetailsState extends State<MedicationDetails> {
-  late String _selectedUnitType;
-  late String _selectedRouteType;
-  late String _selectedFrequencyType;
-  late String _selectedDurationType;
-  late String _selectedDosingInstructions;
+  final _formKey = GlobalKey<FormState>();
+  String? _selectedUnitType;
+  String? _selectedRouteType;
+  String? _selectedFrequencyType;
+  String? _selectedDurationType;
+  String? _selectedDosingInstructions;
   String lblTitle = " ";
   late BahmniDrugOrder _medication;
   late final Map<dynamic, dynamic>? _dosageInstructions;
@@ -38,6 +39,17 @@ class _MedicationDetailsState extends State<MedicationDetails> {
   double s1=0;
   double s2=0;
   double s3=0;
+  static const doseRequired = 'Dose is required';
+  static const dosingUnitRequired = 'Dose Unit is required';
+  static const frequencyRequired = 'Frequency is required';
+  static const routeRequired = 'Route is required';
+  static const durationRequired = 'Duration is required';
+  static const durationUnitRequired = 'Duration Unit is required';
+  static const startDateRequired = 'Start Date is required';
+  static const dosingInstructionRequired = 'Instruction is required';
+  static const requiredAllTerm = "Required";
+  List<String> durationUnits = ['Days','Weeks','Months','Years'];
+
 
   @override
   void initState() {
@@ -92,72 +104,78 @@ class _MedicationDetailsState extends State<MedicationDetails> {
               body: GestureDetector(
                 onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
                 child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      SizedBox(height: 15),
-                      _medicationDisplay(),
-                      SizedBox(height: 15),
-                      toggle == false ? _numericRow("Dose", _doseController): _toggleRow("Dose"),
-                      SizedBox(height: 15),
-                      _unitRow("Dose Units", _dosageInstructions?['doseUnits']),
-                      SizedBox(height: 15),
-                      toggle == false ? _frequencyRow(
-                          "Frequency", _dosageInstructions?['frequencies']):Padding(padding: EdgeInsets.zero),
-                      toggle == false ?SizedBox(height: 20):Padding(padding: EdgeInsets.zero),
-                      _routeRow("Routes", _dosageInstructions?['routes']),
-                      SizedBox(height: 15),
-                      _numericRow("Duration", _durationController),
-                      SizedBox(height: 15),
-                      _durationUnitRow("Duration Units",
-                          _dosageInstructions?['durationUnits']),
-                      SizedBox(height: 15),
-                      _startDateRow("Start Date"),
-                      SizedBox(height: 20),
-                      _totalQuantityRow("Total Quantity"),
-                      SizedBox(height: 15),
-                      _unitRow("Units", _dosageInstructions?['doseUnits']),
-                      SizedBox(height: 15),
-                      _dosingInstructionsRow("Dosing Instructions",
-                          _dosageInstructions?['dosingInstructions']),
-                      SizedBox(height: 15),
-                      _commentToFulfiller(),
-                      SizedBox(height: 15),
-                      Container(
-                        height: 40,
-                        width: 100,
-                        decoration: BoxDecoration(
-                            color: Colors.blue,
-                            borderRadius: BorderRadius.circular(50)),
-                        child: TextButton(
-                          autofocus: false,
-                          onPressed: () {
-                            _medication.dosingInstructions?.doseUnits =
-                                _selectedUnitType;
-                            _medication.dosingInstructions?.quantityUnits =
-                                _selectedUnitType;
-                            _medication.dosingInstructions?.route =
-                                _selectedRouteType;
-                            _medication.dosingInstructions?.frequency =
-                                _selectedFrequencyType;
-                            _medication.durationUnits = _selectedDurationType;
-                            _medication.dosingInstructions
-                                    ?.administrationInstructions =
-                                _selectedDosingInstructions;
-                            _medication.commentToFulfiller =
-                                _notesController.text;
-                            _medication.dosingInstructions?.quantity =
-                                totalQuantity;
-                            _effectiveStopDate();
-                            Navigator.pop(context, _medication);
-                          },
-                          child: const Text('Update',
-                              style: TextStyle(color: Colors.white)),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      children: [
+                        SizedBox(height: 15),
+                        _medicationDisplay(),
+                        SizedBox(height: 15),
+                        toggle == false ? _numericRow("Dose", _doseController): _toggleRow("Dose"),
+                        SizedBox(height: 15),
+                        // _unitRow("Dose Units", _dosageInstructions?['doseUnits']),
+                        SizedBox(height: 15),
+                        toggle == false ? _frequencyRow(
+                            "Frequency", _dosageInstructions?['frequencies']):Padding(padding: EdgeInsets.zero),
+                        toggle == false ?SizedBox(height: 20):Padding(padding: EdgeInsets.zero),
+                        _routeRow("Routes", _dosageInstructions?['routes']),
+                        SizedBox(height: 15),
+                        _numericRow("Duration", _durationController),
+                        SizedBox(height: 15),
+                        // _durationUnitRow("Duration Units",
+                        //     _dosageInstructions?['durationUnits']),
+                        SizedBox(height: 15),
+                        _startDateRow("Start Date"),
+                        SizedBox(height: 20),
+                        _totalQuantityRow("Total Quantity"),
+                        SizedBox(height: 15),
+                        // _unitRow("Units", _dosageInstructions?['doseUnits']),
+                        SizedBox(height: 15),
+                        _dosingInstructionsRow("Dosing Instructions",
+                            _dosageInstructions?['dosingInstructions']),
+                        SizedBox(height: 15),
+                        _commentToFulfiller(),
+                        SizedBox(height: 15),
+                        Container(
+                          height: 40,
+                          width: 100,
+                          decoration: BoxDecoration(
+                              color: Colors.blue,
+                              borderRadius: BorderRadius.circular(50)),
+                          child: TextButton(
+                            autofocus: false,
+                            onPressed: () {
+                              if (!_formKey.currentState!.validate()) {
+                                return;
+                              }
+                              _medication.dosingInstructions?.doseUnits =
+                                  _selectedUnitType;
+                              _medication.dosingInstructions?.quantityUnits =
+                                  _selectedUnitType;
+                              _medication.dosingInstructions?.route =
+                                  _selectedRouteType;
+                              toggle==false?_medication.dosingInstructions?.frequency =
+                                  _selectedFrequencyType:_medication.dosingInstructions?.frequency =null;
+                              _medication.durationUnits = _selectedDurationType;
+                              _medication.dosingInstructions
+                                      ?.administrationInstructions =
+                                  _selectedDosingInstructions;
+                              _medication.commentToFulfiller =
+                                  _notesController.text;
+                              _medication.dosingInstructions?.quantity =
+                                  totalQuantity;
+                              _effectiveStopDate();
+                              Navigator.pop(context, _medication);
+                            },
+                            child: const Text('Update',
+                                style: TextStyle(color: Colors.white)),
+                          ),
                         ),
-                      ),
-                      SizedBox(
-                        height: 20,
-                      )
-                    ],
+                        SizedBox(
+                          height: 20,
+                        )
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -195,37 +213,32 @@ class _MedicationDetailsState extends State<MedicationDetails> {
     );
   }
 
-  Padding _unitRow(String lblTitle, List<dynamic> items) {
-      return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-        child:
-            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-          Text(lblTitle),
-          Container(
+  Widget _unitRow(List<dynamic> items) {
+      return Container(
+        alignment: Alignment.centerRight,
+        width: 110,
+        child: ValueListenableBuilder<bool>(
+          builder:
+              (BuildContext context, bool allowChange, Widget? child) {
+            return DropdownButtonFormField(
+              value: _selectedUnitType,
               alignment: Alignment.centerRight,
-              width: 200,
-              child: ValueListenableBuilder<bool>(
-                builder:
-                    (BuildContext context, bool allowChange, Widget? child) {
-                  return DropdownButton(
-                    value: _selectedUnitType,
-                    alignment: Alignment.centerRight,
-                    onChanged: (newvalue) {
-                      setState(() {
-                        _selectedUnitType = newvalue!;
-                      });
-                    },
-                    items: (items)
-                        .map<DropdownMenuItem<String>>((vt) =>
-                            DropdownMenuItem<String>(
-                                value: vt['name'],
-                                child: Text(vt['name'] ?? 'unknown')))
-                        .toList(),
-                  );
-                },
-                valueListenable: _typeChangeAllowed,
-              ))
-        ]));
+              onChanged: (newvalue) {
+                setState(() {
+                  _selectedUnitType = newvalue!;
+                });
+              },
+              items: (items)
+                  .map<DropdownMenuItem<String>>((vt) =>
+                      DropdownMenuItem<String>(
+                          value: vt['name'],
+                          child: Text(vt['name'] ?? 'unknown')))
+                  .toList(),
+              validator: (value) => value == null ? dosingUnitRequired : null,
+            );
+          },
+          valueListenable: _typeChangeAllowed,
+        ));
   }
 
   Padding _routeRow(String lblTitle, List<dynamic> items) {
@@ -240,7 +253,7 @@ class _MedicationDetailsState extends State<MedicationDetails> {
               child: ValueListenableBuilder<bool>(
                 builder:
                     (BuildContext context, bool allowChange, Widget? child) {
-                  return DropdownButton(
+                  return DropdownButtonFormField(
                     value: _selectedRouteType,
                     alignment: Alignment.centerRight,
                     onChanged: (newvalue) {
@@ -254,6 +267,7 @@ class _MedicationDetailsState extends State<MedicationDetails> {
                                 value: vt['name'],
                                 child: Text(vt['name'] ?? 'unknown')))
                         .toList(),
+                    validator: (value) => value == null ? routeRequired : null,
                   );
                 },
                 valueListenable: _typeChangeAllowed,
@@ -273,7 +287,7 @@ class _MedicationDetailsState extends State<MedicationDetails> {
               child: ValueListenableBuilder<bool>(
                 builder:
                     (BuildContext context, bool allowChange, Widget? child) {
-                  return DropdownButton(
+                  return DropdownButtonFormField(
                     value: _selectedFrequencyType,
                     alignment: Alignment.centerRight,
                     onChanged: (newvalue) {
@@ -288,6 +302,7 @@ class _MedicationDetailsState extends State<MedicationDetails> {
                                 value: vt['name'],
                                 child: Text(vt['name'] ?? 'unknown')))
                         .toList(),
+                    validator: (value) => value == null ? frequencyRequired : null,
                   );
                 },
                 valueListenable: _typeChangeAllowed,
@@ -295,38 +310,33 @@ class _MedicationDetailsState extends State<MedicationDetails> {
         ]));
   }
 
-  Padding _durationUnitRow(String lblTitle, List<dynamic> items) {
-    return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-        child:
-            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-          Text(lblTitle),
-          Container(
-              alignment: Alignment.centerRight,
-              width: 200,
-              child: ValueListenableBuilder<bool>(
-                builder:
-                    (BuildContext context, bool allowChange, Widget? child) {
-                  return DropdownButton(
-                    value: _selectedDurationType,
-                    alignment: Alignment.centerRight,
-                    onChanged: (newvalue) {
-                      setState(() {
-                        _selectedDurationType = newvalue!;
-                        _updateResult();
-                      });
-                    },
-                    items: (items)
-                        .map<DropdownMenuItem<String>>((vt) =>
-                            DropdownMenuItem<String>(
-                                value: vt['name'],
-                                child: Text(vt['name'] ?? 'unknown')))
-                        .toList(),
-                  );
-                },
-                valueListenable: _typeChangeAllowed,
-              ))
-        ]));
+  Widget _durationUnitRow(List<dynamic> items) {
+    return Container(
+      alignment: Alignment.centerRight,
+      width: 150,
+      child: ValueListenableBuilder<bool>(
+        builder:
+            (BuildContext context, bool allowChange, Widget? child) {
+          return DropdownButtonFormField(
+            value: _selectedDurationType,
+            alignment: Alignment.centerRight,
+            onChanged: (newvalue) {
+              setState(() {
+                _selectedDurationType = newvalue!;
+                _updateResult();
+              });
+            },
+            items: (items.where((element) => durationUnits.contains(element['name'])))
+                .map<DropdownMenuItem<String>>((vt) =>
+                    DropdownMenuItem<String>(
+                        value: vt['name'],
+                        child: Text(vt['name'] ?? 'unknown')))
+                .toList(),
+            validator: (value) => value == null ? durationUnitRequired : null,
+          );
+        },
+        valueListenable: _typeChangeAllowed,
+      ));
   }
 
   Padding _dosingInstructionsRow(String lblTitle, List<dynamic> items) {
@@ -341,7 +351,7 @@ class _MedicationDetailsState extends State<MedicationDetails> {
               child: ValueListenableBuilder<bool>(
                 builder:
                     (BuildContext context, bool allowChange, Widget? child) {
-                  return DropdownButton(
+                  return DropdownButtonFormField<String>(
                     value: _selectedDosingInstructions,
                     alignment: Alignment.centerRight,
                     onChanged: (newvalue) {
@@ -355,6 +365,7 @@ class _MedicationDetailsState extends State<MedicationDetails> {
                                 value: vt['name'],
                                 child: Text(vt['name'] ?? 'unknown')))
                         .toList(),
+                    validator: (value) => value == null ? dosingInstructionRequired : null,
                   );
                 },
                 valueListenable: _typeChangeAllowed,
@@ -368,25 +379,33 @@ class _MedicationDetailsState extends State<MedicationDetails> {
         child:
             Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
           Text(lblTitle),
-          Container(
-            alignment: Alignment.centerRight,
-            width: 100,
-            child: TextField(
-                keyboardType: TextInputType.number,
-                controller: controller,
-                onTapOutside: (_) {
-                  setState(() {
-                    if (controller == _doseController) {
-                      _medication.dosingInstructions?.dose =
-                          double.tryParse(_doseController.text);
-                    } else {
-                      _medication.duration =
-                          int.tryParse(_durationController.text);
+          Row(
+            children: [
+              Container(
+                padding: EdgeInsets.only(right: 10),
+                alignment: Alignment.centerRight,
+                width: 50,
+                child: TextFormField(
+                    keyboardType: TextInputType.number,
+                    controller: controller,
+                    validator: (value) => value!.isEmpty ? controller == _doseController ? doseRequired : durationRequired : null,
+                    onTapOutside: (_) {
+                      setState(() {
+                        if (controller == _doseController) {
+                          _medication.dosingInstructions?.dose =
+                              double.tryParse(_doseController.text);
+                        } else {
+                          _medication.duration =
+                              int.tryParse(_durationController.text);
+                        }
+                        _updateResult();
+                      });
                     }
-                    _updateResult();
-                  });
-                }),
-          )
+                    ),
+              ),
+              lblTitle=='Dose'? _unitRow(_dosageInstructions?['doseUnits']) : _durationUnitRow(_dosageInstructions?['durationUnits'])
+            ],
+          ),
         ]));
   }
 
@@ -400,12 +419,13 @@ class _MedicationDetailsState extends State<MedicationDetails> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Padding(
-                padding: EdgeInsets.symmetric(horizontal: 8.0),
+                padding: EdgeInsets.symmetric(horizontal: 3.0),
                 child: SizedBox(
                   width: 30,
-                  height: 40,
-                  child: TextField(
+                  height: 50,
+                  child: TextFormField(
                     keyboardType: TextInputType.number,
+                    validator: (value) => value!.isEmpty ? requiredAllTerm:null,
                     controller: _t1Controller,
                     onTapOutside: (_){
                       setState(() {
@@ -416,13 +436,14 @@ class _MedicationDetailsState extends State<MedicationDetails> {
                 ),
               ),
               Padding(
-                padding: EdgeInsets.symmetric(horizontal: 8.0),
+                padding: EdgeInsets.symmetric(horizontal: 3.0),
                 child: SizedBox(
                   width: 30,
-                  height: 40,
-                  child: TextField(
+                  height: 50,
+                  child: TextFormField(
                     keyboardType: TextInputType.number,
                     controller: _t2Controller,
+                    validator: (value) => value!.isEmpty ? requiredAllTerm:null,
                     onTapOutside: (_){
                       setState(() {
                         s2 = double.tryParse(_t2Controller.text)!;
@@ -431,21 +452,25 @@ class _MedicationDetailsState extends State<MedicationDetails> {
                   ),
                 ),
               ),Padding(
-                padding: EdgeInsets.symmetric(horizontal: 8.0),
+                padding: EdgeInsets.symmetric(horizontal: 3.0),
                 child: SizedBox(
                   width: 30,
-                  height: 40,
-                  child: TextField(
+                  height: 50,
+                  child: TextFormField(
                       keyboardType: TextInputType.number,
                     controller: _t3Controller,
+                    validator: (value) => value!.isEmpty ? requiredAllTerm:null,
                     onTapOutside: (_){
                       setState(() {
                         s3 = double.tryParse(_t3Controller.text)!;
+                        _medication.dosingInstructions?.dose =
+                            s1+s2+s3;
                       });
                     },
                   ),
                 ),
               ),
+              _unitRow(_dosageInstructions?['doseUnits'])
             ],
           )
         ])
@@ -456,9 +481,7 @@ class _MedicationDetailsState extends State<MedicationDetails> {
     double value1 = toggle == false ? double.tryParse(_doseController.text) ?? 0.0 : s1+s2+s3;
     double value2 = double.tryParse(_durationController.text) ?? 0.0;
     setState(() {
-      if (_selectedDurationType == 'Hours') {
-        _quantityCalculate(1 / 24, value1, value2);
-      } else if (_selectedDurationType == 'Days') {
+      if (_selectedDurationType == 'Days') {
         _quantityCalculate(1, value1, value2);
       } else if (_selectedDurationType == 'Weeks') {
         _quantityCalculate(7, value1, value2);
@@ -468,6 +491,7 @@ class _MedicationDetailsState extends State<MedicationDetails> {
         _quantityCalculate(365, value1, value2);
       }
       _medication.dosingInstructions?.quantity = totalQuantity;
+
     });
   }
 
@@ -515,14 +539,15 @@ class _MedicationDetailsState extends State<MedicationDetails> {
           children: [
             Text(lblTitle),
             Container(
-              width: 150,
+              width: 200,
               alignment: Alignment.centerRight,
-              child: TextField(
+              child: TextFormField(
                   controller: _dateController,
                   decoration: const InputDecoration(
                       // icon: Icon(Icons.calendar_today),
                       suffixIcon: Icon(Icons.calendar_today)),
                   readOnly: true,
+                  validator: (value) => value!.isEmpty ? startDateRequired : null,
                   onTap: () async {
                     DateTime? pickedDate = await showDatePicker(
                         context: context,
@@ -545,18 +570,24 @@ class _MedicationDetailsState extends State<MedicationDetails> {
 
   Padding _totalQuantityRow(String lblTitle) {
     String? quantity = _medication.dosingInstructions?.quantity == null
-        ? totalQuantity.floor().toString()
-        : _medication.dosingInstructions?.quantity?.floor().toString();
+        ? totalQuantity.ceil().toString()
+        : _medication.dosingInstructions?.quantity?.ceil().toString();
     return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16.0),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(lblTitle),
-            Container(
-              width: 150,
-              alignment: Alignment.centerRight,
-              child: Text(quantity.toString()),
+            Row(
+              children: [
+                Container(
+                  padding: EdgeInsets.only(right: 10),
+                  width: 150,
+                  alignment: Alignment.centerRight,
+                  child: Text(quantity.toString()),
+                ),
+                _unitRow(_dosageInstructions?['doseUnits'])
+              ],
             ),
           ],
         ));
@@ -598,17 +629,12 @@ class _MedicationDetailsState extends State<MedicationDetails> {
     return ConceptDictionary().dosageInstruction().then((value) {
       setState(() {
         _dosageInstructions = value;
-        _selectedUnitType = _medication.dosingInstructions?.doseUnits ??
-            _dosageInstructions?['doseUnits'].first['name'];
-        _selectedFrequencyType = _medication.dosingInstructions?.frequency ??
-            _dosageInstructions?['frequencies'].first['name'];
-        _selectedRouteType = _medication.dosingInstructions?.route ??
-            _dosageInstructions?['routes'].first['name'];
-        _selectedDurationType = _medication.durationUnits ??
-            _dosageInstructions?['durationUnits'].first['name'];
+        _selectedUnitType = _medication.dosingInstructions?.doseUnits;
+        _selectedFrequencyType = _medication.dosingInstructions?.frequency;
+        _selectedRouteType = _medication.dosingInstructions?.route;
+        _selectedDurationType = _medication.durationUnits;
         _selectedDosingInstructions =
-            _medication.dosingInstructions?.administrationInstructions ??
-                _dosageInstructions?['dosingInstructions'].first['name'];
+            _medication.dosingInstructions!.administrationInstructions;
       });
       return null;
     });

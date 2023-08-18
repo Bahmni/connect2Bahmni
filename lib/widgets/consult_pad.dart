@@ -302,10 +302,15 @@ class _ConsultPadWidgetState extends State<ConsultPadWidget> {
             ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 32.0),
-                child: Row(
+                child: frequency != null ? Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text('$units $doseUnits,  $frequency,   $administrationInstructions'),
+                  ],
+                ): Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text('$units $doseUnits,   $administrationInstructions'),
                   ],
                 ),
               ),
@@ -329,12 +334,12 @@ class _ConsultPadWidgetState extends State<ConsultPadWidget> {
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 22.0),
-                child: Row(
+                child: notes!.isNotEmpty ? Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Expanded(child: Text('Note: $notes',maxLines: 4)),
                   ],
-                ),
+                ):null,
               ),
       ]
           ),
