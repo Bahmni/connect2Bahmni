@@ -408,7 +408,7 @@ class _ConsultPadWidgetState extends State<ConsultPadWidget> {
     return SlidableAction(
       onPressed: (context){
         Provider.of<ConsultationBoard>(context, listen: false)
-            .removeMedication(medication);
+            .removeMedicationRequest(medication);
       },
       icon: Icons.delete,
       backgroundColor: Color.fromRGBO(240, 39, 22, 0.6),
@@ -459,7 +459,7 @@ class _ConsultPadWidgetState extends State<ConsultPadWidget> {
             ));
         if (edited != null && context.mounted) {
           var board = Provider.of<ConsultationBoard>(context, listen: false);
-          board.updateMedication(edited, index);
+          board.updateMedicationRequest(edited, index);
         }
       },
       backgroundColor: Colors.green,

@@ -23,6 +23,7 @@ class MetaProvider with ChangeNotifier {
   List<OmrsPersonAttributeType>? _personAttrTypes;
   List<FormResource>? _publishedForms;
   List<OmrsOrderType>? _orderTypes;
+  Map? _dosageInstructions;
 
   OmrsConcept? get conditionCertainty => _conditionCertainty;
 
@@ -35,6 +36,7 @@ class MetaProvider with ChangeNotifier {
   List<OmrsPersonAttributeType>? get personAttrTypes => _personAttrTypes;
   List<FormResource>? get publishedForms => _publishedForms;
   List<OmrsOrderType>? get orderTypes => _orderTypes;
+  Map? get dosageInstruction => _dosageInstructions;
 
   List<OmrsVisitType>? get allowedVisitTypes {
     if (_visitTypes == null) return [];
@@ -104,6 +106,10 @@ class MetaProvider with ChangeNotifier {
       _orderTypes = value;
       notifyListeners();
     });
+    ConceptDictionary().dosageInstruction().then((value) {
+      _dosageInstructions = value;
+      notifyListeners();
+    }).onError((error, stackTrace) => _logError(error));
   }
 
   _logError(e) {

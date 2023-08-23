@@ -374,7 +374,7 @@ class ConsultationActions extends StatelessWidget {
               builder: (context) => MedicationDetails(medication: newMedication),
             ));
         if (details != null) {
-          board.addMedication(details);
+          board.addMedicationRequest(details);
         }
       }
     }

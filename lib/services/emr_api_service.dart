@@ -211,34 +211,6 @@ class EmrApiService extends DomainService {
       }
     });
   }
-  Future<List<OmrsOrderType>> dosageInstructions() {
-    return UserPreferences().getSessionId()
-    .then((sessionId) {
-      if (sessionId == null) {
-        throw 'Authentication Failure';
-      }
-      return http.get(
-        Uri.parse(AppUrls.omrs.dosageInstructions),
-        headers: <String, String>{
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'Cookie': 'JSESSIONID=$sessionId',
-        },
-      );
-    }).then((response) {
-      switch (response.statusCode) {
-        case 200:
-        case 304:
-          var responseJson = jsonDecode(response.body);
-          var resultList = responseJson['results'] ?? [];
-          return List<OmrsOrderType>.from(resultList.map((ot) {
-            return OmrsOrderType.fromJson(ot);
-          }));
-        default:
-          throw handleErrorResponse(response);
-      }
-    });
-  }
 
   List<Map<String, dynamic>> _txOrders(ConsultationModel consultation, DateTime encounterDateTime) {
     List<Map<String, dynamic>> orders = [];

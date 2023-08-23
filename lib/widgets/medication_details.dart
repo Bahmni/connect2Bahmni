@@ -1,7 +1,8 @@
 import 'package:connect2bahmni/domain/models/bahmni_drug_order.dart';
-import 'package:connect2bahmni/services/concept_dictionary.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+import '../providers/meta_provider.dart';
 
 class MedicationDetails extends StatefulWidget {
   final BahmniDrugOrder medication;
@@ -34,7 +35,6 @@ class _MedicationDetailsState extends State<MedicationDetails> {
   static const lblEnterMedicationNote = "Enter note for the medication";
   final ValueNotifier<bool> _typeChangeAllowed = ValueNotifier<bool>(true);
   double totalQuantity = 0.0;
-  late Future<Map?> _dataFuture;
   bool toggle=false;
   double s1=0;
   double s2=0;
@@ -54,10 +54,17 @@ class _MedicationDetailsState extends State<MedicationDetails> {
   @override
   void initState() {
     super.initState();
-    _dataFuture = fetchFromApi()!;
+    var dosageInstructions = Provider.of<MetaProvider>(context, listen: false).dosageInstruction;
+    _dosageInstructions = dosageInstructions;
     _medication = widget.medication;
+    _selectedUnitType = _medication.dosingInstructions?.doseUnits;
+    _selectedFrequencyType = _medication.dosingInstructions?.frequency;
+    _selectedRouteType = _medication.dosingInstructions?.route;
+    _selectedDurationType = _medication.durationUnits;
+    _selectedDosingInstructions =
+        _medication.dosingInstructions?.administrationInstructions;
     _notesController.text = _medication.commentToFulfiller ?? '';
-    _dateController.text = _medication.effectiveStartDate?.toString() ?? '';
+    _dateController.text = _medication.effectiveStartDate!=null ? DateFormat('dd-MMM-yyy').format(_medication.effectiveStartDate!) : '';
     _doseController.text =
         _medication.dosingInstructions?.dose.toString() ?? '';
     _durationController.text = _medication.duration?.toString() ?? '';
@@ -81,23 +88,7 @@ class _MedicationDetailsState extends State<MedicationDetails> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-        future: _dataFuture,
-        builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Container(
-              color: Colors.white,
-              height: 50,
-              width: 50,
-              alignment: Alignment.center,
-              child: CircularProgressIndicator(
-                strokeWidth: 4,
-              ),
-            );
-          } else if (snapshot.hasError) {
-            return Text('Error: ${snapshot.error}');
-          } else {
-            return Scaffold(
+    return Scaffold(
               appBar: AppBar(
                 title: Text(lblAddMedication),
               ),
@@ -108,34 +99,27 @@ class _MedicationDetailsState extends State<MedicationDetails> {
                     key: _formKey,
                     child: Column(
                       children: [
-                        SizedBox(height: 15),
+                        SizedBox(height: 10),
                         _medicationDisplay(),
-                        SizedBox(height: 15),
+                        SizedBox(height: 10),
                         toggle == false ? _numericRow("Dose", _doseController): _toggleRow("Dose"),
-                        SizedBox(height: 15),
-                        // _unitRow("Dose Units", _dosageInstructions?['doseUnits']),
-                        SizedBox(height: 15),
+                        SizedBox(height: 10),
                         toggle == false ? _frequencyRow(
                             "Frequency", _dosageInstructions?['frequencies']):Padding(padding: EdgeInsets.zero),
                         toggle == false ?SizedBox(height: 20):Padding(padding: EdgeInsets.zero),
                         _routeRow("Routes", _dosageInstructions?['routes']),
-                        SizedBox(height: 15),
+                        SizedBox(height: 10),
                         _numericRow("Duration", _durationController),
-                        SizedBox(height: 15),
-                        // _durationUnitRow("Duration Units",
-                        //     _dosageInstructions?['durationUnits']),
-                        SizedBox(height: 15),
+                        SizedBox(height: 10),
                         _startDateRow("Start Date"),
-                        SizedBox(height: 20),
-                        _totalQuantityRow("Total Quantity"),
                         SizedBox(height: 15),
-                        // _unitRow("Units", _dosageInstructions?['doseUnits']),
+                        _totalQuantityRow("Total Quantity"),
                         SizedBox(height: 15),
                         _dosingInstructionsRow("Dosing Instructions",
                             _dosageInstructions?['dosingInstructions']),
-                        SizedBox(height: 15),
+                        SizedBox(height: 10),
                         _commentToFulfiller(),
-                        SizedBox(height: 15),
+                        SizedBox(height: 10),
                         Container(
                           height: 40,
                           width: 100,
@@ -180,8 +164,6 @@ class _MedicationDetailsState extends State<MedicationDetails> {
                 ),
               ),
             );
-          }
-        });
   }
 
   Widget _medicationDisplay() {
@@ -381,27 +363,40 @@ class _MedicationDetailsState extends State<MedicationDetails> {
           Text(lblTitle),
           Row(
             children: [
-              Container(
-                padding: EdgeInsets.only(right: 10),
-                alignment: Alignment.centerRight,
-                width: 50,
-                child: TextFormField(
-                    keyboardType: TextInputType.number,
-                    controller: controller,
-                    validator: (value) => value!.isEmpty ? controller == _doseController ? doseRequired : durationRequired : null,
-                    onTapOutside: (_) {
-                      setState(() {
-                        if (controller == _doseController) {
-                          _medication.dosingInstructions?.dose =
-                              double.tryParse(_doseController.text);
-                        } else {
-                          _medication.duration =
-                              int.tryParse(_durationController.text);
-                        }
-                        _updateResult();
-                      });
-                    }
-                    ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: Container(
+                  padding: EdgeInsets.only(right: 10,left: 10),
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.all(Radius.circular(8)),
+                    boxShadow: const [
+                      BoxShadow(
+                        blurRadius: 3,
+                        color: Colors.black12
+                      )
+                    ]
+                  ),
+                  width: 80,
+                  height: 60,
+                  child: TextFormField(
+                      keyboardType: TextInputType.number,
+                      controller: controller,
+                      validator: (value) => value!.isEmpty ? controller == _doseController ? doseRequired : durationRequired : null,
+                      onTapOutside: (_) {
+                        setState(() {
+                          if (controller == _doseController && _doseController.text.isNotEmpty) {
+                            _medication.dosingInstructions?.dose =
+                                double.tryParse(_doseController.text);
+                          } else if(controller == _durationController && _durationController.text.isNotEmpty){
+                            _medication.duration =
+                                int.tryParse(_durationController.text);
+                          }
+                          _updateResult();
+                        });
+                      }
+                      ),
+                ),
               ),
               lblTitle=='Dose'? _unitRow(_dosageInstructions?['doseUnits']) : _durationUnitRow(_dosageInstructions?['durationUnits'])
             ],
@@ -420,52 +415,88 @@ class _MedicationDetailsState extends State<MedicationDetails> {
             children: [
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 3.0),
-                child: SizedBox(
-                  width: 30,
-                  height: 50,
+                child: Container(
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.all(Radius.circular(8)),
+                      boxShadow: const [
+                        BoxShadow(
+                            blurRadius: 3,
+                            color: Colors.black12
+                        )
+                      ]
+                  ),
+                  width: 50,
+                  height: 60,
                   child: TextFormField(
                     keyboardType: TextInputType.number,
+                    decoration: InputDecoration(
+                        border: OutlineInputBorder()
+                    ),
                     validator: (value) => value!.isEmpty ? requiredAllTerm:null,
                     controller: _t1Controller,
                     onTapOutside: (_){
-                      setState(() {
+                      _t1Controller.text.isNotEmpty?setState(() {
                         s1 = double.tryParse(_t1Controller.text)!;
-                      });
+                      }):null;
                     },
                   ),
                 ),
               ),
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 3.0),
-                child: SizedBox(
-                  width: 30,
-                  height: 50,
+                child: Container(
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.all(Radius.circular(8)),
+                      boxShadow: const [
+                        BoxShadow(
+                            blurRadius: 3,
+                            color: Colors.black12
+                        )
+                      ]
+                  ),
+                  width: 50,
+                  height: 60,
                   child: TextFormField(
                     keyboardType: TextInputType.number,
+                    decoration: InputDecoration(
+                        border: OutlineInputBorder()
+                    ),
                     controller: _t2Controller,
                     validator: (value) => value!.isEmpty ? requiredAllTerm:null,
                     onTapOutside: (_){
-                      setState(() {
+                      _t2Controller.text.isNotEmpty?setState(() {
                         s2 = double.tryParse(_t2Controller.text)!;
-                      });
+                      }):null;
                     },
                   ),
                 ),
               ),Padding(
                 padding: EdgeInsets.symmetric(horizontal: 3.0),
-                child: SizedBox(
-                  width: 30,
-                  height: 50,
+                child: Container(
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.all(Radius.circular(8)),
+                      boxShadow: const [
+                        BoxShadow(
+                            blurRadius: 3,
+                            color: Colors.black12
+                        )
+                      ]
+                  ),
+                  width: 50,
+                  height: 60,
                   child: TextFormField(
                       keyboardType: TextInputType.number,
+                    decoration: InputDecoration(
+                        border: OutlineInputBorder()
+                    ),
                     controller: _t3Controller,
                     validator: (value) => value!.isEmpty ? requiredAllTerm:null,
                     onTapOutside: (_){
-                      setState(() {
+                      _t3Controller.text.isNotEmpty?setState(() {
                         s3 = double.tryParse(_t3Controller.text)!;
                         _medication.dosingInstructions?.dose =
                             s1+s2+s3;
-                      });
+                      }):null;
                     },
                   ),
                 ),
@@ -497,7 +528,7 @@ class _MedicationDetailsState extends State<MedicationDetails> {
 
   void _quantityCalculate(double factor, double value1, double value2) {
     if(toggle==false) {
-      if (_selectedFrequencyType == 'Once a day') {
+      if (_selectedFrequencyType == 'Once a day' || _selectedFrequencyType == 'Immediately') {
         totalQuantity = factor * value1 * value2;
       } else if (_selectedFrequencyType == 'Twice a day' ||
           _selectedFrequencyType == 'Every 12 hours') {
@@ -508,13 +539,15 @@ class _MedicationDetailsState extends State<MedicationDetails> {
       } else if (_selectedFrequencyType == 'Four times a day' ||
           _selectedFrequencyType == 'Every 6 hours') {
         totalQuantity = factor * value1 * value2 * 4;
-      } else if (_selectedFrequencyType == 'Every 4 hours') {
+      } else if (_selectedFrequencyType == 'Five times a day') {
+        totalQuantity = factor * value1 * value2 * 5;
+      }else if (_selectedFrequencyType == 'Every 4 hours') {
         totalQuantity = factor * value1 * value2 * 6;
       } else if (_selectedFrequencyType == 'Every 3 hours') {
         totalQuantity = factor * value1 * value2 * 8;
       } else if (_selectedFrequencyType == 'Every 2 hours') {
         totalQuantity = factor * value1 * value2 * 12;
-      } else if (_selectedFrequencyType == 'Every hour') {
+      } else if (_selectedFrequencyType == 'Every Hour') {
         totalQuantity = factor * value1 * value2 * 24;
       } else if (_selectedFrequencyType == 'On alternate days') {
         totalQuantity = value1 * value2 / 2;
@@ -524,6 +557,18 @@ class _MedicationDetailsState extends State<MedicationDetails> {
         totalQuantity = factor * value1 * (value2 / 7) * 2;
       } else if (_selectedFrequencyType == 'Thrice a week') {
         totalQuantity = factor * value1 * (value2 / 7) * 3;
+      } else if (_selectedFrequencyType == 'Four days a week') {
+        totalQuantity = factor * value1 * (value2 / 7) * 4;
+      } else if (_selectedFrequencyType == 'Five days a week') {
+        totalQuantity = factor * value1 * (value2 / 7) * 5;
+      } else if (_selectedFrequencyType == 'Six days a week') {
+        totalQuantity = factor * value1 * (value2 / 7) * 6;
+      } else if (_selectedFrequencyType == 'Once a month') {
+        totalQuantity = factor * value1 * value2 / 30;
+      } else if (_selectedFrequencyType == 'Every 2 weeks') {
+        totalQuantity = factor * value1 * value2 / 14;
+      } else if (_selectedFrequencyType == 'Every 3 weeks') {
+        totalQuantity = factor * value1 * value2 / 21;
       }
     }
     else{
@@ -544,7 +589,6 @@ class _MedicationDetailsState extends State<MedicationDetails> {
               child: TextFormField(
                   controller: _dateController,
                   decoration: const InputDecoration(
-                      // icon: Icon(Icons.calendar_today),
                       suffixIcon: Icon(Icons.calendar_today)),
                   readOnly: true,
                   validator: (value) => value!.isEmpty ? startDateRequired : null,
@@ -586,7 +630,7 @@ class _MedicationDetailsState extends State<MedicationDetails> {
                   alignment: Alignment.centerRight,
                   child: Text(quantity.toString()),
                 ),
-                _unitRow(_dosageInstructions?['doseUnits'])
+                _selectedUnitType != null?Text("$_selectedUnitType"):Padding(padding: EdgeInsets.zero)
               ],
             ),
           ],
@@ -623,21 +667,6 @@ class _MedicationDetailsState extends State<MedicationDetails> {
           )),
       textAlign: TextAlign.start,
     );
-  }
-
-  Future<Map?>? fetchFromApi() async {
-    return ConceptDictionary().dosageInstruction().then((value) {
-      setState(() {
-        _dosageInstructions = value;
-        _selectedUnitType = _medication.dosingInstructions?.doseUnits;
-        _selectedFrequencyType = _medication.dosingInstructions?.frequency;
-        _selectedRouteType = _medication.dosingInstructions?.route;
-        _selectedDurationType = _medication.durationUnits;
-        _selectedDosingInstructions =
-            _medication.dosingInstructions!.administrationInstructions;
-      });
-      return null;
-    });
   }
 
   void _effectiveStopDate(){

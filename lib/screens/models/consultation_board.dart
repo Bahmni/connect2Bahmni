@@ -110,19 +110,19 @@ class ConsultationBoard extends ChangeNotifier {
     notifyListeners();
   }
 
-  void addMedication(BahmniDrugOrder medication) {
+  void addMedicationRequest(BahmniDrugOrder medication) {
     _verifyEditable();
     _currentConsultation?.addMedication(medication);
     notifyListeners();
   }
 
-  void removeMedication(BahmniDrugOrder medication){
+  void removeMedicationRequest(BahmniDrugOrder medication){
     _verifyEditable();
     _currentConsultation?.removeMedication(medication);
     notifyListeners();
   }
 
-  void updateMedication(BahmniDrugOrder medication, int index) {
+  void updateMedicationRequest(BahmniDrugOrder medication, int index) {
     _currentConsultation?.updateMedication(medication,index);
     notifyListeners();
   }
