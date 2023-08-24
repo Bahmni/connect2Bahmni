@@ -1,3 +1,4 @@
+import '../domain/models/dosage_instruction.dart';
 import '../domain/models/form_definition.dart';
 import '../domain/models/omrs_identifier_type.dart';
 import '../domain/models/omrs_order.dart';
@@ -23,7 +24,7 @@ class MetaProvider with ChangeNotifier {
   List<OmrsPersonAttributeType>? _personAttrTypes;
   List<FormResource>? _publishedForms;
   List<OmrsOrderType>? _orderTypes;
-  Map? _dosageInstructions;
+  DoseAttributes? _dosageInstructions;
 
   OmrsConcept? get conditionCertainty => _conditionCertainty;
 
@@ -36,7 +37,7 @@ class MetaProvider with ChangeNotifier {
   List<OmrsPersonAttributeType>? get personAttrTypes => _personAttrTypes;
   List<FormResource>? get publishedForms => _publishedForms;
   List<OmrsOrderType>? get orderTypes => _orderTypes;
-  Map? get dosageInstruction => _dosageInstructions;
+  DoseAttributes? get dosageInstruction => _dosageInstructions;
 
   List<OmrsVisitType>? get allowedVisitTypes {
     if (_visitTypes == null) return [];

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:connect2bahmni/domain/models/dosage_instruction.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -106,7 +107,7 @@ class ConceptDictionary {
       throw 'Failed to fetch Medication';
     }
   }
-  Future<Map> dosageInstruction() async{
+  Future<DoseAttributes> dosageInstruction() async{
     String? sessionId = await UserPreferences().getSessionId();
     if (sessionId == null) {
       throw 'Authentication Failure';
@@ -115,8 +116,8 @@ class ConceptDictionary {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     if (prefs.containsKey(cacheKey)) {
       String? cachedData = prefs.getString(cacheKey);
-      var resultList = jsonDecode(cachedData!) as Map;
-      return resultList;
+      Map<String,dynamic>? resultList = jsonDecode(cachedData!) as Map<String,dynamic>;
+      return DoseAttributes(details: resultList);
     }
     String url = AppUrls.omrs.dosageInstructions;
     var response = await http.get(
@@ -135,10 +136,10 @@ class ConceptDictionary {
       var durationUnits = responseJson['durationUnits'];
       var dosingInstructions = responseJson['dosingInstructions'];
       var frequencies = responseJson['frequencies'];
-      var details = {};
+      Map<String,dynamic> details = {};
       details.addAll({'doseUnits':doseUnits,'routes':routes,'durationUnits':durationUnits,'dosingInstructions':dosingInstructions,'frequencies':frequencies});
       await prefs.setString(cacheKey, jsonEncode(details));
-      return details;
+      return DoseAttributes(details: details);
     } else {
       throw 'Failed to fetch Dosing Instructions';
     }

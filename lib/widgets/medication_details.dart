@@ -1,4 +1,5 @@
 import 'package:connect2bahmni/domain/models/bahmni_drug_order.dart';
+import 'package:connect2bahmni/domain/models/dosage_instruction.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -23,7 +24,7 @@ class _MedicationDetailsState extends State<MedicationDetails> {
   String? _selectedDosingInstructions;
   String lblTitle = " ";
   late BahmniDrugOrder _medication;
-  late final Map<dynamic, dynamic>? _dosageInstructions;
+  late final Map<dynamic, dynamic>? _dosageAttributes;
   final TextEditingController _notesController = TextEditingController();
   final TextEditingController _dateController = TextEditingController();
   final TextEditingController _doseController = TextEditingController();
@@ -54,8 +55,8 @@ class _MedicationDetailsState extends State<MedicationDetails> {
   @override
   void initState() {
     super.initState();
-    var dosageInstructions = Provider.of<MetaProvider>(context, listen: false).dosageInstruction;
-    _dosageInstructions = dosageInstructions;
+    DoseAttributes? dosageInstructions = Provider.of<MetaProvider>(context, listen: false).dosageInstruction;
+    _dosageAttributes = dosageInstructions?.details;
     _medication = widget.medication;
     _selectedUnitType = _medication.dosingInstructions?.doseUnits;
     _selectedFrequencyType = _medication.dosingInstructions?.frequency;
@@ -105,9 +106,9 @@ class _MedicationDetailsState extends State<MedicationDetails> {
                         toggle == false ? _numericRow("Dose", _doseController): _toggleRow("Dose"),
                         SizedBox(height: 10),
                         toggle == false ? _frequencyRow(
-                            "Frequency", _dosageInstructions?['frequencies']):Padding(padding: EdgeInsets.zero),
+                            "Frequency", _dosageAttributes?['frequencies']):Padding(padding: EdgeInsets.zero),
                         toggle == false ?SizedBox(height: 20):Padding(padding: EdgeInsets.zero),
-                        _routeRow("Routes", _dosageInstructions?['routes']),
+                        _routeRow("Routes", _dosageAttributes?['routes']),
                         SizedBox(height: 10),
                         _numericRow("Duration", _durationController),
                         SizedBox(height: 10),
@@ -116,7 +117,7 @@ class _MedicationDetailsState extends State<MedicationDetails> {
                         _totalQuantityRow("Total Quantity"),
                         SizedBox(height: 15),
                         _dosingInstructionsRow("Dosing Instructions",
-                            _dosageInstructions?['dosingInstructions']),
+                            _dosageAttributes?['dosingInstructions']),
                         SizedBox(height: 10),
                         _commentToFulfiller(),
                         SizedBox(height: 10),
@@ -398,7 +399,7 @@ class _MedicationDetailsState extends State<MedicationDetails> {
                       ),
                 ),
               ),
-              lblTitle=='Dose'? _unitRow(_dosageInstructions?['doseUnits']) : _durationUnitRow(_dosageInstructions?['durationUnits'])
+              lblTitle=='Dose'? _unitRow(_dosageAttributes?['doseUnits']) : _durationUnitRow(_dosageAttributes?['durationUnits'])
             ],
           ),
         ]));
@@ -501,7 +502,7 @@ class _MedicationDetailsState extends State<MedicationDetails> {
                   ),
                 ),
               ),
-              _unitRow(_dosageInstructions?['doseUnits'])
+              _unitRow(_dosageAttributes?['doseUnits'])
             ],
           )
         ])
