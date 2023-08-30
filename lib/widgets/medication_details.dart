@@ -37,9 +37,9 @@ class _MedicationDetailsState extends State<MedicationDetails> {
   final ValueNotifier<bool> _typeChangeAllowed = ValueNotifier<bool>(true);
   double totalQuantity = 0.0;
   bool showFrequency=true;
-  double morningDose=0;
-  double afternoonDose=0;
-  double eveningDose=0;
+  int morningDose=0;
+  int afternoonDose=0;
+  int eveningDose=0;
   static const doseRequired = 'Dose is required';
   static const dosingUnitRequired = 'Dose Unit is required';
   static const frequencyRequired = 'Frequency is required';
@@ -66,9 +66,14 @@ class _MedicationDetailsState extends State<MedicationDetails> {
         _medication.dosingInstructions?.administrationInstructions;
     _notesController.text = _medication.commentToFulfiller ?? '';
     _dateController.text = _medication.effectiveStartDate!=null ? DateFormat('dd-MMM-yyy').format(_medication.effectiveStartDate!) : '';
-    _doseController.text =
-        _medication.dosingInstructions?.dose.toString() ?? '';
     _durationController.text = _medication.duration?.toString() ?? '';
+    String? dose = _medication.dosingInstructions?.dose.toString();
+    showFrequency = dose?[dose.length - 1] != '1'? true:false;
+    _doseController.text = dose?[dose.length - 1] != '1' ?
+    _medication.dosingInstructions?.dose.toString() ?? '':'';
+    _morningDoseController.text = dose?[dose.length - 1] != '1' ? '' : dose?[0] ?? '';
+    _afternoonDoseController.text = dose?[dose.length - 1] != '1' ? '' : dose?[1] ?? '';
+    _eveningDoseController.text = dose?[dose.length - 1] != '1' ? '' : dose?[2] ?? '';
     if (_medication.dosingInstructions == null) {
       DosingInstructions newDosingInstructions = DosingInstructions();
       _medication.dosingInstructions = newDosingInstructions;
@@ -379,7 +384,6 @@ class _MedicationDetailsState extends State<MedicationDetails> {
                     ]
                   ),
                   width: 80,
-                  height: 60,
                   child: TextFormField(
                       keyboardType: TextInputType.number,
                       controller: controller,
@@ -425,7 +429,6 @@ class _MedicationDetailsState extends State<MedicationDetails> {
                       ]
                   ),
                   width: 80,
-                  height: 60,
                   child: TextFormField(
                       keyboardType: TextInputType.number,
                       controller: controller,
@@ -470,7 +473,6 @@ class _MedicationDetailsState extends State<MedicationDetails> {
                       ]
                   ),
                   width: 50,
-                  height: 60,
                   child: TextFormField(
                     keyboardType: TextInputType.number,
                     decoration: InputDecoration(
@@ -480,7 +482,7 @@ class _MedicationDetailsState extends State<MedicationDetails> {
                     controller: _morningDoseController,
                     onTapOutside: (_){
                       _morningDoseController.text.isNotEmpty?setState(() {
-                        morningDose = double.tryParse(_morningDoseController.text)!;
+                        morningDose = int.tryParse(_morningDoseController.text)!;
                       }):null;
                     },
                   ),
@@ -499,7 +501,6 @@ class _MedicationDetailsState extends State<MedicationDetails> {
                       ]
                   ),
                   width: 50,
-                  height: 60,
                   child: TextFormField(
                     keyboardType: TextInputType.number,
                     decoration: InputDecoration(
@@ -509,7 +510,7 @@ class _MedicationDetailsState extends State<MedicationDetails> {
                     validator: (value) => value!.isEmpty ? requiredAllTerm:null,
                     onTapOutside: (_){
                       _afternoonDoseController.text.isNotEmpty?setState(() {
-                        afternoonDose = double.tryParse(_afternoonDoseController.text)!;
+                        afternoonDose = int.tryParse(_afternoonDoseController.text)!;
                       }):null;
                     },
                   ),
@@ -527,7 +528,6 @@ class _MedicationDetailsState extends State<MedicationDetails> {
                       ]
                   ),
                   width: 50,
-                  height: 60,
                   child: TextFormField(
                       keyboardType: TextInputType.number,
                     decoration: InputDecoration(
@@ -537,9 +537,9 @@ class _MedicationDetailsState extends State<MedicationDetails> {
                     validator: (value) => value!.isEmpty ? requiredAllTerm:null,
                     onTapOutside: (_){
                       _eveningDoseController.text.isNotEmpty?setState(() {
-                        eveningDose = double.tryParse(_eveningDoseController.text)!;
+                        eveningDose = int.tryParse(_eveningDoseController.text)!;
                         _medication.dosingInstructions?.dose =
-                            morningDose+afternoonDose+eveningDose;
+                            double.tryParse('$morningDose$afternoonDose$eveningDose.1');
                       }):null;
                     },
                   ),
@@ -553,7 +553,7 @@ class _MedicationDetailsState extends State<MedicationDetails> {
   }
 
   void _updateResult() {
-    double doseValue = showFrequency == true ? double.tryParse(_doseController.text) ?? 0.0 : morningDose+afternoonDose+eveningDose;
+    double doseValue = showFrequency == true ? double.tryParse(_doseController.text) ?? 0.0 : (morningDose+afternoonDose+eveningDose).toDouble();
     double durationValue = double.tryParse(_durationController.text) ?? 0.0;
     setState(() {
       if (_selectedDurationType == 'Days') {
@@ -566,7 +566,6 @@ class _MedicationDetailsState extends State<MedicationDetails> {
         _quantityCalculate(365, doseValue, durationValue);
       }
       _medication.dosingInstructions?.quantity = totalQuantity;
-
     });
   }
 

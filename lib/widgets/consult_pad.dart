@@ -270,7 +270,8 @@ class _ConsultPadWidgetState extends State<ConsultPadWidget> {
   Widget _medicationWidget(BahmniDrugOrder medication,int index){
     String? text = medication.concept?.name;
     String? notes = medication.commentToFulfiller;
-    String? units = medication.dosingInstructions?.dose.toString();
+    String? doseValue = medication.dosingInstructions?.dose.toString();
+    String? displayValue = doseValue?[doseValue.length - 1] == '1'? doseValue?.substring(0, doseValue.length - 2).split('').join('-') : doseValue?.substring(0, doseValue.length - 2);
     String? doseUnits = medication.dosingInstructions?.doseUnits;
     String? startDate = medication.effectiveStartDate!=null ? DateFormat('dd-MMM-yyy').format(medication.effectiveStartDate!).toString():'  ';
     String? frequency = medication.dosingInstructions?.frequency;
@@ -305,12 +306,12 @@ class _ConsultPadWidgetState extends State<ConsultPadWidget> {
                 child: frequency != null ? Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('$units $doseUnits,  $frequency,   $administrationInstructions'),
+                    Text('$displayValue $doseUnits,  $frequency,   $administrationInstructions'),
                   ],
                 ): Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('$units $doseUnits,   $administrationInstructions'),
+                    Text('$displayValue $doseUnits,   $administrationInstructions'),
                   ],
                 ),
               ),
