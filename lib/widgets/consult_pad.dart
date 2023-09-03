@@ -1,10 +1,13 @@
+import 'package:connect2bahmni/domain/models/bahmni_drug_order.dart';
+import 'package:connect2bahmni/domain/models/omrs_order.dart';
+import 'package:connect2bahmni/widgets/investigation_details.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'condition.dart';
 import 'consultation_notes.dart';
 import '../domain/models/form_definition.dart';
-import '../domain/models/omrs_order.dart';
 import '../utils/date_time.dart';
 import '../utils/string_utils.dart';
 import '../screens/models/consultation_model.dart';
@@ -12,7 +15,7 @@ import '../screens/models/consultation_board.dart';
 import '../widgets/consultation_context.dart';
 import '../domain/condition_model.dart';
 import '../domain/models/omrs_obs.dart';
-import '../widgets/investigation_details.dart';
+import 'medication_details.dart';
 
 class ConsultPadWidget extends StatefulWidget {
   const ConsultPadWidget({
@@ -74,6 +77,7 @@ class _ConsultPadWidgetState extends State<ConsultPadWidget> {
             ..._diagnoses(consultation?.diagnosisList),
             ..._problemList(consultation?.problemList),
             ..._investigationList(consultation?.investigationList),
+            ..._medicationList(consultation?.medicationList),
             (consultation?.consultNote != null) ? _ConsultationNote(consultNote: consultation!.consultNote!, sliding: true,) : const SizedBox(height: 1),
             ..._formList(consultation?.observationForms),
           ],
@@ -241,6 +245,109 @@ class _ConsultPadWidgetState extends State<ConsultPadWidget> {
     );
   }
 
+  List<Widget> _medicationList(List<BahmniDrugOrder>? medicationList) {
+    if (medicationList == null) return [];
+    if (medicationList.isEmpty) return [];
+    return <Widget>[
+      Align(
+        alignment: Alignment.centerLeft,
+        child: Container(
+          padding: const EdgeInsets.fromLTRB(10, 5, 0, 0),
+          child: Text('Medication List',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+      ),
+      ...medicationList.asMap().entries.map((el) {
+        final index = el.key;
+        final medication = el.value;
+        return _medicationWidget(medication, index);
+      }).toList()
+    ];
+  }
+  Widget _medicationWidget(BahmniDrugOrder medication,int index){
+    String? text = medication.concept?.name;
+    String? notes = medication.commentToFulfiller;
+    String? doseValue = medication.dosingInstructions?.dose.toString();
+    String? displayValue = doseValue?[doseValue.length - 1] == '1'? doseValue?.substring(0, doseValue.length - 2).split('').join('-') : doseValue?.substring(0, doseValue.length - 2);
+    String? doseUnits = medication.dosingInstructions?.doseUnits;
+    String? startDate = medication.effectiveStartDate!=null ? DateFormat('dd-MMM-yyy').format(medication.effectiveStartDate!).toString():'  ';
+    String? frequency = medication.dosingInstructions?.frequency;
+    String? quantity = medication.dosingInstructions?.quantity?.floor().toString();
+    String? quantityUnits = medication.dosingInstructions?.quantityUnits;
+    String? route = medication.dosingInstructions?.route;
+    String? duration = medication.duration.toString();
+    String? durationUnits = medication.durationUnits;
+    String? administrationInstructions = medication.dosingInstructions?.administrationInstructions;
+    return Slidable(
+        endActionPane: ActionPane(
+          motion: const ScrollMotion(),
+          children: [
+            _removeMedicationAction(medication),
+            _editMedicationAction(medication, index),
+          ],
+        ),
+        child: Container(
+          color: Theme.of(context).colorScheme.onBackground,
+          child: Column(
+            children: [
+              ListTile(
+              leading: const Icon(
+                Icons.medication_outlined,
+                size: 24,
+              ),
+              title: Text('$text'),
+              tileColor: Colors.red,
+            ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 32.0),
+                child: frequency != null ? Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text('$displayValue $doseUnits,  $frequency,   $administrationInstructions'),
+                  ],
+                ): Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text('$displayValue $doseUnits,   $administrationInstructions'),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 32.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text('$route,   Total: $quantity $quantityUnits'),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 32.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(child: Text('From: $startDate  ➤ $duration $durationUnits')),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 22.0),
+                child: notes!.isNotEmpty ? Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(child: Text('Note: $notes',maxLines: 4)),
+                  ],
+                ):null,
+              ),
+      ]
+          ),
+        )
+    );
+  }
+
   Widget _conditionWidget(ConditionModel condition) {
     String? display = condition.code?.display;
     display ??= '(Unknown)';
@@ -298,6 +405,18 @@ class _ConsultPadWidgetState extends State<ConsultPadWidget> {
       label: 'Remove',
     );
   }
+  SlidableAction _removeMedicationAction(BahmniDrugOrder medication){
+    return SlidableAction(
+      onPressed: (context){
+        Provider.of<ConsultationBoard>(context, listen: false)
+            .removeMedicationRequest(medication);
+      },
+      icon: Icons.delete,
+      backgroundColor: Color.fromRGBO(240, 39, 22, 0.6),
+      foregroundColor: Colors.white,
+      label: 'Remove',
+    );
+  }
 
   SlidableAction _removeConditionAction(ConditionModel condition) {
     return SlidableAction(
@@ -323,6 +442,25 @@ class _ConsultPadWidgetState extends State<ConsultPadWidget> {
         if (edited != null && context.mounted) {
           var board = Provider.of<ConsultationBoard>(context, listen: false);
           board.updateInvestigation(edited, index);
+        }
+      },
+      backgroundColor: Colors.green,
+      foregroundColor: Colors.white,
+      icon: Icons.edit,
+      label: 'Edit',
+    );
+  }
+  SlidableAction _editMedicationAction(BahmniDrugOrder medication,int index) {
+    return SlidableAction(
+      onPressed: (_) async {
+        final edited = await Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => MedicationDetails(medication: medication),
+            ));
+        if (edited != null && context.mounted) {
+          var board = Provider.of<ConsultationBoard>(context, listen: false);
+          board.updateMedicationRequest(edited, index);
         }
       },
       backgroundColor: Colors.green,

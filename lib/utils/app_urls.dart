@@ -18,6 +18,7 @@ class OMRSRestUrls {
   String get patient => '$base/patient';
   String get visit => '$base/visit';
   String get concept => '$base/concept';
+  String get drug => '$base/drug';
   String get visitType => '$base/visittype';
   String get encType => '$base/encountertype';
   String get obs => '$base/obs';
@@ -25,6 +26,7 @@ class OMRSRestUrls {
   String get personAttrTypes => '$base/personattributetype?v=custom:(uuid,name,format,description)';
   String get forms => '$base/form';
   String get orderType => '$base/ordertype?v=custom:(uuid,display,conceptClasses:(uuid,display,name))';
+  String get dosageInstructions => '$base/bahmnicore/config/drugOrders';
 }
 
 class FHIRUrls {

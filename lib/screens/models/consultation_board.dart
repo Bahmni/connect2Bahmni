@@ -1,10 +1,10 @@
+import 'package:connect2bahmni/domain/models/bahmni_drug_order.dart';
+import 'package:connect2bahmni/domain/models/omrs_order.dart';
 import 'package:flutter/foundation.dart';
-
 import '../../domain/condition_model.dart';
 import '../../domain/models/omrs_encounter_type.dart';
 import '../../domain/models/form_definition.dart';
 import '../../domain/models/omrs_location.dart';
-import '../../domain/models/omrs_order.dart';
 import '../../domain/models/omrs_visit_type.dart';
 import '../../domain/models/user.dart';
 import '../../domain/models/omrs_concept.dart';
@@ -110,6 +110,22 @@ class ConsultationBoard extends ChangeNotifier {
     notifyListeners();
   }
 
+  void addMedicationRequest(BahmniDrugOrder medication) {
+    _verifyEditable();
+    _currentConsultation?.addMedication(medication);
+    notifyListeners();
+  }
+
+  void removeMedicationRequest(BahmniDrugOrder medication){
+    _verifyEditable();
+    _currentConsultation?.removeMedication(medication);
+    notifyListeners();
+  }
+
+  void updateMedicationRequest(BahmniDrugOrder medication, int index) {
+    _currentConsultation?.updateMedication(medication,index);
+    notifyListeners();
+  }
   void addFormObsList(FormResource form, List<OmrsObs> obsList) {
     _verifyEditable();
     _currentConsultation?.addObservationForm(form, obsList);
@@ -121,5 +137,4 @@ class ConsultationBoard extends ChangeNotifier {
     _currentConsultation?.removeObservationForm(form);
     notifyListeners();
   }
-
 }

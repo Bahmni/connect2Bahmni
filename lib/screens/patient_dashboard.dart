@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
+import '../domain/models/bahmni_drug_order.dart';
 import '../domain/models/omrs_order.dart';
 import '../domain/models/bahmni_appointment.dart';
 import '../utils/app_failures.dart';
@@ -11,6 +12,8 @@ import '../widgets/consultation_notes.dart';
 import '../widgets/investigation_details.dart';
 import '../widgets/investigation_search.dart';
 import '../widgets/jitsi_meeting.dart';
+import '../widgets/medication_details.dart';
+import '../widgets/medication_search.dart';
 import '../widgets/patient_chart.dart';
 import '../providers/user_provider.dart';
 import '../screens/models/consultation_model.dart';
@@ -293,7 +296,7 @@ class ConsultationActions extends StatelessWidget {
             IconButton(
               tooltip: 'Medication',
               icon: const Icon(Icons.medication_outlined),
-              onPressed: () {},
+              onPressed: () => addMedicationToConsultation(context),
             ),
             IconButton(
               tooltip: 'Investigation',
@@ -353,6 +356,25 @@ class ConsultationActions extends StatelessWidget {
             ));
         if (details != null) {
           board.addInvestigation(details);
+        }
+      }
+    }
+  }
+  addMedicationToConsultation(BuildContext context) async {
+    var board = _activeBoardToUpdate(context);
+    if (board == null) return;
+
+    DrugConcept? concept = await Navigator.push(context,
+        MaterialPageRoute(builder: (context) => const MedicationSearch()));
+    if (concept != null) {
+      if (context.mounted) {
+        var newMedication = BahmniDrugOrder(concept: concept);
+        BahmniDrugOrder? details = await Navigator.push(context,
+            MaterialPageRoute(
+              builder: (context) => MedicationDetails(medication: newMedication),
+            ));
+        if (details != null) {
+          board.addMedicationRequest(details);
         }
       }
     }
