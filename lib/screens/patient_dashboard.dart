@@ -368,10 +368,10 @@ class ConsultationActions extends StatelessWidget {
         MaterialPageRoute(builder: (context) => const MedicationSearch()));
     if (concept != null) {
       if (context.mounted) {
-        var newMedication = BahmniDrugOrder(concept: concept);
+        var drugOrder = BahmniDrugOrder(concept: concept);
         BahmniDrugOrder? details = await Navigator.push(context,
             MaterialPageRoute(
-              builder: (context) => MedicationDetails(medication: newMedication),
+              builder: (context) => MedicationDetails(medOrder: drugOrder),
             ));
         if (details != null) {
           board.addMedicationRequest(details);

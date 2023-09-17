@@ -1,15 +1,15 @@
-import 'package:connect2bahmni/domain/models/bahmni_drug_order.dart';
-import 'package:connect2bahmni/domain/models/dosage_instruction.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../providers/meta_provider.dart';
+import '../domain/models/bahmni_drug_order.dart';
+import '../domain/models/dosage_instruction.dart';
 
 class MedicationDetails extends StatefulWidget {
-  final BahmniDrugOrder medication;
+  final BahmniDrugOrder medOrder;
 
-  const MedicationDetails({Key? key, required this.medication})
-      : super(key: key);
+  const MedicationDetails({Key? key, required this.medOrder}) : super(key: key);
 
   @override
   State<MedicationDetails> createState() => _MedicationDetailsState();
@@ -22,8 +22,7 @@ class _MedicationDetailsState extends State<MedicationDetails> {
   String? _selectedFrequencyType;
   String? _selectedDurationType;
   String? _selectedDosingInstructions;
-  String lblTitle = " ";
-  late BahmniDrugOrder _medication;
+  late BahmniDrugOrder _drugOrder;
   late final Map<dynamic, dynamic>? _dosageAttributes;
   final TextEditingController _notesController = TextEditingController();
   final TextEditingController _dateController = TextEditingController();
@@ -34,7 +33,6 @@ class _MedicationDetailsState extends State<MedicationDetails> {
   final TextEditingController _eveningDoseController = TextEditingController();
   static const lblAddMedication = "Add Medication";
   static const lblEnterMedicationNote = "Enter note for the medication";
-  final ValueNotifier<bool> _typeChangeAllowed = ValueNotifier<bool>(true);
   double totalQuantity = 0.0;
   bool showFrequency=true;
   int morningDose=0;
@@ -49,7 +47,17 @@ class _MedicationDetailsState extends State<MedicationDetails> {
   static const startDateRequired = 'Start Date is required';
   static const dosingInstructionRequired = 'Instruction is required';
   static const requiredAllTerm = "Required";
+  static const lblRoutes = "Routes";
+  static const lblFrequency = "Frequency";
+  static const lblDose = "Dose";
+  static const lblDuration = "Duration";
+  static const lblStartDate = "Start Date";
+  static const lblTotalQuantity = "Total Quantity";
+  static const lblDosingInstructions = "Instructions";
+  // static const lblDosingInstructions = "Dosing Instructions";
+  static const lblDefaultRoute = 'Oral';
   List<String> durationUnits = ['Days','Weeks','Months','Years'];
+  static const firstColumnWidth = 100.0;
 
 
   @override
@@ -57,26 +65,27 @@ class _MedicationDetailsState extends State<MedicationDetails> {
     super.initState();
     DoseAttributes? dosageInstructions = Provider.of<MetaProvider>(context, listen: false).dosageInstruction;
     _dosageAttributes = dosageInstructions?.details;
-    _medication = widget.medication;
-    _selectedUnitType = _medication.dosingInstructions?.doseUnits;
-    _selectedFrequencyType = _medication.dosingInstructions?.frequency;
-    _selectedRouteType = _medication.dosingInstructions?.route;
-    _selectedDurationType = _medication.durationUnits;
-    _selectedDosingInstructions =
-        _medication.dosingInstructions?.administrationInstructions;
-    _notesController.text = _medication.commentToFulfiller ?? '';
-    _dateController.text = _medication.effectiveStartDate!=null ? DateFormat('dd-MMM-yyy').format(_medication.effectiveStartDate!) : '';
-    _durationController.text = _medication.duration?.toString() ?? '';
-    String? dose = _medication.dosingInstructions?.dose.toString();
+    _drugOrder = widget.medOrder;
+    _selectedUnitType = _drugOrder.dosingInstructions?.doseUnits;
+    _selectedFrequencyType = _drugOrder.dosingInstructions?.frequency;
+    _selectedRouteType = _drugOrder.dosingInstructions?.route;
+    _selectedDurationType = _drugOrder.durationUnits ?? 'Days';
+    _selectedDosingInstructions = _drugOrder.dosingInstructions?.administrationInstructions;
+    _notesController.text = _drugOrder.commentToFulfiller ?? '';
+    _dateController.text = _drugOrder.effectiveStartDate == null
+        ? DateFormat('dd-MMM-yyy').format(DateTime.now())
+        : DateFormat('dd-MMM-yyy').format(_drugOrder.effectiveStartDate!);
+    _durationController.text = _drugOrder.duration?.toString() ?? '';
+    String? dose = _drugOrder.dosingInstructions?.dose.toString();
     showFrequency = dose?[dose.length - 1] != '1'? true:false;
     _doseController.text = dose?[dose.length - 1] != '1' ?
-    _medication.dosingInstructions?.dose.toString() ?? '':'';
+    _drugOrder.dosingInstructions?.dose.toString() ?? '':'';
     _morningDoseController.text = dose?[dose.length - 1] != '1' ? '' : dose?[0] ?? '';
     _afternoonDoseController.text = dose?[dose.length - 1] != '1' ? '' : dose?[1] ?? '';
     _eveningDoseController.text = dose?[dose.length - 1] != '1' ? '' : dose?[2] ?? '';
-    if (_medication.dosingInstructions == null) {
+    if (_drugOrder.dosingInstructions == null) {
       DosingInstructions newDosingInstructions = DosingInstructions();
-      _medication.dosingInstructions = newDosingInstructions;
+      _drugOrder.dosingInstructions = newDosingInstructions;
     }
   }
 
@@ -108,21 +117,19 @@ class _MedicationDetailsState extends State<MedicationDetails> {
                         SizedBox(height: 10),
                         _medicationDisplay(),
                         SizedBox(height: 10),
-                        showFrequency == true ? _doseRow("Dose", _doseController): _toggleRow("Dose"),
+                        showFrequency ? _selectDose(): _selectCommonTimes(),
                         SizedBox(height: 10),
-                        showFrequency == true ? _frequencyRow(
-                            "Frequency", _dosageAttributes?['frequencies']):Padding(padding: EdgeInsets.zero),
-                        showFrequency == true ?SizedBox(height: 20):Padding(padding: EdgeInsets.zero),
-                        _routeRow("Routes", _dosageAttributes?['routes']),
+                        if (showFrequency)
+                          _selectFrequency(_dosageAttributes?['frequencies']),
+                        _selectRoutes(_dosageAttributes?['routes']),
                         SizedBox(height: 10),
-                        _durationRow("Duration", _durationController),
+                        _selectDuration(),
                         SizedBox(height: 10),
-                        _startDateRow("Start Date"),
+                        _selectStartDate(),
                         SizedBox(height: 15),
-                        _totalQuantityRow("Total Quantity"),
+                        _totalQuantityRow(),
                         SizedBox(height: 15),
-                        _dosingInstructionsRow("Dosing Instructions",
-                            _dosageAttributes?['dosingInstructions']),
+                        _selectDosingInstruction(_dosageAttributes?['dosingInstructions']),
                         SizedBox(height: 10),
                         _commentToFulfiller(),
                         SizedBox(height: 10),
@@ -138,27 +145,20 @@ class _MedicationDetailsState extends State<MedicationDetails> {
                               if (!_formKey.currentState!.validate()) {
                                 return;
                               }
-                              _medication.dosingInstructions?.doseUnits =
-                                  _selectedUnitType;
-                              _medication.dosingInstructions?.quantityUnits =
-                                  _selectedUnitType;
-                              _medication.dosingInstructions?.route =
-                                  _selectedRouteType;
-                              showFrequency==true?_medication.dosingInstructions?.frequency =
-                                  _selectedFrequencyType:_medication.dosingInstructions?.frequency =null;
-                              _medication.durationUnits = _selectedDurationType;
-                              _medication.dosingInstructions
-                                      ?.administrationInstructions =
-                                  _selectedDosingInstructions;
-                              _medication.commentToFulfiller =
-                                  _notesController.text;
-                              _medication.dosingInstructions?.quantity =
-                                  totalQuantity;
+                              _drugOrder.dosingInstructions?.doseUnits = _selectedUnitType;
+                              _drugOrder.dosingInstructions?.quantityUnits = _selectedUnitType;
+                              _drugOrder.dosingInstructions?.route = _selectedRouteType;
+                              showFrequency
+                                  ? _drugOrder.dosingInstructions?.frequency = _selectedFrequencyType
+                                  : _drugOrder.dosingInstructions?.frequency = null;
+                              _drugOrder.durationUnits = _selectedDurationType;
+                              _drugOrder.dosingInstructions?.administrationInstructions = _selectedDosingInstructions;
+                              _drugOrder.commentToFulfiller = _notesController.text;
+                              _drugOrder.dosingInstructions?.quantity = totalQuantity;
                               _effectiveStopDate();
-                              Navigator.pop(context, _medication);
+                              Navigator.pop(context, _drugOrder);
                             },
-                            child: const Text('Update',
-                                style: TextStyle(color: Colors.white)),
+                            child: const Text('Update', style: TextStyle(color: Colors.white)),
                           ),
                         ),
                         SizedBox(
@@ -173,7 +173,7 @@ class _MedicationDetailsState extends State<MedicationDetails> {
   }
 
   Widget _medicationDisplay() {
-    String? display = _medication.concept?.name ?? '';
+    String? display = _drugOrder.concept?.name ?? '';
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: Row(
@@ -184,11 +184,22 @@ class _MedicationDetailsState extends State<MedicationDetails> {
             width: 50,
             height: 50,
             decoration: BoxDecoration(
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.shade600,
+                  spreadRadius: 0.5,
+                  blurRadius: 1,
+                ),
+              ],
               borderRadius: BorderRadius.all(Radius.circular(8)),
-              color: Colors.black26,
+              border: Border.all(color: Colors.grey),
+              color: showFrequency ? Colors.grey : Theme.of(context).canvasColor,
             ),
             child: IconButton(
               icon: Icon(Icons.compare_arrows),
+              iconSize: 20,
+              color: showFrequency ? Colors.white : Colors.blue,
+              isSelected: showFrequency,
               onPressed: () {
                 setState(() {
                   showFrequency = !showFrequency;
@@ -201,354 +212,361 @@ class _MedicationDetailsState extends State<MedicationDetails> {
     );
   }
 
-  Widget _unitRow(List<dynamic> items) {
+  Widget _drugDoseUnits(List<dynamic> items) {
       return Container(
-        alignment: Alignment.centerRight,
-        width: 110,
-        child: ValueListenableBuilder<bool>(
-          builder:
-              (BuildContext context, bool allowChange, Widget? child) {
-            return DropdownButtonFormField(
-              value: _selectedUnitType,
-              alignment: Alignment.centerRight,
-              onChanged: (newvalue) {
-                setState(() {
-                  _selectedUnitType = newvalue!;
-                });
-              },
-              items: (items)
-                  .map<DropdownMenuItem<String>>((vt) =>
-                      DropdownMenuItem<String>(
-                          value: vt['name'],
-                          child: Text(vt['name'] ?? 'unknown')))
-                  .toList(),
-              validator: (value) => value == null ? dosingUnitRequired : null,
-            );
+        alignment: Alignment.topRight,
+        //width: 110,
+        child: DropdownButtonFormField(
+          value: _selectedUnitType,
+          alignment: Alignment.centerRight,
+          onChanged: (value) {
+            setState(() {
+              _selectedUnitType = value!;
+            });
           },
-          valueListenable: _typeChangeAllowed,
-        ));
+          items: (items)
+              .map<DropdownMenuItem<String>>((vt) =>
+              DropdownMenuItem<String>(
+                  value: vt['name'],
+                  child: Text(vt['name'] ?? 'unknown')))
+              .toList(),
+          validator: (value) => value == null ? dosingUnitRequired : null,
+        )
+      );
   }
 
-  Padding _routeRow(String lblTitle, List<dynamic> items) {
+  Padding _selectRoutes(List<dynamic> items) {
+    var defaultRouteElement = items.firstWhere((element) {
+      return element['name'] == lblDefaultRoute;
+    }, orElse: () => null);
+    var defaultRoute = defaultRouteElement != null ? defaultRouteElement['name'] : null;
+
     return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16.0),
-        child:
-            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-          Text(lblTitle),
-          Container(
-              alignment: Alignment.centerRight,
-              width: 200,
-              child: ValueListenableBuilder<bool>(
-                builder:
-                    (BuildContext context, bool allowChange, Widget? child) {
-                  return DropdownButtonFormField(
-                    value: _selectedRouteType,
-                    alignment: Alignment.centerRight,
-                    onChanged: (newvalue) {
-                      setState(() {
-                        _selectedRouteType = newvalue!;
-                      });
-                    },
-                    items: (items)
-                        .map<DropdownMenuItem<String>>((vt) =>
-                            DropdownMenuItem<String>(
-                                value: vt['name'],
-                                child: Text(vt['name'] ?? 'unknown')))
-                        .toList(),
-                    validator: (value) => value == null ? routeRequired : null,
-                  );
-                },
-                valueListenable: _typeChangeAllowed,
-              ))
-        ]));
-  }
-
-  Padding _frequencyRow(String lblTitle, List<dynamic> items) {
-    return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-        child:
-            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-          Text(lblTitle),
-          Container(
-              alignment: Alignment.centerRight,
-              width: 200,
-              child: ValueListenableBuilder<bool>(
-                builder:
-                    (BuildContext context, bool allowChange, Widget? child) {
-                  return DropdownButtonFormField(
-                    value: _selectedFrequencyType,
-                    alignment: Alignment.centerRight,
-                    onChanged: (newvalue) {
-                      setState(() {
-                        _selectedFrequencyType = newvalue!;
-                        _updateResult();
-                      });
-                    },
-                    items: (items)
-                        .map<DropdownMenuItem<String>>((vt) =>
-                            DropdownMenuItem<String>(
-                                value: vt['name'],
-                                child: Text(vt['name'] ?? 'unknown')))
-                        .toList(),
-                    validator: (value) => value == null ? frequencyRequired : null,
-                  );
-                },
-                valueListenable: _typeChangeAllowed,
-              ))
-        ]));
-  }
-
-  Widget _durationUnitRow(List<dynamic> items) {
-    return Container(
-      alignment: Alignment.centerRight,
-      width: 150,
-      child: ValueListenableBuilder<bool>(
-        builder:
-            (BuildContext context, bool allowChange, Widget? child) {
-          return DropdownButtonFormField(
-            value: _selectedDurationType,
-            alignment: Alignment.centerRight,
-            onChanged: (newvalue) {
-              setState(() {
-                _selectedDurationType = newvalue!;
-                _updateResult();
-              });
-            },
-            items: (items.where((element) => durationUnits.contains(element['name'])))
-                .map<DropdownMenuItem<String>>((vt) =>
-                    DropdownMenuItem<String>(
-                        value: vt['name'],
-                        child: Text(vt['name'] ?? 'unknown')))
-                .toList(),
-            validator: (value) => value == null ? durationUnitRequired : null,
-          );
-        },
-        valueListenable: _typeChangeAllowed,
-      ));
-  }
-
-  Padding _dosingInstructionsRow(String lblTitle, List<dynamic> items) {
-    return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-        child:
-            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-          Text(lblTitle),
-          Container(
-              alignment: Alignment.centerRight,
-              width: 200,
-              child: ValueListenableBuilder<bool>(
-                builder:
-                    (BuildContext context, bool allowChange, Widget? child) {
-                  return DropdownButtonFormField<String>(
-                    value: _selectedDosingInstructions,
-                    alignment: Alignment.centerRight,
-                    onChanged: (newvalue) {
-                      setState(() {
-                        _selectedDosingInstructions = newvalue!;
-                      });
-                    },
-                    items: (items)
-                        .map<DropdownMenuItem<String>>((vt) =>
-                            DropdownMenuItem<String>(
-                                value: vt['name'],
-                                child: Text(vt['name'] ?? 'unknown')))
-                        .toList(),
-                    validator: (value) => value == null ? dosingInstructionRequired : null,
-                  );
-                },
-                valueListenable: _typeChangeAllowed,
-              ))
-        ]));
-  }
-
-  Padding _doseRow(String lblTitle, TextEditingController controller) {
-    return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-        child:
-            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-          Text(lblTitle),
-          Row(
+        child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                child: Container(
-                  padding: EdgeInsets.only(right: 10,left: 10),
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.all(Radius.circular(8)),
-                    boxShadow: const [
-                      BoxShadow(
-                        blurRadius: 3,
-                        color: Colors.black12
-                      )
-                    ]
+              SizedBox(
+                width: firstColumnWidth,
+                child: Text(lblRoutes),
+              ),
+              Expanded(
+                  child: DropdownButtonFormField(
+                    value: _selectedRouteType ?? defaultRoute,
+                    alignment: Alignment.topRight,
+                    onChanged: (value) {
+                      setState(() {
+                        _selectedRouteType = value! as String?;
+                      });
+                    },
+                    items: (items).map<DropdownMenuItem<String>>((vt) =>
+                        DropdownMenuItem<String>(value: vt['name'], child: Text(vt['name'] ?? 'unknown'))
+                    ).toList(),
+                    validator: (value) => value == null ? routeRequired : null
+                 )
+              )
+            ]
+        )
+    );
+  }
+
+  Padding _selectFrequency(List<dynamic> items) {
+    return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        child:
+            Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  SizedBox(
+                    width: firstColumnWidth,
+                    child: Text(lblFrequency),
                   ),
-                  width: 80,
-                  child: TextFormField(
-                      keyboardType: TextInputType.number,
-                      controller: controller,
-                      validator: (value) => value!.isEmpty ?doseRequired : null,
-                      onTapOutside: (_) {
-                        setState(() {
-                          if (_doseController.text.isNotEmpty) {
-                            _medication.dosingInstructions?.dose =
-                                double.tryParse(_doseController.text);
-                          }
-                          _updateResult();
-                        });
-                      }
+                  Expanded(
+                      child: DropdownButtonFormField(
+                        value: _selectedFrequencyType,
+                        alignment: Alignment.topRight,
+                        onChanged: (value) {
+                          setState(() {
+                            _selectedFrequencyType = value!;
+                            _updateResult();
+                          });
+                        },
+                        items: (items).map<DropdownMenuItem<String>>((vt) =>
+                            DropdownMenuItem<String>(value: vt['name'], child: Text(vt['name'] ?? 'unknown'))
+                        ).toList(),
+                        validator: (value) => value == null ? frequencyRequired : null,
                       ),
+                  ),
+                ]
+            )
+    );
+  }
+
+  Widget _selectDurationUnit(List<dynamic> items) {
+    return SizedBox(
+      child: DropdownButtonFormField(
+        value: _selectedDurationType,
+        alignment: Alignment.topRight,
+        onChanged: (value) {
+          setState(() {
+            _selectedDurationType = value!;
+            _updateResult();
+          });
+        },
+        items: (items.where((element) => durationUnits.contains(element['name']))).map<DropdownMenuItem<String>>((vt) =>
+              DropdownMenuItem<String>(value: vt['name'], child: Text(vt['name'] ?? 'unknown'))
+        ).toList(),
+        validator: (value) => value == null ? durationUnitRequired : null,
+      )
+    );
+  }
+
+  Padding _selectDosingInstruction(List<dynamic> items) {
+    return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              SizedBox(
+                width: firstColumnWidth,
+                child: Text(lblDosingInstructions),
+              ),
+              Expanded(
+                child: DropdownButtonFormField<String>(
+                  value: _selectedDosingInstructions,
+                  alignment: Alignment.topRight,
+                  onChanged: (value) {
+                    setState(() {
+                      _selectedDosingInstructions = value!;
+                    });
+                  },
+                  items: (items).map<DropdownMenuItem<String>>((vt) =>
+                      DropdownMenuItem<String>(value: vt['name'], child: Text(vt['name'] ?? 'unknown'))
+                  ).toList(),
+                  validator: (value) => value == null ? dosingInstructionRequired : null,
                 ),
               ),
-              _unitRow(_dosageAttributes?['doseUnits'])
-            ],
-          ),
-        ]));
+            ]
+        )
+    );
   }
 
-  Padding _durationRow(String lblTitle, TextEditingController controller) {
+  Padding _selectDose() {
     return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16.0),
-        child:
-        Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-          Text(lblTitle),
-          Row(
+        child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                child: Container(
-                  padding: EdgeInsets.only(right: 10,left: 10),
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.all(Radius.circular(8)),
-                      boxShadow: const [
-                        BoxShadow(
-                            blurRadius: 3,
-                            color: Colors.black12
-                        )
-                      ]
-                  ),
-                  width: 80,
-                  child: TextFormField(
+              SizedBox(
+                width: firstColumnWidth,
+                child: Text(lblDose),
+              ),
+              SizedBox(
+                width: 50,
+                child: TextFormField(
+                    keyboardType: TextInputType.number,
+                    controller: _doseController,
+                    textAlign: TextAlign.right,
+                    validator: (value) => value!.isEmpty ?doseRequired : null,
+                    onTapOutside: (_) {
+                      setState(() {
+                        if (_doseController.text.isNotEmpty) {
+                          _drugOrder.dosingInstructions?.dose =
+                              double.tryParse(_doseController.text);
+                        }
+                        _updateResult();
+                      });
+                    }
+                ),
+              ),
+              SizedBox(width: 10),
+              Expanded(
+                child: _drugDoseUnits(_dosageAttributes?['doseUnits']),
+              )
+          ]
+        )
+    );
+  }
+
+  Padding _selectDuration() {
+    return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              SizedBox(
+                width: firstColumnWidth,
+                child: Text(lblDuration),
+              ),
+              SizedBox(
+                width: 50,
+                child: TextFormField(
                       keyboardType: TextInputType.number,
-                      controller: controller,
+                      controller: _durationController,
+                      textAlign: TextAlign.right,
                       validator: (value) => value!.isEmpty ? durationRequired : null,
                       onTapOutside: (_) {
                         setState(() {
                           if(_durationController.text.isNotEmpty){
-                            _medication.duration =
+                            _drugOrder.duration =
                                 int.tryParse(_durationController.text);
                           }
-                          _updateResult();
+                          //TODO
+                          //_updateResult();
                         });
                       }
                   ),
-                ),
               ),
-              _durationUnitRow(_dosageAttributes?['durationUnits'])
-            ],
-          ),
-        ]));
+              SizedBox(
+                width:10,
+              ),
+              //_selectDurationUnit(_dosageAttributes?['durationUnits'])
+              Expanded(
+                child: _selectDurationUnit(_dosageAttributes?['durationUnits'])
+              ),
+            ]
+        )
+    );
   }
 
-  Padding _toggleRow(String lblTitle) {
+  Padding _selectCommonTimes() {
     return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16.0),
         child:
-        Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-          Text(lblTitle),
-          Row(
+        Row(
+            //mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              SizedBox(
+                width: firstColumnWidth,
+                child:Text(lblDose),
+              ),
+              //SizedBox(width: 10,),
+              SizedBox(
+                  width: 80,
+                  child: TextField(
+                    decoration: InputDecoration(
+                      //border: OutlineInputBorder(),
+                      hintText: 'X-X-X',
+                    ),
+                    inputFormatters: [
+                      // FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+                      // LengthLimitingTextInputFormatter(4),
+                      CommonDoseTimeFormatter(pattern: 'X-X-X'),
+                    ],
+                  )
+              ),
+              SizedBox(width: 10,),
+              Expanded(
+                child:_drugDoseUnits(_dosageAttributes?['doseUnits'])
+              ),
+            ]
+        )
+    );
+  }
+
+  // ignore: unused_element
+  Padding _commonTimesRow() {
+    return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        child:
+        Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 3.0),
-                child: Container(
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.all(Radius.circular(8)),
-                      boxShadow: const [
-                        BoxShadow(
-                            blurRadius: 3,
-                            color: Colors.black12
-                        )
-                      ]
-                  ),
-                  width: 50,
-                  child: TextFormField(
-                    keyboardType: TextInputType.number,
-                    decoration: InputDecoration(
-                        border: OutlineInputBorder()
+              Text(lblDose),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 3.0),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.all(Radius.circular(8)),
+                        boxShadow: const [
+                          BoxShadow(
+                              blurRadius: 3,
+                              color: Colors.black12
+                          )
+                        ]
+                      ),
+                      width: 50,
+                      child: TextFormField(
+                        keyboardType: TextInputType.number,
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder()
+                        ),
+                        validator: (value) => value!.isEmpty ? requiredAllTerm:null,
+                        controller: _morningDoseController,
+                        onTapOutside: (_)   {
+                          _morningDoseController.text.isNotEmpty?setState(() {
+                            morningDose = int.tryParse(_morningDoseController.text)!;
+                          }):null;
+                        },
+                      ),
                     ),
-                    validator: (value) => value!.isEmpty ? requiredAllTerm:null,
-                    controller: _morningDoseController,
-                    onTapOutside: (_){
-                      _morningDoseController.text.isNotEmpty?setState(() {
-                        morningDose = int.tryParse(_morningDoseController.text)!;
-                      }):null;
-                    },
                   ),
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 3.0),
-                child: Container(
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.all(Radius.circular(8)),
-                      boxShadow: const [
-                        BoxShadow(
-                            blurRadius: 3,
-                            color: Colors.black12
-                        )
-                      ]
-                  ),
-                  width: 50,
-                  child: TextFormField(
-                    keyboardType: TextInputType.number,
-                    decoration: InputDecoration(
-                        border: OutlineInputBorder()
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 3.0),
+                    child: Container(
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.all(Radius.circular(8)),
+                          boxShadow: const [
+                            BoxShadow(
+                                blurRadius: 3,
+                                color: Colors.black12
+                            )
+                          ]
+                      ),
+                      width: 50,
+                      child: TextFormField(
+                        keyboardType: TextInputType.number,
+                        decoration: InputDecoration(
+                            border: OutlineInputBorder()
+                        ),
+                        controller: _afternoonDoseController,
+                        validator: (value) => value!.isEmpty ? requiredAllTerm:null,
+                        onTapOutside: (_){
+                          _afternoonDoseController.text.isNotEmpty?setState(() {
+                            afternoonDose = int.tryParse(_afternoonDoseController.text)!;
+                          }):null;
+                        },
+                      ),
                     ),
-                    controller: _afternoonDoseController,
-                    validator: (value) => value!.isEmpty ? requiredAllTerm:null,
-                    onTapOutside: (_){
-                      _afternoonDoseController.text.isNotEmpty?setState(() {
-                        afternoonDose = int.tryParse(_afternoonDoseController.text)!;
-                      }):null;
-                    },
                   ),
-                ),
-              ),Padding(
-                padding: EdgeInsets.symmetric(horizontal: 3.0),
-                child: Container(
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.all(Radius.circular(8)),
-                      boxShadow: const [
-                        BoxShadow(
-                            blurRadius: 3,
-                            color: Colors.black12
-                        )
-                      ]
-                  ),
-                  width: 50,
-                  child: TextFormField(
-                      keyboardType: TextInputType.number,
-                    decoration: InputDecoration(
-                        border: OutlineInputBorder()
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 3.0),
+                    child: Container(
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.all(Radius.circular(8)),
+                          boxShadow: const [
+                            BoxShadow(
+                                blurRadius: 3,
+                                color: Colors.black12
+                            )
+                          ]
+                      ),
+                      width: 50,
+                      child: TextFormField(
+                          keyboardType: TextInputType.number,
+                        decoration: InputDecoration(
+                            border: OutlineInputBorder()
+                        ),
+                        controller: _eveningDoseController,
+                        validator: (value) => value!.isEmpty ? requiredAllTerm:null,
+                        onTapOutside: (_){
+                          _eveningDoseController.text.isNotEmpty?setState(() {
+                            eveningDose = int.tryParse(_eveningDoseController.text)!;
+                            _drugOrder.dosingInstructions?.dose =
+                                double.tryParse('$morningDose$afternoonDose$eveningDose.1');
+                          }):null;
+                        },
+                      ),
                     ),
-                    controller: _eveningDoseController,
-                    validator: (value) => value!.isEmpty ? requiredAllTerm:null,
-                    onTapOutside: (_){
-                      _eveningDoseController.text.isNotEmpty?setState(() {
-                        eveningDose = int.tryParse(_eveningDoseController.text)!;
-                        _medication.dosingInstructions?.dose =
-                            double.tryParse('$morningDose$afternoonDose$eveningDose.1');
-                      }):null;
-                    },
                   ),
-                ),
-              ),
-              _unitRow(_dosageAttributes?['doseUnits'])
-            ],
-          )
-        ])
+                  _drugDoseUnits(_dosageAttributes?['doseUnits'])
+                ],
+              )
+          ]
+        )
     );
   }
 
@@ -565,66 +583,65 @@ class _MedicationDetailsState extends State<MedicationDetails> {
       } else if (_selectedDurationType == 'Years') {
         _quantityCalculate(365, doseValue, durationValue);
       }
-      _medication.dosingInstructions?.quantity = totalQuantity;
+      _drugOrder.dosingInstructions?.quantity = totalQuantity;
     });
   }
 
   void _quantityCalculate(double factor, double value1, double value2) {
-    if(showFrequency==true) {
+    if (showFrequency) {
       var frequencyPerDay = _dosageAttributes?['frequencies'].where((element)=> element['name']==_selectedFrequencyType).toList()[0]['frequencyPerDay'];
       totalQuantity = factor * value1 * value2 * frequencyPerDay;
-    }
-    else{
+    } else {
       totalQuantity = factor * value1 * value2;
     }
   }
 
-  Padding _startDateRow(String lblTitle) {
+  Padding _selectStartDate() {
     return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16.0),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(lblTitle),
-            Container(
-              width: 200,
-              alignment: Alignment.centerRight,
+            SizedBox(
+              width: firstColumnWidth,
+              child: Text(lblStartDate),
+            ),
+            Expanded(
               child: TextFormField(
-                  controller: _dateController,
-                  decoration: const InputDecoration(
-                      suffixIcon: Icon(Icons.calendar_today)),
-                  readOnly: true,
-                  validator: (value) => value!.isEmpty ? startDateRequired : null,
-                  onTap: () async {
-                    DateTime? pickedDate = await showDatePicker(
-                        context: context,
-                        initialDate: DateTime.now(),
-                        firstDate: DateTime.now(),
-                        lastDate: DateTime(2101));
-                    if (pickedDate != null) {
-                      String formattedDate =
-                          DateFormat('dd-MMM-yyy').format(pickedDate);
-                      setState(() {
-                        _dateController.text = formattedDate;
-                        _medication.effectiveStartDate = pickedDate;
-                      });
-                    }
-                  }),
+                controller: _dateController,
+                decoration: const InputDecoration(suffixIcon: Icon(Icons.calendar_today_outlined)),
+                readOnly: true,
+                validator: (value) => value!.isEmpty ? startDateRequired : null,
+                onTap: () async {
+                  DateTime? pickedDate = await showDatePicker(
+                      context: context,
+                      initialDate: DateTime.now(),
+                      firstDate: DateTime.now(),
+                      lastDate: DateTime(2101));
+                  if (pickedDate != null) {
+                    String formattedDate = DateFormat('dd-MMM-yyy').format(pickedDate);
+                    setState(() {
+                      _dateController.text = formattedDate;
+                      _drugOrder.effectiveStartDate = pickedDate;
+                    });
+                  }
+                }
+              ),
             ),
           ],
         ));
   }
 
-  Padding _totalQuantityRow(String lblTitle) {
-    String? quantity = _medication.dosingInstructions?.quantity == null
+  Padding _totalQuantityRow() {
+    String? quantity = _drugOrder.dosingInstructions?.quantity == null
         ? totalQuantity.ceil().toString()
-        : _medication.dosingInstructions?.quantity?.ceil().toString();
+        : _drugOrder.dosingInstructions?.quantity?.ceil().toString();
     return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16.0),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(lblTitle),
+            Text(lblTotalQuantity),
             Row(
               children: [
                 Container(
@@ -641,62 +658,89 @@ class _MedicationDetailsState extends State<MedicationDetails> {
   }
 
   Widget _commentToFulfiller() {
-    return TextField(
-      controller: _notesController,
-      decoration: InputDecoration(
-        hintText: lblEnterMedicationNote,
-        enabledBorder: OutlineInputBorder(
-          borderSide: const BorderSide(
-            color: Color(0xFFDBE2E7),
-            width: 2,
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10.0),
+      child: TextField(
+        controller: _notesController,
+        decoration: InputDecoration(
+          hintText: lblEnterMedicationNote,
+          enabledBorder: OutlineInputBorder(
+            borderSide: const BorderSide(
+              color: Color(0xFFDBE2E7),
+              width: 2,
+            ),
+            borderRadius: BorderRadius.circular(8),
           ),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderSide: const BorderSide(
-            color: Color(0xFFDBE2E7),
-            width: 2,
+          focusedBorder: OutlineInputBorder(
+            borderSide: const BorderSide(
+              color: Color(0xFFDBE2E7),
+              width: 2,
+            ),
+            borderRadius: BorderRadius.circular(8),
           ),
-          borderRadius: BorderRadius.circular(8),
+          contentPadding: const EdgeInsetsDirectional.fromSTEB(20, 40, 24, 0),
         ),
-        contentPadding: const EdgeInsetsDirectional.fromSTEB(20, 40, 24, 0),
-      ),
-      maxLines: 8,
-      style: Theme.of(context).textTheme.bodyLarge!.merge(const TextStyle(
-            fontFamily: 'Lexend Deca',
-            color: Color(0xFF1E2429),
-            fontSize: 14,
-            fontWeight: FontWeight.normal,
-          )),
-      textAlign: TextAlign.start,
+        maxLines: 8,
+        style: Theme.of(context).textTheme.bodyLarge!.merge(
+            const TextStyle(
+              fontFamily: 'Lexend Deca',
+              color: Color(0xFF1E2429),
+              fontSize: 14,
+              fontWeight: FontWeight.normal,
+            )
+        ),
+        textAlign: TextAlign.start,
+      )
     );
   }
 
   void _effectiveStopDate(){
-    if(_selectedDurationType == 'Days'){
+    if(_selectedDurationType == 'Days') {
       setState(() {
-        _medication.effectiveStopDate = _medication.effectiveStartDate!.add(Duration(days: int.parse(_durationController.text)));
+        _drugOrder.effectiveStopDate = _drugOrder.effectiveStartDate!.add(Duration(days: int.parse(_durationController.text)));
       });
     }
-    else if(_selectedDurationType == 'Hours'){
+    else if(_selectedDurationType == 'Hours') {
       setState(() {
-        _medication.effectiveStopDate = _medication.effectiveStartDate!.add(Duration(days: int.parse(_durationController.text)));
+        _drugOrder.effectiveStopDate = _drugOrder.effectiveStartDate!.add(Duration(days: int.parse(_durationController.text)));
       });
     }
-    else if(_selectedDurationType == 'Weeks'){
+    else if(_selectedDurationType == 'Weeks') {
       setState(() {
-        _medication.effectiveStopDate = _medication.effectiveStartDate!.add(Duration(days: int.parse(_durationController.text)*7));
+        _drugOrder.effectiveStopDate = _drugOrder.effectiveStartDate!.add(Duration(days: int.parse(_durationController.text)*7));
       });
     }
-    else if(_selectedDurationType == 'Months'){
+    else if(_selectedDurationType == 'Months') {
       setState(() {
-        _medication.effectiveStopDate = _medication.effectiveStartDate!.add(Duration(days: int.parse(_durationController.text)*30));
+        _drugOrder.effectiveStopDate = _drugOrder.effectiveStartDate!.add(Duration(days: int.parse(_durationController.text)*30));
       });
     }
-    else if(_selectedDurationType == 'Years'){
+    else if(_selectedDurationType == 'Years') {
       setState(() {
-        _medication.effectiveStopDate = _medication.effectiveStartDate!.add(Duration(days: int.parse(_durationController.text)*365));
+        _drugOrder.effectiveStopDate = _drugOrder.effectiveStartDate!.add(Duration(days: int.parse(_durationController.text)*365));
       });
     }
+  }
+}
+
+class CommonDoseTimeFormatter extends TextInputFormatter {
+  final String pattern;
+  static const separator = '-';
+
+  CommonDoseTimeFormatter({required this.pattern});
+
+  @override
+  TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
+    if (newValue.text.isNotEmpty) {
+      if (newValue.text.length > oldValue.text.length) {
+        if (newValue.text.length > pattern.length) return oldValue;
+        if (newValue.text.length < pattern.length && pattern[newValue.text.length - 1] == separator) {
+          return TextEditingValue(
+              text: '${oldValue.text}$separator${newValue.text.substring(newValue.text.length - 1)}',
+              selection: TextSelection.collapsed(offset: newValue.selection.end + 1));
+        }
+      }
+    }
+    return newValue;
   }
 }

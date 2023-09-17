@@ -1,20 +1,20 @@
-import 'package:connect2bahmni/domain/models/bahmni_drug_order.dart';
-import 'package:connect2bahmni/domain/models/omrs_order.dart';
-import 'package:connect2bahmni/widgets/investigation_details.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'condition.dart';
-import 'consultation_notes.dart';
+import '../domain/condition_model.dart';
+import '../domain/models/bahmni_drug_order.dart';
 import '../domain/models/form_definition.dart';
+import '../domain/models/omrs_obs.dart';
+import '../domain/models/omrs_order.dart';
 import '../utils/date_time.dart';
 import '../utils/string_utils.dart';
 import '../screens/models/consultation_model.dart';
 import '../screens/models/consultation_board.dart';
 import '../widgets/consultation_context.dart';
-import '../domain/condition_model.dart';
-import '../domain/models/omrs_obs.dart';
+import '../widgets/investigation_details.dart';
+import 'condition.dart';
+import 'consultation_notes.dart';
 import 'medication_details.dart';
 
 class ConsultPadWidget extends StatefulWidget {
@@ -260,91 +260,60 @@ class _ConsultPadWidgetState extends State<ConsultPadWidget> {
           ),
         ),
       ),
-      ...medicationList.asMap().entries.map((el) {
-        final index = el.key;
-        final medication = el.value;
-        return _medicationWidget(medication, index);
-      }).toList()
+      ...medicationList.asMap().entries.map((el) => _medicationListItem(el.value, el.key)).toList()
     ];
   }
-  Widget _medicationWidget(BahmniDrugOrder medication,int index){
-    String? text = medication.concept?.name;
-    String? notes = medication.commentToFulfiller;
-    String? doseValue = medication.dosingInstructions?.dose.toString();
+  Widget _medicationListItem(BahmniDrugOrder medOrder,int index) {
+    String? drugName = medOrder.concept?.name;
+    String? notes = medOrder.commentToFulfiller;
+    String? doseValue = medOrder.dosingInstructions?.dose.toString();
     String? displayValue = doseValue?[doseValue.length - 1] == '1'? doseValue?.substring(0, doseValue.length - 2).split('').join('-') : doseValue?.substring(0, doseValue.length - 2);
-    String? doseUnits = medication.dosingInstructions?.doseUnits;
-    String? startDate = medication.effectiveStartDate!=null ? DateFormat('dd-MMM-yyy').format(medication.effectiveStartDate!).toString():'  ';
-    String? frequency = medication.dosingInstructions?.frequency;
-    String? quantity = medication.dosingInstructions?.quantity?.floor().toString();
-    String? quantityUnits = medication.dosingInstructions?.quantityUnits;
-    String? route = medication.dosingInstructions?.route;
-    String? duration = medication.duration.toString();
-    String? durationUnits = medication.durationUnits;
-    String? administrationInstructions = medication.dosingInstructions?.administrationInstructions;
+    String? doseUnits = medOrder.dosingInstructions?.doseUnits;
+    String? startDate = medOrder.effectiveStartDate!=null ? DateFormat('dd-MMM-yyy').format(medOrder.effectiveStartDate!).toString():'  ';
+    String? frequency = medOrder.dosingInstructions?.frequency;
+    String? quantity = medOrder.dosingInstructions?.quantity?.floor().toString();
+    String? quantityUnits = medOrder.dosingInstructions?.quantityUnits;
+    String? route = medOrder.dosingInstructions?.route;
+    String? duration = medOrder.duration.toString();
+    String? durationUnits = medOrder.durationUnits;
+    String? administrationInstructions = medOrder.dosingInstructions?.administrationInstructions;
+
+    //TODO: Do not show frequency in commonTimes
+    var mainText = TextSpan(
+      text: drugName,
+      style: const TextStyle(color: Colors.black),
+      children: <TextSpan>[
+        TextSpan(text: ' $displayValue $doseUnits, $frequency, $route, $administrationInstructions', style: const TextStyle(fontWeight: FontWeight.w300, fontSize: 12))
+      ],
+    );
+    var subText = TextSpan(
+      text: 'From: $startDate. $duration $durationUnits. Quantity: $quantity $quantityUnits',
+      style: const TextStyle(fontSize: 12),
+      children: <TextSpan>[
+        if (notes != null && notes.isNotEmpty)
+          TextSpan(text: '\nNote: $notes', style: const TextStyle(fontWeight: FontWeight.normal, fontSize: 12))
+      ],
+    );
+
     return Slidable(
         endActionPane: ActionPane(
           motion: const ScrollMotion(),
           children: [
-            _removeMedicationAction(medication),
-            _editMedicationAction(medication, index),
+            _removeMedicationAction(medOrder),
+            _editMedicationAction(medOrder, index),
           ],
         ),
         child: Container(
           color: Theme.of(context).colorScheme.onBackground,
-          child: Column(
-            children: [
-              ListTile(
-              leading: const Icon(
-                Icons.medication_outlined,
-                size: 24,
-              ),
-              title: Text('$text'),
-              tileColor: Colors.red,
-            ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 32.0),
-                child: frequency != null ? Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text('$displayValue $doseUnits,  $frequency,   $administrationInstructions'),
-                  ],
-                ): Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text('$displayValue $doseUnits,   $administrationInstructions'),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 32.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text('$route,   Total: $quantity $quantityUnits'),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 32.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(child: Text('From: $startDate  ➤ $duration $durationUnits')),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 22.0),
-                child: notes!.isNotEmpty ? Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(child: Text('Note: $notes',maxLines: 4)),
-                  ],
-                ):null,
-              ),
-      ]
+          child: ListTile(
+            leading: const Icon(Icons.medication_outlined, size: 24),
+            //title: Text('$drugName'),
+            title: Text.rich(mainText),
+            subtitle: Text.rich(subText),
+            //dense: true,
+            tileColor: Colors.red,
           ),
-        )
+        ),
     );
   }
 
@@ -450,13 +419,13 @@ class _ConsultPadWidgetState extends State<ConsultPadWidget> {
       label: 'Edit',
     );
   }
-  SlidableAction _editMedicationAction(BahmniDrugOrder medication,int index) {
+  SlidableAction _editMedicationAction(BahmniDrugOrder drugOrder,int index) {
     return SlidableAction(
       onPressed: (_) async {
         final edited = await Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => MedicationDetails(medication: medication),
+              builder: (context) => MedicationDetails(medOrder: drugOrder),
             ));
         if (edited != null && context.mounted) {
           var board = Provider.of<ConsultationBoard>(context, listen: false);
