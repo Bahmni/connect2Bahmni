@@ -56,6 +56,7 @@ class _MedicationDetailsState extends State<MedicationDetails> {
   static const lblDosingInstructions = "Instructions";
   // static const lblDosingInstructions = "Dosing Instructions";
   static const lblDefaultRoute = 'Oral';
+  static const careSettingOutPatient = 'OUTPATIENT';
   List<String> durationUnits = ['Days','Weeks','Months','Years'];
   static const firstColumnWidth = 100.0;
 
@@ -66,15 +67,20 @@ class _MedicationDetailsState extends State<MedicationDetails> {
     DoseAttributes? dosageInstructions = Provider.of<MetaProvider>(context, listen: false).dosageInstruction;
     _dosageAttributes = dosageInstructions?.details;
     _drugOrder = widget.medOrder;
+    _drugOrder.careSetting = _drugOrder.careSetting ?? careSettingOutPatient;
     _selectedUnitType = _drugOrder.dosingInstructions?.doseUnits;
     _selectedFrequencyType = _drugOrder.dosingInstructions?.frequency;
-    _selectedRouteType = _drugOrder.dosingInstructions?.route;
+
+    var defaultRouteElement = _dosageAttributes?['routes'].firstWhere((element) {
+      return element['name'] == lblDefaultRoute;
+    }, orElse: () => null);
+    var defaultRoute = defaultRouteElement != null ? defaultRouteElement['name'] : null;
+    _selectedRouteType = _drugOrder.dosingInstructions?.route ?? defaultRoute;
     _selectedDurationType = _drugOrder.durationUnits ?? 'Days';
     _selectedDosingInstructions = _drugOrder.dosingInstructions?.administrationInstructions;
     _notesController.text = _drugOrder.commentToFulfiller ?? '';
-    _dateController.text = _drugOrder.effectiveStartDate == null
-        ? DateFormat('dd-MMM-yyy').format(DateTime.now())
-        : DateFormat('dd-MMM-yyy').format(_drugOrder.effectiveStartDate!);
+    _drugOrder.effectiveStartDate ??= DateTime.now();
+    _dateController.text = DateFormat('dd-MMM-yyy').format(_drugOrder.effectiveStartDate!);
     _durationController.text = _drugOrder.duration?.toString() ?? '';
     String? dose = _drugOrder.dosingInstructions?.dose.toString();
     showFrequency = dose?[dose.length - 1] != '1'? true:false;
@@ -155,7 +161,7 @@ class _MedicationDetailsState extends State<MedicationDetails> {
                               _drugOrder.dosingInstructions?.administrationInstructions = _selectedDosingInstructions;
                               _drugOrder.commentToFulfiller = _notesController.text;
                               _drugOrder.dosingInstructions?.quantity = totalQuantity;
-                              _effectiveStopDate();
+                              _setEffectiveStopDate();
                               Navigator.pop(context, _drugOrder);
                             },
                             child: const Text('Update', style: TextStyle(color: Colors.white)),
@@ -173,7 +179,7 @@ class _MedicationDetailsState extends State<MedicationDetails> {
   }
 
   Widget _medicationDisplay() {
-    String? display = _drugOrder.concept?.name ?? '';
+    String? display = _drugOrder.drug?.name ?? '';
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: Row(
@@ -236,11 +242,6 @@ class _MedicationDetailsState extends State<MedicationDetails> {
   }
 
   Padding _selectRoutes(List<dynamic> items) {
-    var defaultRouteElement = items.firstWhere((element) {
-      return element['name'] == lblDefaultRoute;
-    }, orElse: () => null);
-    var defaultRoute = defaultRouteElement != null ? defaultRouteElement['name'] : null;
-
     return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16.0),
         child: Row(
@@ -252,11 +253,11 @@ class _MedicationDetailsState extends State<MedicationDetails> {
               ),
               Expanded(
                   child: DropdownButtonFormField(
-                    value: _selectedRouteType ?? defaultRoute,
+                    value: _selectedRouteType,
                     alignment: Alignment.topRight,
                     onChanged: (value) {
                       setState(() {
-                        _selectedRouteType = value! as String?;
+                        _selectedRouteType = value!;
                       });
                     },
                     items: (items).map<DropdownMenuItem<String>>((vt) =>
@@ -694,7 +695,7 @@ class _MedicationDetailsState extends State<MedicationDetails> {
     );
   }
 
-  void _effectiveStopDate(){
+  void _setEffectiveStopDate(){
     if(_selectedDurationType == 'Days') {
       setState(() {
         _drugOrder.effectiveStopDate = _drugOrder.effectiveStartDate!.add(Duration(days: int.parse(_durationController.text)));

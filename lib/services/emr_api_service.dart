@@ -94,6 +94,7 @@ class EmrApiService extends DomainService {
         'bahmniDiagnoses': _diagnosesPayload(consultation, encounterDateTime),
         'observations': [..._obsPayload(consultation, encounterDateTime), ..._formObservations(consultation, encounterDateTime)],
         'orders': _txOrders(consultation, encounterDateTime),
+        'drugOrders': _txDrugOrders(consultation, encounterDateTime),
       };
   }
 
@@ -225,6 +226,37 @@ class EmrApiService extends DomainService {
       });
     }
     return orders;
+  }
+
+  List<Map<String, dynamic>> _txDrugOrders(ConsultationModel consultation, DateTime encounterDateTime) {
+    return consultation.medicationList.map((drugOrder) {
+      var administrationInstructions = drugOrder.dosingInstructions?.administrationInstructions ?? '';
+      var note = drugOrder.commentToFulfiller ?? '';
+      return {
+        'careSetting': drugOrder.careSetting,
+        'orderType': 'Drug Order',
+        'dosingInstructionType': 'org.openmrs.module.bahmniemrapi.drugorder.dosinginstructions.FlexibleDosingInstructions',
+        'drug': {
+          'uuid': drugOrder.drug?.uuid,
+        },
+        'dosingInstructions': {
+          'dose': drugOrder.dosingInstructions?.dose,
+          'doseUnits': drugOrder.dosingInstructions?.doseUnits,
+          'route': drugOrder.dosingInstructions?.route,
+          'frequency': drugOrder.dosingInstructions?.frequency,
+          'asNeeded': drugOrder.dosingInstructions?.asNeeded ?? false,
+          'administrationInstructions': "{\"instructions\":\"$administrationInstructions\",\"additionalInstructions\":\"$note\"}",
+          'quantity': drugOrder.dosingInstructions?.quantity,
+          'quantityUnits': drugOrder.dosingInstructions?.quantityUnits,
+          'numberOfRefills': 0,
+        },
+        "duration": drugOrder.duration,
+        "durationUnits": drugOrder.durationUnits,
+        "scheduledDate": drugOrder.scheduledDate?.toUtc().toIso8601String(),
+        "autoExpireDate": null,
+        "dateStopped": null,
+      };
+    }).toList();
   }
 
 }

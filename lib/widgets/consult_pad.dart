@@ -263,8 +263,9 @@ class _ConsultPadWidgetState extends State<ConsultPadWidget> {
       ...medicationList.asMap().entries.map((el) => _medicationListItem(el.value, el.key)).toList()
     ];
   }
+
   Widget _medicationListItem(BahmniDrugOrder medOrder,int index) {
-    String? drugName = medOrder.concept?.name;
+    String? drugName = medOrder.drug?.name;
     String? notes = medOrder.commentToFulfiller;
     String? doseValue = medOrder.dosingInstructions?.dose.toString();
     String? displayValue = doseValue?[doseValue.length - 1] == '1'? doseValue?.substring(0, doseValue.length - 2).split('').join('-') : doseValue?.substring(0, doseValue.length - 2);
@@ -362,6 +363,7 @@ class _ConsultPadWidgetState extends State<ConsultPadWidget> {
       ),
     );
   }
+
   SlidableAction _removeInvestigationAction(OmrsOrder investigation){
     return SlidableAction(
         onPressed: (context){
@@ -374,6 +376,7 @@ class _ConsultPadWidgetState extends State<ConsultPadWidget> {
       label: 'Remove',
     );
   }
+
   SlidableAction _removeMedicationAction(BahmniDrugOrder medication){
     return SlidableAction(
       onPressed: (context){
