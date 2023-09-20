@@ -63,7 +63,7 @@ class ConsultationBoard extends ChangeNotifier {
     }
     return _currentConsultation!.save().then((value) {
       notifyListeners();
-      return true;
+      return value;
     });
   }
 

@@ -22,6 +22,7 @@ class _MedicationDetailsState extends State<MedicationDetails> {
   String? _selectedFrequencyType;
   String? _selectedDurationType;
   String? _selectedDosingInstructions;
+  DateTime? _effectiveStartDate;
   late BahmniDrugOrder _drugOrder;
   late final Map<dynamic, dynamic>? _dosageAttributes;
   final TextEditingController _notesController = TextEditingController();
@@ -34,6 +35,7 @@ class _MedicationDetailsState extends State<MedicationDetails> {
   static const lblAddMedication = "Add Medication";
   static const lblEnterMedicationNote = "Enter note for the medication";
   double totalQuantity = 0.0;
+  late ValueNotifier<double> _totalQuantityNotifier;
   bool showFrequency=true;
   int morningDose=0;
   int afternoonDose=0;
@@ -79,8 +81,8 @@ class _MedicationDetailsState extends State<MedicationDetails> {
     _selectedDurationType = _drugOrder.durationUnits ?? 'Days';
     _selectedDosingInstructions = _drugOrder.dosingInstructions?.administrationInstructions;
     _notesController.text = _drugOrder.commentToFulfiller ?? '';
-    _drugOrder.effectiveStartDate ??= DateTime.now();
-    _dateController.text = DateFormat('dd-MMM-yyy').format(_drugOrder.effectiveStartDate!);
+    _effectiveStartDate = _drugOrder.effectiveStartDate ?? DateTime.now();
+    _dateController.text = DateFormat('dd-MMM-yyy').format(_effectiveStartDate!);
     _durationController.text = _drugOrder.duration?.toString() ?? '';
     String? dose = _drugOrder.dosingInstructions?.dose.toString();
     showFrequency = dose?[dose.length - 1] != '1'? true:false;
@@ -93,6 +95,8 @@ class _MedicationDetailsState extends State<MedicationDetails> {
       DosingInstructions newDosingInstructions = DosingInstructions();
       _drugOrder.dosingInstructions = newDosingInstructions;
     }
+    totalQuantity = _drugOrder.dosingInstructions?.quantity ?? 0.0;
+    _totalQuantityNotifier = ValueNotifier<double>(totalQuantity);
   }
 
   @override
@@ -133,7 +137,7 @@ class _MedicationDetailsState extends State<MedicationDetails> {
                         SizedBox(height: 10),
                         _selectStartDate(),
                         SizedBox(height: 15),
-                        _totalQuantityRow(),
+                        _totalQuantityDisplay(),
                         SizedBox(height: 15),
                         _selectDosingInstruction(_dosageAttributes?['dosingInstructions']),
                         SizedBox(height: 10),
@@ -157,11 +161,16 @@ class _MedicationDetailsState extends State<MedicationDetails> {
                               showFrequency
                                   ? _drugOrder.dosingInstructions?.frequency = _selectedFrequencyType
                                   : _drugOrder.dosingInstructions?.frequency = null;
+                              if (_durationController.text.isNotEmpty) {
+                                _drugOrder.duration = int.tryParse(_durationController.text);
+                              }
                               _drugOrder.durationUnits = _selectedDurationType;
                               _drugOrder.dosingInstructions?.administrationInstructions = _selectedDosingInstructions;
                               _drugOrder.commentToFulfiller = _notesController.text;
                               _drugOrder.dosingInstructions?.quantity = totalQuantity;
-                              _setEffectiveStopDate();
+                              _drugOrder.dosingInstructions?.dose = double.tryParse(_doseController.text);
+                              _drugOrder.effectiveStartDate = _effectiveStartDate;
+                              _drugOrder.effectiveStopDate = _calculateEffectiveStopDate(_effectiveStartDate!, _selectedDurationType!);
                               Navigator.pop(context, _drugOrder);
                             },
                             child: const Text('Update', style: TextStyle(color: Colors.white)),
@@ -185,7 +194,9 @@ class _MedicationDetailsState extends State<MedicationDetails> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(display, style: TextStyle(fontSize: 20)),
+          Flexible(
+            child: Text(display, style: TextStyle(fontSize: 20)),
+          ),
           Container(
             width: 50,
             height: 50,
@@ -221,21 +232,15 @@ class _MedicationDetailsState extends State<MedicationDetails> {
   Widget _drugDoseUnits(List<dynamic> items) {
       return Container(
         alignment: Alignment.topRight,
-        //width: 110,
         child: DropdownButtonFormField(
           value: _selectedUnitType,
-          alignment: Alignment.centerRight,
+          alignment: Alignment.topLeft,
           onChanged: (value) {
-            setState(() {
-              _selectedUnitType = value!;
-            });
+            _selectedUnitType = value!;
           },
-          items: (items)
-              .map<DropdownMenuItem<String>>((vt) =>
-              DropdownMenuItem<String>(
-                  value: vt['name'],
-                  child: Text(vt['name'] ?? 'unknown')))
-              .toList(),
+          items: (items).map<DropdownMenuItem<String>>((vt) =>
+              DropdownMenuItem<String>(value: vt['name'], child: Text(vt['name'] ?? 'unknown'))
+          ).toList(),
           validator: (value) => value == null ? dosingUnitRequired : null,
         )
       );
@@ -254,11 +259,9 @@ class _MedicationDetailsState extends State<MedicationDetails> {
               Expanded(
                   child: DropdownButtonFormField(
                     value: _selectedRouteType,
-                    alignment: Alignment.topRight,
+                    alignment: Alignment.topLeft,
                     onChanged: (value) {
-                      setState(() {
-                        _selectedRouteType = value!;
-                      });
+                      _selectedRouteType = value!;
                     },
                     items: (items).map<DropdownMenuItem<String>>((vt) =>
                         DropdownMenuItem<String>(value: vt['name'], child: Text(vt['name'] ?? 'unknown'))
@@ -285,11 +288,11 @@ class _MedicationDetailsState extends State<MedicationDetails> {
                   Expanded(
                       child: DropdownButtonFormField(
                         value: _selectedFrequencyType,
-                        alignment: Alignment.topRight,
+                        alignment: Alignment.topLeft,
                         onChanged: (value) {
                           setState(() {
                             _selectedFrequencyType = value!;
-                            _updateResult();
+                            _updateTotalQuantity();
                           });
                         },
                         items: (items).map<DropdownMenuItem<String>>((vt) =>
@@ -307,11 +310,11 @@ class _MedicationDetailsState extends State<MedicationDetails> {
     return SizedBox(
       child: DropdownButtonFormField(
         value: _selectedDurationType,
-        alignment: Alignment.topRight,
+        alignment: Alignment.topLeft,
         onChanged: (value) {
           setState(() {
             _selectedDurationType = value!;
-            _updateResult();
+            _updateTotalQuantity();
           });
         },
         items: (items.where((element) => durationUnits.contains(element['name']))).map<DropdownMenuItem<String>>((vt) =>
@@ -367,16 +370,12 @@ class _MedicationDetailsState extends State<MedicationDetails> {
                 child: TextFormField(
                     keyboardType: TextInputType.number,
                     controller: _doseController,
-                    textAlign: TextAlign.right,
+                    textAlign: TextAlign.left,
                     validator: (value) => value!.isEmpty ?doseRequired : null,
-                    onTapOutside: (_) {
-                      setState(() {
-                        if (_doseController.text.isNotEmpty) {
-                          _drugOrder.dosingInstructions?.dose =
-                              double.tryParse(_doseController.text);
-                        }
-                        _updateResult();
-                      });
+                    onChanged: (_) {
+                      if (_doseController.text.isNotEmpty) {
+                        _updateTotalQuantity();
+                      }
                     }
                 ),
               ),
@@ -404,24 +403,18 @@ class _MedicationDetailsState extends State<MedicationDetails> {
                 child: TextFormField(
                       keyboardType: TextInputType.number,
                       controller: _durationController,
-                      textAlign: TextAlign.right,
+                      textAlign: TextAlign.left,
                       validator: (value) => value!.isEmpty ? durationRequired : null,
-                      onTapOutside: (_) {
-                        setState(() {
-                          if(_durationController.text.isNotEmpty){
-                            _drugOrder.duration =
-                                int.tryParse(_durationController.text);
-                          }
-                          //TODO
-                          //_updateResult();
-                        });
+                      onChanged: (_) {
+                        if (_durationController.text.isNotEmpty) {
+                          _updateTotalQuantity();
+                        }
                       }
                   ),
               ),
               SizedBox(
                 width:10,
               ),
-              //_selectDurationUnit(_dosageAttributes?['durationUnits'])
               Expanded(
                 child: _selectDurationUnit(_dosageAttributes?['durationUnits'])
               ),
@@ -571,29 +564,32 @@ class _MedicationDetailsState extends State<MedicationDetails> {
     );
   }
 
-  void _updateResult() {
-    double doseValue = showFrequency == true ? double.tryParse(_doseController.text) ?? 0.0 : (morningDose+afternoonDose+eveningDose).toDouble();
+  void _updateTotalQuantity() {
+    double doseValue = showFrequency ? double.tryParse(_doseController.text) ?? 0.0 : (morningDose+afternoonDose+eveningDose).toDouble();
     double durationValue = double.tryParse(_durationController.text) ?? 0.0;
     setState(() {
       if (_selectedDurationType == 'Days') {
-        _quantityCalculate(1, doseValue, durationValue);
+        totalQuantity = _calculateQuantity(1, doseValue, durationValue);
       } else if (_selectedDurationType == 'Weeks') {
-        _quantityCalculate(7, doseValue, durationValue);
+        totalQuantity = _calculateQuantity(7, doseValue, durationValue);
       } else if (_selectedDurationType == 'Months') {
-        _quantityCalculate(30, doseValue, durationValue);
+        totalQuantity = _calculateQuantity(30, doseValue, durationValue);
       } else if (_selectedDurationType == 'Years') {
-        _quantityCalculate(365, doseValue, durationValue);
+        totalQuantity = _calculateQuantity(365, doseValue, durationValue);
       }
-      _drugOrder.dosingInstructions?.quantity = totalQuantity;
+      _totalQuantityNotifier.value = totalQuantity;
     });
   }
 
-  void _quantityCalculate(double factor, double value1, double value2) {
+  double _calculateQuantity(double factor, double value1, double value2) {
+    if (_selectedFrequencyType == null) {
+      return 0.0;
+    }
     if (showFrequency) {
       var frequencyPerDay = _dosageAttributes?['frequencies'].where((element)=> element['name']==_selectedFrequencyType).toList()[0]['frequencyPerDay'];
-      totalQuantity = factor * value1 * value2 * frequencyPerDay;
+      return factor * value1 * value2 * frequencyPerDay;
     } else {
-      totalQuantity = factor * value1 * value2;
+      return factor * value1 * value2;
     }
   }
 
@@ -621,10 +617,8 @@ class _MedicationDetailsState extends State<MedicationDetails> {
                       lastDate: DateTime(2101));
                   if (pickedDate != null) {
                     String formattedDate = DateFormat('dd-MMM-yyy').format(pickedDate);
-                    setState(() {
-                      _dateController.text = formattedDate;
-                      _drugOrder.effectiveStartDate = pickedDate;
-                    });
+                    _effectiveStartDate = pickedDate;
+                    _dateController.text = formattedDate;
                   }
                 }
               ),
@@ -633,29 +627,35 @@ class _MedicationDetailsState extends State<MedicationDetails> {
         ));
   }
 
-  Padding _totalQuantityRow() {
-    String? quantity = _drugOrder.dosingInstructions?.quantity == null
-        ? totalQuantity.ceil().toString()
-        : _drugOrder.dosingInstructions?.quantity?.ceil().toString();
-    return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(lblTotalQuantity),
-            Row(
+  Widget _totalQuantityDisplay() {
+    return ValueListenableBuilder<double>(
+      builder: (BuildContext context, double value, Widget? child) {
+        // String? quantity = _drugOrder.dosingInstructions?.quantity == null
+        //     ? totalQuantity.ceil().toString()
+        //     : _drugOrder.dosingInstructions?.quantity?.ceil().toString();
+        return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Container(
-                  padding: EdgeInsets.only(right: 10),
-                  width: 150,
-                  alignment: Alignment.centerRight,
-                  child: Text(quantity.toString()),
+                Text(lblTotalQuantity),
+                Row(
+                  children: [
+                    Container(
+                      padding: EdgeInsets.only(right: 10),
+                      width: 150,
+                      alignment: Alignment.centerRight,
+                      child: Text(value.ceil().toString()),
+                    ),
+                    _selectedUnitType != null ? Text("$_selectedUnitType") : Padding(padding: EdgeInsets.zero)
+                  ],
                 ),
-                _selectedUnitType != null?Text("$_selectedUnitType"):Padding(padding: EdgeInsets.zero)
               ],
-            ),
-          ],
-        ));
+            )
+        );
+      },
+      valueListenable: _totalQuantityNotifier,
+    );
   }
 
   Widget _commentToFulfiller() {
@@ -695,31 +695,21 @@ class _MedicationDetailsState extends State<MedicationDetails> {
     );
   }
 
-  void _setEffectiveStopDate(){
-    if(_selectedDurationType == 'Days') {
-      setState(() {
-        _drugOrder.effectiveStopDate = _drugOrder.effectiveStartDate!.add(Duration(days: int.parse(_durationController.text)));
-      });
-    }
-    else if(_selectedDurationType == 'Hours') {
-      setState(() {
-        _drugOrder.effectiveStopDate = _drugOrder.effectiveStartDate!.add(Duration(days: int.parse(_durationController.text)));
-      });
-    }
-    else if(_selectedDurationType == 'Weeks') {
-      setState(() {
-        _drugOrder.effectiveStopDate = _drugOrder.effectiveStartDate!.add(Duration(days: int.parse(_durationController.text)*7));
-      });
-    }
-    else if(_selectedDurationType == 'Months') {
-      setState(() {
-        _drugOrder.effectiveStopDate = _drugOrder.effectiveStartDate!.add(Duration(days: int.parse(_durationController.text)*30));
-      });
-    }
-    else if(_selectedDurationType == 'Years') {
-      setState(() {
-        _drugOrder.effectiveStopDate = _drugOrder.effectiveStartDate!.add(Duration(days: int.parse(_durationController.text)*365));
-      });
+  DateTime? _calculateEffectiveStopDate(DateTime startDate, String durationType) {
+    switch (durationType) {
+      case 'Hours':
+        //TODO fix it
+        return startDate.add(Duration(hours: int.parse(_durationController.text)));
+      case 'Days':
+        return startDate.add(Duration(days: int.parse(_durationController.text)));
+      case 'Weeks':
+        return startDate.add(Duration(days: int.parse(_durationController.text)*7));
+      case 'Months':
+        return startDate.add(Duration(days: int.parse(_durationController.text)*30));
+      case 'Years':
+        return startDate.add(Duration(days: int.parse(_durationController.text)*365));
+      default:
+        return null;
     }
   }
 }
