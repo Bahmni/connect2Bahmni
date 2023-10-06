@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:connect2bahmni/utils/environment.dart';
 import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
@@ -24,7 +24,7 @@ void main() async {
   Logger.root.onRecord.listen((record) {
     debugPrint('${record.level.name}: ${record.time}: ${record.message}');
   });
-  await dotenv.load(fileName: ".env");
+  Environment().initialize();
   runApp(const MyApp());
 }
 

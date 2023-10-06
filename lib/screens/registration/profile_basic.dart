@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
@@ -11,6 +10,7 @@ import '../models/profile_model.dart';
 import '../../domain/models/omrs_identifier_type.dart';
 import '../../providers/meta_provider.dart';
 import '../../utils/date_time.dart';
+import '../../utils/environment.dart';
 import '../../widgets/form_fields.dart';
 
 class BasicProfile extends StatefulWidget {
@@ -59,10 +59,10 @@ class _BasicProfileState extends State<BasicProfile> {
     _lastName = widget.basicDetails?.lastName ?? '';
     _gender = widget.basicDetails?.gender?.name ?? '';
     _birthDate = widget.basicDetails?.dateOfBirth;
-    _abdmIdentifierNames = dotenv.get('abdm.identifiers', fallback: '').split(',');
+    _abdmIdentifierNames = Environment().abdmIdentifiers!.split(',');
 
     var metaProvider = Provider.of<MetaProvider>(context, listen: false);
-    var idNames = dotenv.get('app.additionalIdentifiers', fallback: '').split(',');
+    var idNames = Environment().additionalIdentifiers!.split(',');
     idNames.where((name) => name.trim().isNotEmpty).forEach((name) {
       metaProvider.patientIdentifierTypes?.where((idType) {
         if (_isPrimaryIdenfier(idType)) return false;

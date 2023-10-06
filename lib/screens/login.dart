@@ -5,7 +5,6 @@ import '../providers/auth.dart';
 import '../utils/validators.dart';
 import '../providers/user_provider.dart';
 import '../utils/app_routes.dart';
-import '../providers/meta_provider.dart';
 
 const locationAttributeName = 'Login Locations';
 
@@ -56,7 +55,7 @@ class _LoginState extends State<Login> {
     );
   }
 
-  void _doLogin() {
+  void _doLogin() async {
     if (_formKey.currentState!.validate()) {
       UserPreferences().removeSession();
       _formKey.currentState!.save();
@@ -65,7 +64,6 @@ class _LoginState extends State<Login> {
         if (response.status) {
           var session = response.session!;
           Provider.of<UserProvider>(context, listen: false).setUser(session.user);
-          Provider.of<MetaProvider>(context, listen: false).initialize();
           var providerLoginLocations = session.user.provider?.attrValue(locationAttributeName);
           if (providerLoginLocations != null && providerLoginLocations.isNotEmpty) {
             var assignedLocations = <String, String>{};

@@ -16,11 +16,19 @@ class PatientConditionList extends StatefulWidget {
 class _PatientConditionListState extends State<PatientConditionList> {
   static const lblEncounterDiagnoses = 'Encounter Diagnoses';
   static const lblNoEncounterDiagnosisFound = 'None found';
+  Future<List<ConditionModel>>? _futureDiagnoses;
+
+  @override
+  void initState() {
+    super.initState();
+    _futureDiagnoses = EmrApiService().searchCondition(OmrsPatient(uuid: widget.patientUuid));
+  }
+
   @override
   Widget build(BuildContext context) {
-    Future<List<ConditionModel>> futureDiagnoses = EmrApiService().searchCondition(OmrsPatient(uuid: widget.patientUuid));
+
     return FutureBuilder<List<ConditionModel>>(
-        future: futureDiagnoses,
+        future: _futureDiagnoses,
         initialData: const [],
         builder: (BuildContext context, AsyncSnapshot<List<ConditionModel>> snapshot) {
           if (snapshot.connectionState != ConnectionState.done) {

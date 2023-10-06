@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
-
 import '../../providers/meta_provider.dart';
+import '../../utils/environment.dart';
 import '../models/profile_model.dart';
 import 'profile_controller.dart';
 
@@ -46,7 +45,7 @@ class _ProfileAttributesState extends State<ProfileAttributes> {
 
   void _init() {
     var metaProvider = Provider.of<MetaProvider>(context, listen: false);
-    List<String> attributes = dotenv.get('app.patientAttributes', fallback: '').split(',');
+    List<String> attributes = Environment().patientAttributeNames!.split(',');
     attributes.where((name) => name.trim().isNotEmpty).forEach((name) {
       name = name.trim();
       var mandatory = false;

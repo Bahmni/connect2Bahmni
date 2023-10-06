@@ -1,3 +1,4 @@
+import 'dart:async';
 import '../domain/models/dosage_instruction.dart';
 import '../domain/models/form_definition.dart';
 import '../domain/models/omrs_identifier_type.dart';
@@ -5,7 +6,6 @@ import '../domain/models/omrs_order.dart';
 import '../domain/models/omrs_person_attribute.dart';
 import '../services/emr_api_service.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import '../domain/models/omrs_concept.dart';
 import '../domain/models/omrs_encounter_type.dart';
 import '../services/concept_dictionary.dart';
@@ -13,6 +13,7 @@ import '../domain/models/omrs_visit_type.dart';
 import '../services/encounters.dart';
 import '../services/forms.dart';
 import '../services/patients.dart';
+import '../utils/environment.dart';
 
 class MetaProvider with ChangeNotifier {
   OmrsConcept? _conditionCertainty;
@@ -41,24 +42,21 @@ class MetaProvider with ChangeNotifier {
 
   List<OmrsVisitType>? get allowedVisitTypes {
     if (_visitTypes == null) return [];
-    var allowedList = dotenv.get('app.allowedVisitTypes', fallback: '')
-        .split(',')
+    var allowedList = Environment().allowedVisitTypes!.split(',')
         .map((e) => e.trim().toLowerCase()).toList();
     return _visitTypes!.where((e) => allowedList.contains(e.display?.toLowerCase())).toList();
   }
 
   List<OmrsEncounterType>? get allowedEncTypes {
     if (_encTypes == null) return [];
-    var allowedList = dotenv.get('app.allowedEncTypes', fallback: '')
-        .split(',')
+    var allowedList = Environment().allowedEncounterTypes!.split(',')
         .map((e) => e.trim().toLowerCase()).toList();
     return _encTypes!.where((e) => allowedList.contains(e.display?.toLowerCase())).toList();
   }
 
   List<FormResource> get observationForms {
     if (_publishedForms == null) return [];
-    var allowedList = dotenv.get('bahmni.obsForms', fallback: '')
-        .split(',')
+    var allowedList = Environment().obsFormNames!.split(',')
         .map((e) => e.trim().toLowerCase()).toList();
     return _publishedForms!.where((form) => allowedList.contains(form.name.toLowerCase())).toList();
   }
@@ -92,7 +90,7 @@ class MetaProvider with ChangeNotifier {
       notifyListeners();
     }).catchError((e) => _logError(e));
 
-    var consultConceptUuid = dotenv.get('app.conceptConsultationNotes', fallback: '');
+    var consultConceptUuid = Environment().consultationNoteConcept!;
     if (consultConceptUuid.isNotEmpty) {
       ConceptDictionary().fetchConceptByUuid(consultConceptUuid).then((value) {
         _consultNoteConcept = value;
@@ -113,8 +111,43 @@ class MetaProvider with ChangeNotifier {
     }).onError((error, stackTrace) => _logError(error));
   }
 
+  Future<bool> initMetaData() {
+    var consultConceptUuid = Environment().consultationNoteConcept!;
+    return Future.wait(
+      [
+        ConceptDictionary().fetchDiagnosisCertainty(),
+        ConceptDictionary().fetchDiagnosisOrder(),
+        Encounters().visitTypes(),
+        Encounters().encTypes(),
+        Patients().identifierTypes(),
+        Patients().attributeTypes(),
+        EmrApiService().orderTypes(),
+        ConceptDictionary().fetchConceptByUuid(consultConceptUuid),
+        BahmniForms().published(),
+        ConceptDictionary().dosageInstruction(),
+      ]
+    ).then((List<Object?> values) {
+      debugPrint('initMetaData: metadata loaded');
+      _conditionCertainty = values[0] as OmrsConcept?;
+      _diagnosisOrder = values[1] as OmrsConcept?;
+      _visitTypes = values[2] as List<OmrsVisitType>?;
+      _encTypes = values[3] as List<OmrsEncounterType>?;
+      _patientIdentifierTypes = values[4] as List<OmrsIdentifierType>?;
+      _personAttrTypes = values[5] as List<OmrsPersonAttributeType>?;
+      _orderTypes = values[6] as List<OmrsOrderType>?;
+      _consultNoteConcept = values[7] as OmrsConcept?;
+      _publishedForms = values[8] as List<FormResource>?;
+      _dosageInstructions = values[9] as DoseAttributes?;
+      notifyListeners();
+      return true;
+    }).catchError((error, stackTrace) {
+      _logError(error);
+      return false;
+    });
+  }
+
   _logError(e) {
     debugPrint(e);
   }
-
 }
+

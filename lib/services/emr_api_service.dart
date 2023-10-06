@@ -16,7 +16,9 @@ class EmrApiService extends DomainService {
   static const errLocationRequired = 'Location is required';
   static const errVisitTypeRequired = 'Visit type is required';
   static const errEncTypeRequired = 'Encounter type is required';
-  static const errConsultationNoteRequired = 'Consultation note is required';
+  static const errConsultationPatientRequired = 'Patient not specified';
+  static const errConsultationPractitionerRequired = 'Practitioner not specified';
+  static const errEmptyConsultationCannotBeSaved = 'Consultation is empty';
 
   Future<List<ConditionModel>> searchCondition(OmrsPatient patient) async {
     String? sessionId = await UserPreferences().getSessionId();
@@ -37,7 +39,7 @@ class EmrApiService extends DomainService {
       var responseJson = jsonDecode(response.body);
       return List<ConditionModel>.from(responseJson.map((v) => ConditionModel.fromPatientDiagnosis(patient, v)));
     } else {
-      throw 'Failed to fetch Diagnoses';
+      throw handleErrorResponse(response);
     }
   }
 
@@ -100,12 +102,21 @@ class EmrApiService extends DomainService {
 
   List<Failure> validate(ConsultationModel consultation) {
     List<Failure> validationResults = [];
+    consultation.patient ?? validationResults.add(Failure(errConsultationPatientRequired));
+    consultation.user.provider ?? validationResults.add(Failure(errConsultationPractitionerRequired));
     consultation.location ?? validationResults.add(Failure(errLocationRequired));
     consultation.visitType ?? validationResults.add(Failure(errVisitTypeRequired));
     consultation.encounterType ?? validationResults.add(Failure(errEncTypeRequired));
-    if (consultation.consultNote?.concept.uuid == null) {
-      validationResults.add(Failure(errConsultationNoteRequired));
+
+    var isEmptyConsultation = consultation.diagnosisList.isEmpty && consultation.observationForms.isEmpty
+      && consultation.medicationList.isEmpty && consultation.investigationList.isEmpty
+      && consultation.consultNote == null;
+    if (isEmptyConsultation) {
+      validationResults.add(Failure(errEmptyConsultationCannotBeSaved));
     }
+    // if (consultation.consultNote?.concept.uuid == null) {
+    //   validationResults.add(Failure(errConsultationNoteRequired));
+    // }
     return validationResults;
   }
 

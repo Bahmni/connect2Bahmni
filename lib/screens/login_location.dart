@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../providers/meta_provider.dart';
 import '../services/locations.dart';
 import '../providers/auth.dart';
 import '../domain/models/omrs_location.dart';
@@ -22,17 +23,34 @@ const lblLoginLocation = 'Login Location';
 class _LoginLocationState extends State<LoginLocation> {
   final _formKey = GlobalKey<FormState>();
   String? selectedValue;
+  Future<List<OmrsLocation>>? _locationsFuture;
+
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    Map? assignedLocations = ModalRoute.of(context)?.settings.arguments as Map?;
+    _locationsFuture = Future.wait(
+        [
+          (assignedLocations != null)  ? _fetchPresetLoginLocations(assignedLocations) : _fetchAllLoginLocations(),
+          Provider.of<MetaProvider>(context, listen: false).initMetaData(),
+        ]
+    ).then((List<Object?> values) {
+      if (values.isEmpty) {
+        return List<OmrsLocation>.empty();
+      }
+      return (values[0] as List).map((e) => e as OmrsLocation).toList();
+    }).catchError((error, stackTrace) {
+      return List<OmrsLocation>.empty();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    Map? assignedLocations = ModalRoute.of(context)?.settings.arguments as Map?;
-    Future<List<DropdownMenuItem<String>>> locationsFuture = (assignedLocations != null)
-        ? _fetchPresetLoginLocations(assignedLocations)
-        : _fetchAllLoginLocations();
-    return FutureBuilder<List<DropdownMenuItem<String>>>(
-        future: locationsFuture,
+    return FutureBuilder<List<OmrsLocation>>(
+        future: _locationsFuture,
         initialData: const [],
-        builder: (BuildContext context, AsyncSnapshot<List<DropdownMenuItem<String>>> snapshot) {
+        builder: (BuildContext context, AsyncSnapshot<List<OmrsLocation>> snapshot) {
           if (snapshot.connectionState != ConnectionState.done) {
             return const Center(
               child: CircularProgressIndicator(),
@@ -51,7 +69,7 @@ class _LoginLocationState extends State<LoginLocation> {
     );
   }
 
-  Scaffold _locationForm(BuildContext context, List<DropdownMenuItem<String>> locationList) {
+  Scaffold _locationForm(BuildContext context, List<OmrsLocation> locationList) {
     return Scaffold(
         appBar: AppBar(
           automaticallyImplyLeading: false,
@@ -84,7 +102,7 @@ class _LoginLocationState extends State<LoginLocation> {
                         selectedValue = newVal;
                       },
                       hint: const Text(lblLoginLocation),
-                      items: locationList
+                      items: locationList.map((element) => DropdownMenuItem(value: element.uuid, child: Text(element.name ?? 'unknown'))).toList()
                   ),
                   const SizedBox(height: 10.0),
                   Container(
@@ -117,19 +135,15 @@ class _LoginLocationState extends State<LoginLocation> {
     );
   }
 
-  Future<List<DropdownMenuItem<String>>> _fetchPresetLoginLocations(Map locationsMap) {
-    List<DropdownMenuItem<String>> locationList = [];
+  Future<List<OmrsLocation>> _fetchPresetLoginLocations(Map locationsMap) {
+    List<OmrsLocation> locations = [];
     for (var element in locationsMap.entries) {
-      locationList.add(DropdownMenuItem(value: element.key, child: Text(element.value)));
+      locations.add(OmrsLocation(uuid: element.key, name: element.value));
     }
-    return Future.delayed(const Duration(seconds: 2), () => locationList,);
+    return Future.value(locations);
   }
-  Future<List<DropdownMenuItem<String>>> _fetchAllLoginLocations() {
-    var completer = Completer<List<DropdownMenuItem<String>>>();
-    Locations().allOmrsLoginLocations().then((values) {
-      var list = List<DropdownMenuItem<String>>.of(values.map((loc) => DropdownMenuItem(value: loc.uuid, child: Text(loc.name!))));
-      completer.complete(list);
-    });
-    return completer.future;
+
+  Future<List<OmrsLocation>> _fetchAllLoginLocations() {
+    return Locations().allOmrsLoginLocations();
   }
 }

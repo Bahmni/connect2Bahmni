@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:intl/intl.dart';
 import '../services/disease_summary.dart';
+import '../utils/environment.dart';
 
 class ObsFlowSheetView extends StatefulWidget {
   final String patientUuid;
@@ -21,7 +21,7 @@ class _ObsFlowSheetViewState extends State<ObsFlowSheetView> {
   @override
   void initState() {
     super.initState();
-    var conceptNames = dotenv.get('app.flowSheet.concepts', fallback: '');
+    var conceptNames = Environment().flowSheetConcepts!;
     if (conceptNames.trim().isEmpty) {
       obsFlowSheetFuture = Future.value(ObsFlowSheet(dates: [], conceptsDataMap: {}));
     } else {
