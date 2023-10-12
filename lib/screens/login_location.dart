@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../providers/meta_provider.dart';
 import '../services/locations.dart';
 import '../providers/auth.dart';
 import '../domain/models/omrs_location.dart';
@@ -30,19 +29,7 @@ class _LoginLocationState extends State<LoginLocation> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     Map? assignedLocations = ModalRoute.of(context)?.settings.arguments as Map?;
-    _locationsFuture = Future.wait(
-        [
-          (assignedLocations != null)  ? _fetchPresetLoginLocations(assignedLocations) : _fetchAllLoginLocations(),
-          Provider.of<MetaProvider>(context, listen: false).initMetaData(),
-        ]
-    ).then((List<Object?> values) {
-      if (values.isEmpty) {
-        return List<OmrsLocation>.empty();
-      }
-      return (values[0] as List).map((e) => e as OmrsLocation).toList();
-    }).catchError((error, stackTrace) {
-      return List<OmrsLocation>.empty();
-    });
+    _locationsFuture = (assignedLocations != null)  ? _fetchPresetLoginLocations(assignedLocations) : _fetchAllLoginLocations();
   }
 
   @override

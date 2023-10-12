@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../providers/meta_provider.dart';
 import '../utils/shared_preference.dart';
 import '../providers/auth.dart';
 import '../utils/validators.dart';
@@ -64,6 +65,7 @@ class _LoginState extends State<Login> {
         if (response.status) {
           var session = response.session!;
           Provider.of<UserProvider>(context, listen: false).setUser(session.user);
+          initMetaData();
           var providerLoginLocations = session.user.provider?.attrValue(locationAttributeName);
           if (providerLoginLocations != null && providerLoginLocations.isNotEmpty) {
             var assignedLocations = <String, String>{};
@@ -83,6 +85,10 @@ class _LoginState extends State<Login> {
     } else {
       showLoginFailure(context);
     }
+  }
+
+  void initMetaData() async {
+    await Provider.of<MetaProvider>(context, listen: false).initMetaData();
   }
 
   Row _showLoading() {
