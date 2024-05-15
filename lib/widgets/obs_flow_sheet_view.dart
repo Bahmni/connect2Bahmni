@@ -6,7 +6,7 @@ import '../utils/environment.dart';
 class ObsFlowSheetView extends StatefulWidget {
   final String patientUuid;
 
-  const ObsFlowSheetView({Key? key, required this.patientUuid}) : super(key: key);
+  const ObsFlowSheetView({super.key, required this.patientUuid});
 
   @override
   State<ObsFlowSheetView> createState() => _ObsFlowSheetViewState();

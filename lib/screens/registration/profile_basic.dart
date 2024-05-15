@@ -22,7 +22,7 @@ class BasicProfile extends StatefulWidget {
   final ProfileController<ProfileBasics>? controller;
   final bool readOnly;
 
-  const BasicProfile({Key? key, this.phoneNumber, this.basicDetails, this.identifiers, this.formKey, this.controller, this.readOnly = false}) : super(key: key);
+  const BasicProfile({super.key, this.phoneNumber, this.basicDetails, this.identifiers, this.formKey, this.controller, this.readOnly = false});
 
   @override
   State<BasicProfile> createState() => _BasicProfileState();

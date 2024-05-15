@@ -3,7 +3,7 @@ import '../widgets/my_tasks.dart';
 import '../widgets/app_drawer.dart';
 
 class TasksAndNotificationsWidget extends StatefulWidget {
-  const TasksAndNotificationsWidget({Key? key}) : super(key: key);
+  const TasksAndNotificationsWidget({super.key});
 
   @override
   State<TasksAndNotificationsWidget> createState() => _TasksAndNotificationsWidgetState();

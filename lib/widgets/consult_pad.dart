@@ -231,7 +231,7 @@ class _ConsultPadWidgetState extends State<ConsultPadWidget> {
         ],
       ),
       child: Container(
-          color: Theme.of(context).colorScheme.onBackground,
+          color: Theme.of(context).colorScheme.background,
           child: ListTile(
             leading: const Icon(
               Icons.medical_services_outlined,
@@ -305,7 +305,7 @@ class _ConsultPadWidgetState extends State<ConsultPadWidget> {
           ],
         ),
         child: Container(
-          color: Theme.of(context).colorScheme.onBackground,
+          color: Theme.of(context).colorScheme.background,
           child: ListTile(
             leading: const Icon(Icons.medication_outlined, size: 24),
             //title: Text('$drugName'),
@@ -350,7 +350,7 @@ class _ConsultPadWidgetState extends State<ConsultPadWidget> {
         ],
       ),
       child: Container(
-        color: Theme.of(context).colorScheme.onBackground,
+        color: Theme.of(context).colorScheme.background,
         child: ListTile(
           leading: const Icon(
             Icons.category,
@@ -405,15 +405,15 @@ class _ConsultPadWidgetState extends State<ConsultPadWidget> {
 
   SlidableAction _editInvestigationAction(OmrsOrder investigation,int index) {
     return SlidableAction(
-      onPressed: (_) async {
-        final edited = await Navigator.push(
+      onPressed: (_) {
+        dynamic edited = Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) => InvestigationDetails(investigation: investigation),
             ));
         if (edited != null && context.mounted) {
           var board = Provider.of<ConsultationBoard>(context, listen: false);
-          board.updateInvestigation(edited, index);
+          board.updateInvestigation(edited as OmrsOrder, index);
         }
       },
       backgroundColor: Colors.green,
@@ -424,15 +424,15 @@ class _ConsultPadWidgetState extends State<ConsultPadWidget> {
   }
   SlidableAction _editMedicationAction(BahmniDrugOrder drugOrder,int index) {
     return SlidableAction(
-      onPressed: (_) async {
-        final edited = await Navigator.push(
+      onPressed: (_) {
+        dynamic edited = Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) => MedicationDetails(medOrder: drugOrder),
             ));
         if (edited != null && context.mounted) {
           var board = Provider.of<ConsultationBoard>(context, listen: false);
-          board.updateMedicationRequest(edited, index);
+          board.updateMedicationRequest(edited as BahmniDrugOrder, index);
         }
       },
       backgroundColor: Colors.green,
@@ -443,8 +443,8 @@ class _ConsultPadWidgetState extends State<ConsultPadWidget> {
   }
   SlidableAction _editConditionAction(ConditionModel aCondition) {
     return SlidableAction(
-      onPressed: (_) async {
-        final edited = await Navigator.push(
+      onPressed: (_) {
+        dynamic edited = Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) => ConditionWidget(condition: aCondition),
@@ -489,7 +489,7 @@ class _ConsultPadWidgetState extends State<ConsultPadWidget> {
           ],
         ),
         child: Container(
-          color: Theme.of(context).colorScheme.onBackground,
+          color: Theme.of(context).colorScheme.background,
           child: ListTile(
             leading: const Icon(
               Icons.description_outlined,
@@ -596,7 +596,7 @@ class _ConsultationNote extends StatelessWidget {
         ],
       ),
       child: Container(
-        color: Theme.of(context).colorScheme.onBackground,
+        color: Theme.of(context).colorScheme.background,
         child: const ListTile(
           title: Text('Consultation Notes'),
           tileColor: Colors.red,

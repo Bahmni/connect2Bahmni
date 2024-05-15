@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: setup JDK
         uses: actions/setup-java@v2
         with:
@@ -26,7 +26,8 @@ jobs:
       - name: setup flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.10.0'
+          flutter-version: 3.19.6
+      - run: flutter --version
       - name: create env file
         run: |
           touch .env

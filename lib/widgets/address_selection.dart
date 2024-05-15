@@ -13,7 +13,7 @@ class AddressScreen extends StatefulWidget {
   final ProfileController<ProfileAddress>? controller;
   final bool readOnly;
   final OnAddressSearch? onSearch;
-  const AddressScreen({Key? key, this.address, this.controller, this.formKey, this.readOnly = false, this.onSearch}) : super(key: key);
+  const AddressScreen({super.key, this.address, this.controller, this.formKey, this.readOnly = false, this.onSearch});
   @override
   State<AddressScreen> createState() => _AddressScreenState();
 }
@@ -27,7 +27,7 @@ class _AddressScreenState extends State<AddressScreen> {
   static const lblState = "State";
   static const lblVillage = "Village";
   //static const msgNoMatchFound = 'No match found';
-  static const msgSelect = 'Select';
+  //static const msgSelect = 'Select';
 
   final TextEditingController _stateController = TextEditingController();
   final TextEditingController _districtController = TextEditingController();

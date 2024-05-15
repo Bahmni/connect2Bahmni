@@ -3,7 +3,7 @@ import '../widgets/app_drawer.dart';
 import '../screens/dashboard.dart';
 
 class UserDashBoard extends StatefulWidget {
-  const UserDashBoard({Key? key}) : super(key: key);
+  const UserDashBoard({super.key});
   @override
   State<UserDashBoard> createState() => _UserDashBoardState();
 }

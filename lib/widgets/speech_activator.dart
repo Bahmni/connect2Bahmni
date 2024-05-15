@@ -3,7 +3,7 @@ import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 
 class SpeechEg extends StatefulWidget {
-  const SpeechEg({Key? key}) : super(key: key);
+  const SpeechEg({super.key});
 
   @override
   State<SpeechEg> createState() => _SpeechEgState();

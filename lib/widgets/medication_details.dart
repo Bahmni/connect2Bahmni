@@ -9,7 +9,7 @@ import '../domain/models/dosage_instruction.dart';
 class MedicationDetails extends StatefulWidget {
   final BahmniDrugOrder medOrder;
 
-  const MedicationDetails({Key? key, required this.medOrder}) : super(key: key);
+  const MedicationDetails({super.key, required this.medOrder});
 
   @override
   State<MedicationDetails> createState() => _MedicationDetailsState();

@@ -10,7 +10,7 @@ import '../providers/user_provider.dart';
 
 class LaunchMeeting extends StatefulWidget {
   final BahmniAppointment? event;
-  const LaunchMeeting({Key? key, this.event}) : super(key: key);
+  const LaunchMeeting({super.key, this.event});
 
   @override
   State<LaunchMeeting> createState() => _LaunchMeetingState();

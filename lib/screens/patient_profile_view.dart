@@ -15,7 +15,7 @@ import '../utils/app_failures.dart';
 class PatientProfileView extends StatefulWidget {
   final String patientUuid;
 
-  const PatientProfileView({Key? key, required this.patientUuid}) : super(key: key);
+  const PatientProfileView({super.key, required this.patientUuid});
 
   @override
   State<PatientProfileView> createState() => _PatientProfileView();

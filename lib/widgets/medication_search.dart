@@ -6,7 +6,7 @@ import '../utils/app_failures.dart';
 import '../services/concept_dictionary.dart';
 
 class MedicationSearch extends StatefulWidget {
-  const MedicationSearch({Key? key}) : super(key: key);
+  const MedicationSearch({super.key});
 
   @override
   State<MedicationSearch> createState() => _MedicationSearchWidgetState();

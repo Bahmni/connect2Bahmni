@@ -8,7 +8,7 @@ import '../domain/models/omrs_concept.dart';
 class ConditionWidget extends StatefulWidget {
   final ConditionModel? condition;
   //final OmrsConcept? valueSetCertainty;
-  const ConditionWidget({Key? key, this.condition}) : super(key: key);
+  const ConditionWidget({super.key, this.condition});
 
   @override
   State<ConditionWidget> createState() => _ConditionWidgetState();

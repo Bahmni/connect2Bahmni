@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class ConsultationNotesWidget extends StatefulWidget {
   final String? notes;
-  const ConsultationNotesWidget({Key? key, this.notes}) : super(key: key);
+  const ConsultationNotesWidget({super.key, this.notes});
 
   @override
   State<ConsultationNotesWidget> createState() => _ConsultationNotesWidgetState();
