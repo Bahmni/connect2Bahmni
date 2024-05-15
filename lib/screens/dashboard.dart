@@ -12,7 +12,7 @@ import '../screens/models/patient_model.dart';
 import '../services/patients.dart';
 
 class DashboardWidget extends StatefulWidget {
-  const DashboardWidget({Key? key}) : super(key: key);
+  const DashboardWidget({super.key});
 
 
   @override

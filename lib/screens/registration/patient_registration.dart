@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
 import '../../domain/models/address_entry.dart';
+import '../../domain/models/omrs_identifier_type.dart';
 import '../../providers/meta_provider.dart';
 import '../../screens/registration/profile_attributes.dart';
-import '../../domain/models/omrs_identifier_type.dart';
 import '../../services/address_hierarchy.dart';
 import '../../services/visits.dart';
 import '../../utils/app_failures.dart';
@@ -14,6 +13,7 @@ import '../../widgets/visit_types_fab.dart';
 import '../models/profile_model.dart';
 import 'profile_basic.dart';
 import 'profile_controller.dart';
+import 'profile_heading.dart';
 import 'profile_summary.dart';
 
 const String lblNext = 'Next';
@@ -22,7 +22,6 @@ const String lblSaveProfile = 'Save Profile';
 const String lblEditProfile = 'Edit Profile';
 const String lblError = 'Profile Error';
 const String lblPrevious = 'Previous';
-const String lblPatientProfile =  "Patient Profile";
 const errInvalidProfile = 'Please provide required information';
 
 class PatientRegistration extends StatefulWidget {
@@ -48,6 +47,8 @@ class _PatientRegistration extends State<PatientRegistration> {
   final List<AddressEntry> addressHierarchy = [];
 
   static const errStartingVisit = "Error occurred while trying to start visit";
+  static const lblScreenTitle = 'Patient';
+  static const lblProfileHeading = 'Patient Profile';
 
   @override
   void dispose() {
@@ -67,9 +68,10 @@ class _PatientRegistration extends State<PatientRegistration> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        title: const Text(lblPatientProfile,),
+        title: const Text(lblScreenTitle),
         actions:  [
           ValueListenableBuilder<int>(
             builder: (BuildContext context, int pageIndex, Widget? child) {
@@ -130,62 +132,55 @@ class _PatientRegistration extends State<PatientRegistration> {
   }
 
   Widget _buildPage(int pageIndex) {
+    return SingleChildScrollView(
+      child: Wrap(
+          children: [
+            if (pageIndex != 3)
+              ProfileHeading(title: lblProfileHeading),
+            Container(
+              padding: EdgeInsets.all(10),
+              child: _pageWidget(pageIndex),
+            )
+          ]
+      )
+    );
+  }
+
+  Widget _pageWidget(int pageIndex) {
     switch (pageIndex) {
       case 0:
-        return Wrap(children: [
-          ..._heading(),
-          Container(
-              padding: EdgeInsets.all(10),
-              child: BasicProfile(
-                formKey: _basicDetailsFormKey,
-                identifiers: profile.identifiers,
-                basicDetails: profile.basicDetails,
-                controller: _basicDetailsController,
-                readOnly: _profileSaved.value,
-              ))
-        ]);
+        return BasicProfile(
+          formKey: _basicDetailsFormKey,
+          identifiers: profile.identifiers,
+          basicDetails: profile.basicDetails,
+          controller: _basicDetailsController,
+          readOnly: _profileSaved.value,
+        );
       case 1:
-        return Column(
-          mainAxisSize: MainAxisSize.max,
-          children: [
-            ..._heading(),
-            Container (
-                padding: EdgeInsets.all(10),
-                child: ProfileAttributes(
-                  formKey: _profileAttributeFormKey,
-                  attributes: profile.attributes,
-                  controller: _attributesController,
-                  readOnly: _profileSaved.value,
-                )
-            )
-          ],
+        return ProfileAttributes(
+          formKey: _profileAttributeFormKey,
+          attributes: profile.attributes,
+          controller: _attributesController,
+          readOnly: _profileSaved.value,
         );
       case 2:
-        return Wrap(children: [
-          ..._heading(),
-          Container(
-              padding: EdgeInsets.all(10),
-              child: AddressScreen(
-                formKey: _addressFormKey,
-                address: profile.address,
-                controller: _addressController,
-                readOnly: _profileSaved.value,
-                onSearch: (pattern) async {
-                  return _findAddressEntries(pattern);
-                },
-              ))
-        ]);
+        return AddressScreen(
+          formKey: _addressFormKey,
+          address: profile.address,
+          controller: _addressController,
+          readOnly: _profileSaved.value,
+          onSearch: (pattern) async {
+            return _findAddressEntries(pattern);
+          },
+        );
       case 3:
       default:
-        return Container (
-            padding: EdgeInsets.all(10),
-            child: ProfileSummary(
-              uuid: profile.uuid,
-              basicDetails: profile.basicDetails,
-              address: profile.address,
-              attributes: profile.attributes,
-              identifiers: profile.identifiers,
-            )
+        return ProfileSummary(
+          uuid: profile.uuid,
+          basicDetails: profile.basicDetails,
+          address: profile.address,
+          attributes: profile.attributes,
+          identifiers: profile.identifiers,
         );
     }
   }
@@ -436,30 +431,6 @@ class _PatientRegistration extends State<PatientRegistration> {
     }
     return true;
   }
-
-  List<Widget> _heading() {
-    return [Card(
-        elevation: 0,
-        color: Theme.of(context).colorScheme.surfaceVariant,
-        shape: RoundedRectangleBorder(
-          side: BorderSide(
-            color: Theme.of(context).colorScheme.outline,
-          ),
-          borderRadius: const BorderRadius.all(Radius.circular(12)),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: const [
-            ListTile(
-              leading: Icon(Icons.person_add_alt_1_rounded),
-              title: Text('New Patient Registration'),
-              subtitle: Text(''),
-            ),
-          ],
-        )
-    )];
-  }
-
 }
 
 

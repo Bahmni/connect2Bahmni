@@ -19,9 +19,9 @@ import 'medication_details.dart';
 
 class ConsultPadWidget extends StatefulWidget {
   const ConsultPadWidget({
-    Key? key,
+    super.key,
     this.patientUuid,
-  }) : super(key: key);
+  });
 
   final Color color = const Color(0xFFFFE306);
   final String? patientUuid;
@@ -66,7 +66,7 @@ class _ConsultPadWidgetState extends State<ConsultPadWidget> {
 
   Widget _showConsultation(BuildContext context, ConsultationModel? consultation) {
     return Container(
-        color: Theme.of(context).colorScheme.onBackground,
+        color: Theme.of(context).colorScheme.background,
         child: Column(
           children: [
             _heading(context, consultation),
@@ -173,7 +173,7 @@ class _ConsultPadWidgetState extends State<ConsultPadWidget> {
           ),
         ),
       ),
-      ...diagnosisList.map((el) => _conditionWidget(el)).toList()
+      ...diagnosisList.map((el) => _conditionWidget(el))
     ];
   }
 
@@ -192,7 +192,7 @@ class _ConsultPadWidgetState extends State<ConsultPadWidget> {
           ),
         ),
       ),
-      ...problemList.map((el) => _conditionWidget(el)).toList()
+      ...problemList.map((el) => _conditionWidget(el))
     ];
   }
 
@@ -215,7 +215,7 @@ class _ConsultPadWidgetState extends State<ConsultPadWidget> {
         final index = el.key;
         final investigation = el.value;
         return _investigationWidget(investigation, index);
-      }).toList()
+      })
     ];
   }
 
@@ -260,7 +260,7 @@ class _ConsultPadWidgetState extends State<ConsultPadWidget> {
           ),
         ),
       ),
-      ...medicationList.asMap().entries.map((el) => _medicationListItem(el.value, el.key)).toList()
+      ...medicationList.asMap().entries.map((el) => _medicationListItem(el.value, el.key))
     ];
   }
 
@@ -474,7 +474,7 @@ class _ConsultPadWidgetState extends State<ConsultPadWidget> {
           ),
         ),
       ),
-      ...formObservations.keys.map((form) { return _obsFormWidget(form);}).toList()
+      ...formObservations.keys.map((form) { return _obsFormWidget(form);})
     ];
   }
 
@@ -534,8 +534,7 @@ class _ConsultationNote extends StatelessWidget {
   final OmrsObs consultNote;
   final bool? sliding;
 
-  const _ConsultationNote({Key? key, required this.consultNote, this.sliding})
-      : super(key: key);
+  const _ConsultationNote({required this.consultNote, this.sliding});
 
   @override
   Widget build(BuildContext context) {

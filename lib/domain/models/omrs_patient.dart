@@ -2,6 +2,7 @@ import 'package:fhir/r4.dart' as fhir;
 import 'package:json_annotation/json_annotation.dart';
 import '../../domain/models/person.dart';
 import '../../domain/models/omrs_identifier.dart';
+import '../../utils/date_time.dart';
 part 'omrs_patient.g.dart';
 
 @JsonSerializable()
@@ -32,7 +33,7 @@ class OmrsPatient {
 
   fhir.FhirDate? _birthDate() {
     var dt = person?.birthdate;
-    return dt != null ? fhir.FhirDate.fromDateTime(dt) : null;
+    return dt != null ? toFhirDate(dt) : null;
   }
 
   _address() {

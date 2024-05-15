@@ -79,31 +79,27 @@ class _AddressScreenState extends State<AddressScreen> {
     );
   }
 
-  TypeAheadFormField<String> _buildStateProvinceField(BuildContext context) {
+  TypeAheadField<String> _buildStateProvinceField(BuildContext context) {
     return
-      TypeAheadFormField<String>(
-          enabled: !widget.readOnly,
-          textFieldConfiguration: TextFieldConfiguration(
-              //autofocus: true,
-              decoration: InputDecoration(
-                  hintText: lblState
-              ),
-              enabled: !widget.readOnly,
-              controller: _stateController
-          ),
-          noItemsFoundBuilder: (context) {
-            return SizedBox();
+      TypeAheadField<String>(
+          builder: (context, controller, focusNode) {
+            return TextField(
+                controller: _stateController,
+                focusNode: focusNode,
+                autofocus: true,
+                enabled: !widget.readOnly,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: lblState,
+                )
+            );
           },
           suggestionsCallback: (pattern) async {
-            // if (pattern.isEmpty) {
-            //   return districts;
-            // }
             if (widget.onSearch != null) {
               var addressPattern = pattern;
               List<AddressEntry> matches = await widget.onSearch!(addressPattern);
               return matches.map((e) => e.name).toList();
             }
-            //return districts.where((element) => element.toLowerCase().contains(pattern.toLowerCase()));
             return [];
           },
           itemBuilder: (context, suggestion) {
@@ -112,39 +108,33 @@ class _AddressScreenState extends State<AddressScreen> {
               subtitle: Text(suggestion),
             );
           },
-          onSuggestionSelected: (suggestion) {
-            _stateController.text = suggestion;
-          },
-          validator: (value) {
-            if (value == null || value.isEmpty) {
-              return '$msgSelect $lblState';
-            }
-            return null;
-          },
-          onSaved: (value) {
+          // validator: (value) {
+          //   if (value == null || value.isEmpty) {
+          //     return '$msgSelect $lblState';
+          //   }
+          //   return null;
+          // },
+          onSelected: (value) {
+            _stateController.text = value;
             _updateAddress();
           }
       );
   }
 
-  TypeAheadFormField<String> _buildDistrictField(BuildContext context) {
+  TypeAheadField<String> _buildDistrictField(BuildContext context) {
     return
-      TypeAheadFormField<String>(
-          enabled: !widget.readOnly,
-          //initialValue: selectedDistrict,
-          textFieldConfiguration: TextFieldConfiguration(
-              //autofocus: true,
-              // style: DefaultTextStyle.of(context).style.copyWith(
-              //     fontStyle: FontStyle.italic
-              // ),
-              decoration: InputDecoration(
-                  hintText: lblDistrict
-              ),
-              enabled: !widget.readOnly,
-              controller: _districtController
-          ),
-          noItemsFoundBuilder: (context) {
-            return SizedBox();
+      TypeAheadField<String>(
+          builder: (context, controller, focusNode) {
+            return TextField(
+                controller: _districtController,
+                focusNode: focusNode,
+                autofocus: true,
+                enabled: !widget.readOnly,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: lblDistrict,
+                )
+            );
           },
           suggestionsCallback: (pattern) async {
             if (widget.onSearch != null) {
@@ -160,34 +150,32 @@ class _AddressScreenState extends State<AddressScreen> {
               subtitle: Text(suggestion),
             );
           },
-          onSuggestionSelected: (suggestion) {
-            _districtController.text = suggestion;
-          },
-          validator: (value) {
-            if (value == null || value.isEmpty) {
-              return '$msgSelect $lblDistrict';
-            }
-            return null;
-          },
-          onSaved: (value) {
+          // validator: (value) {
+          //   if (value == null || value.isEmpty) {
+          //     return '$msgSelect $lblDistrict';
+          //   }
+          //   return null;
+          // },
+          onSelected: (value) {
+            _districtController.text = value;
             _updateAddress();
           }
       );
   }
 
-  TypeAheadFormField<String> _buildSubDistrictField(BuildContext context) {
-    return TypeAheadFormField(
-        enabled: !widget.readOnly,
-        textFieldConfiguration: TextFieldConfiguration(
-            //autofocus: true,
-            decoration: InputDecoration(
-                hintText: lblSubDistrict
-            ),
-            enabled: !widget.readOnly,
-            controller: _subDistrictController
-        ),
-        noItemsFoundBuilder: (context) {
-          return SizedBox();
+  TypeAheadField<String> _buildSubDistrictField(BuildContext context) {
+    return TypeAheadField(
+        builder: (context, controller, focusNode) {
+          return TextField(
+              controller: _subDistrictController,
+              focusNode: focusNode,
+              autofocus: true,
+              enabled: !widget.readOnly,
+              decoration: InputDecoration(
+                border: OutlineInputBorder(),
+                labelText: lblSubDistrict,
+              )
+          );
         },
         suggestionsCallback: (pattern) async {
           if (widget.onSearch != null) {
@@ -203,34 +191,33 @@ class _AddressScreenState extends State<AddressScreen> {
             subtitle: Text(suggestion),
           );
         },
-        onSuggestionSelected: (suggestion) {
-          _subDistrictController.text = suggestion;
-        },
-        validator: (value) {
-          if (value == null || value.isEmpty) {
-            return '$msgSelect $lblSubDistrict';
-          }
-          return null;
-        },
-        onSaved: (value) {
+        // validator: (value) {
+        //   if (value == null || value.isEmpty) {
+        //     return '$msgSelect $lblSubDistrict';
+        //   }
+        //   return null;
+        // },
+        onSelected: (value) {
+          _subDistrictController.text = value;
           _updateAddress();
         }
     );
   }
 
-  TypeAheadFormField<String> _buildVillageField(BuildContext context) {
-    return TypeAheadFormField(
-        enabled: !widget.readOnly,
-        textFieldConfiguration: TextFieldConfiguration(
-            //autofocus: true,
-            decoration: InputDecoration(
-                hintText: lblVillage
-            ),
-            enabled: !widget.readOnly,
-            controller: _villageController
-        ),
-        noItemsFoundBuilder: (context) {
-          return SizedBox();
+  TypeAheadField<String> _buildVillageField(BuildContext context) {
+    return TypeAheadField(
+        //enabled: !widget.readOnly,
+        builder: (context, controller, focusNode) {
+          return TextField(
+              controller: _villageController,
+              focusNode: focusNode,
+              autofocus: true,
+              enabled: !widget.readOnly,
+              decoration: InputDecoration(
+                border: OutlineInputBorder(),
+                labelText: lblVillage,
+              )
+          );
         },
         suggestionsCallback: (pattern) async {
           if (widget.onSearch != null) {
@@ -246,16 +233,14 @@ class _AddressScreenState extends State<AddressScreen> {
             subtitle: Text(suggestion),
           );
         },
-        onSuggestionSelected: (suggestion) {
-          _villageController.text = suggestion;
-        },
-        validator: (value) {
-          if (value == null || value.isEmpty) {
-            return '$msgSelect $lblVillage';
-          }
-          return null;
-        },
-        onSaved: (value) {
+        // validator: (value) {
+        //   if (value == null || value.isEmpty) {
+        //     return '$msgSelect $lblVillage';
+        //   }
+        //   return null;
+        // },
+        onSelected: (value) {
+          _villageController.text = value;
           _updateAddress();
         }
     );

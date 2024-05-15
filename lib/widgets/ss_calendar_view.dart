@@ -67,11 +67,11 @@ class AppointmentsDayView extends StatefulWidget {
   final List<BahmniAppointment>? initialList;
 
   const AppointmentsDayView({
-    Key? key,
+    super.key,
     this.state,
     this.width,
     this.initialList,
-  }) : super(key: key);
+  });
 
   @override
   State<AppointmentsDayView> createState() => _AppointmentsDayViewState();
@@ -79,7 +79,7 @@ class AppointmentsDayView extends StatefulWidget {
 
 class _AppointmentsDayViewState extends State<AppointmentsDayView> {
   final Map<String, bool> history = <String, bool>{};
-  final EventController<BahmniAppointment> controller = EventController<BahmniAppointment>();
+  final EventController<BahmniAppointment?> controller = EventController<BahmniAppointment?>();
   User? _user;
   final heightPerMinute = 1.7;
 
@@ -100,11 +100,11 @@ class _AppointmentsDayViewState extends State<AppointmentsDayView> {
   Widget build(BuildContext context) {
     if (widget.initialList != null) {
       controller.addAll(_eventList(widget.initialList));
-      //TODO, pass the initialdate as state
+      //TODO, pass the initial date as state
       history.putIfAbsent(keyForDate(DateTime.now()), () => true);
     }
     var currentHour = DateTime.now().hour;
-    return DayView<BahmniAppointment>(
+    return DayView<BahmniAppointment?>(
       onPageChange: (date, page) => browseToDate(date),
       key: widget.state,
       controller: controller,
@@ -112,10 +112,10 @@ class _AppointmentsDayViewState extends State<AppointmentsDayView> {
       heightPerMinute: heightPerMinute,
       scrollOffset: heightPerMinute*60*currentHour,
       eventTileBuilder: _defaultEventTileBuilder,
-      onEventTap: (events, date) {
+      onEventTap: (List<CalendarEventData<Object?>> events, DateTime date) {
         if (events.isNotEmpty) {
-          var event = events.single.event;
-          _showEventInfoDialog(context, event!).then((value) async {
+          var event = events.single.event as BahmniAppointment;
+          _showEventInfoDialog(context, event).then((value) async {
             if (value == 'Charts') {
               final navigator = Navigator.of(context);
               var patientModel = await _patientUuidFromEvent(event);
@@ -133,6 +133,7 @@ class _AppointmentsDayViewState extends State<AppointmentsDayView> {
           });
         }
       },
+
     );
   }
 
@@ -199,7 +200,7 @@ class _AppointmentsDayViewState extends State<AppointmentsDayView> {
 
 Widget _defaultEventTileBuilder(
     DateTime date,
-    List<CalendarEventData<BahmniAppointment>> events,
+    List<CalendarEventData<Object?>> events,
     Rect boundary,
     DateTime startDuration,
     DateTime endDuration,

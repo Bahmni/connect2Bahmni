@@ -1,3 +1,4 @@
+import 'package:fhir/r4.dart';
 import 'package:intl/intl.dart';
 
 import '../screens/models/person_age.dart';
@@ -51,4 +52,8 @@ String formattedDate(DateTime dateTime) {
 String formattedTime(DateTime dateTime) {
   var localDateTime = dateTime.isUtc ? dateTime.toLocal() : dateTime;
   return DateFormat('hh:mm a').format(localDateTime);
+}
+
+FhirDate toFhirDate(DateTime date) {
+  return FhirDate.fromUnits(year: date.year, month: date.month, day: date.day,isUtc:  date.isUtc);
 }

@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:fhir/r4.dart';
 
 import '../../utils/app_routes.dart';
+import '../../utils/date_time.dart';
 import '../models/patient_model.dart';
 import '../models/profile_model.dart';
 
@@ -176,7 +177,7 @@ class _ProfileSummaryState extends State<ProfileSummary> {
               ]
           )
       )).toList(),
-      birthDate: FhirDate.fromDateTime(widget.basicDetails!.dateOfBirth!),
+      birthDate: toFhirDate(widget.basicDetails!.dateOfBirth!),
       gender: FhirCode.asConst(widget.basicDetails!.gender!.name),
       address: widget.address != null ? [Address(
           city: widget.address!.cityVillage,
@@ -190,6 +191,7 @@ class _ProfileSummaryState extends State<ProfileSummary> {
           ])] : null,
     ));
     Navigator.pushReplacementNamed(context, AppRoutes.patients, arguments: patient);
+
   }
 
   String _fullName() {

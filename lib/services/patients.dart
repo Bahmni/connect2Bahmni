@@ -1,4 +1,5 @@
 import 'dart:convert';
+
 import 'package:http/http.dart' as http;
 import 'package:fhir/r4.dart';
 
@@ -6,6 +7,7 @@ import '../domain/models/common.dart';
 import '../domain/models/omrs_patient.dart';
 import '../domain/models/omrs_identifier_type.dart';
 import '../domain/models/omrs_person_attribute.dart';
+import '../../utils/date_time.dart';
 import '../utils/app_urls.dart';
 import '../utils/app_config.dart';
 import '../utils/model_extn.dart';
@@ -46,7 +48,7 @@ class Patients extends DomainService {
             fhirId: p['uuid'],
             name: [HumanName(given:  [p['name']])],
             identifier: [Identifier(value: p['identifier'])],
-            birthDate: p['birthdate'] != null ? FhirDate.fromDateTime(DateTime.fromMillisecondsSinceEpoch(p['birthdate'] as int)) : null,
+            birthDate: p['birthdate'] != null ? toFhirDate(DateTime.fromMillisecondsSinceEpoch(p['birthdate'] as int)) : null,
             gender: p['gender'] != null ? FhirCode(_getGenderCode(p['gender'])) : null,
           )).toList();
         Bundle bundle = Bundle(
@@ -122,7 +124,7 @@ class Patients extends DomainService {
       if (responseJson != null && responseJson is List) {
         var patients = responseJson.map((p) {
           int? timestamp = p['birthdate'] as int?;
-          FhirDate? dob = timestamp != null ? FhirDate.fromDateTime(DateTime.fromMillisecondsSinceEpoch(timestamp)) : null;
+          FhirDate? dob = timestamp != null ? toFhirDate(DateTime.fromMillisecondsSinceEpoch(timestamp)) : null;
           String? genderCode = _getGenderCode(p['gender'] as String?);
           List<FhirExtension> extensions = [];
           if (p['drugOrderIds'] != null) {

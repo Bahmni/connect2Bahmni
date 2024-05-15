@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../screens/login_location.dart';
 import '../providers/meta_provider.dart';
 import '../utils/shared_preference.dart';
 import '../providers/auth.dart';
@@ -10,7 +11,7 @@ import '../utils/app_routes.dart';
 const locationAttributeName = 'Login Locations';
 
 class Login extends StatefulWidget {
-  const Login({Key? key}) : super(key: key);
+  const Login({super.key});
 
   @override
   State<Login> createState() => _LoginState();
@@ -72,8 +73,9 @@ class _LoginState extends State<Login> {
             for (var loc in providerLoginLocations) {
               assignedLocations.putIfAbsent(loc['uuid'], () => loc['name']);
             }
-            Navigator.pushNamed(context, AppRoutes.loginLocations,
-              arguments: assignedLocations,
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => LoginLocation(assignedLocations: assignedLocations)),
             );
           } else {
             Navigator.pushNamed(context, AppRoutes.loginLocations,);

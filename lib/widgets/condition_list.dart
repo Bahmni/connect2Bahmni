@@ -7,7 +7,7 @@ import '../services/emr_api_service.dart';
 class PatientConditionList extends StatefulWidget {
   final String patientUuid;
 
-  const PatientConditionList({Key? key, required this.patientUuid}) : super(key: key);
+  const PatientConditionList({super.key, required this.patientUuid});
 
   @override
   State<PatientConditionList> createState() => _PatientConditionListState();
