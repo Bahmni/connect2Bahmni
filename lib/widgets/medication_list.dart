@@ -7,7 +7,7 @@ import '../services/drug_orders.dart';
 class MedicationList extends StatefulWidget {
   final String patientUuid;
 
-  const MedicationList({Key? key, required this.patientUuid}) : super(key: key);
+  const MedicationList({super.key, required this.patientUuid});
 
   @override
   State<MedicationList> createState() => _MedicationListState();

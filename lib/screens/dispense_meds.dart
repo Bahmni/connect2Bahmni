@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class MedicationDispensation extends StatefulWidget {
 
-  const MedicationDispensation({Key? key}) : super(key: key);
+  const MedicationDispensation({super.key});
   @override
   State<MedicationDispensation> createState() => _MedicationDispensationState();
 }

@@ -7,7 +7,7 @@ class PatientListWidget extends StatelessWidget {
   final List<PatientModel> patientList;
   final OnSelectPatient? onSelect;
   final OnActionPatient? onAction;
-  const PatientListWidget({Key? key, required this.patientList, this.onSelect, this.onAction}) : super(key: key);
+  const PatientListWidget({super.key, required this.patientList, this.onSelect, this.onAction});
 
   @override
   Widget build(BuildContext context) {

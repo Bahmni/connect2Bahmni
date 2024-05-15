@@ -13,7 +13,7 @@ class ConsultationContext extends StatefulWidget {
   final PatientModel patient;
   final bool? isNew;
   final bool allowVisitTypeChange;
-  const ConsultationContext({Key? key, this.visitTypeUuid, this.encTypeUuid, required this.patient, this.isNew, this.allowVisitTypeChange = true}) : super(key: key);
+  const ConsultationContext({super.key, this.visitTypeUuid, this.encTypeUuid, required this.patient, this.isNew, this.allowVisitTypeChange = true});
 
   @override
   State<ConsultationContext> createState() => _ConsultationContextState();

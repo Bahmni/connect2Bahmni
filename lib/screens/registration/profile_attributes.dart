@@ -10,7 +10,7 @@ class ProfileAttributes extends StatefulWidget {
   final GlobalKey<FormState>? formKey;
   final ProfileController<List<ProfileAttribute>>? controller;
   final bool readOnly;
-  const ProfileAttributes({Key? key, this.attributes, this.formKey, this.controller, this.readOnly = false}) : super(key: key);
+  const ProfileAttributes({super.key, this.attributes, this.formKey, this.controller, this.readOnly = false});
 
   @override
   State<ProfileAttributes> createState() => _ProfileAttributesState();

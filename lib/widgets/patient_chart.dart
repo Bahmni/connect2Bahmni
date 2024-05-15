@@ -11,9 +11,9 @@ import 'visit_list.dart';
 
 class PatientChartWidget extends StatefulWidget {
   const PatientChartWidget({
-    Key? key,
+    super.key,
     required this.patient,
-  }) : super(key: key);
+  });
 
   final Color color = const Color(0xFFFFE306);
   final PatientModel patient;

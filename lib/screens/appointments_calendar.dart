@@ -10,7 +10,7 @@ import '../utils/app_failures.dart';
 import '../utils/app_routes.dart';
 
 class AppointmentsCalendar extends StatefulWidget {
-  const AppointmentsCalendar({Key? key}) : super(key: key);
+  const AppointmentsCalendar({super.key});
 
   @override
   State<AppointmentsCalendar> createState() => _AppointmentsCalendarState();

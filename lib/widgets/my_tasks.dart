@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../domain/models/task_notifications.dart';
 
 class TaskNotificationWidget extends StatefulWidget {
-  const TaskNotificationWidget({Key? key}) : super(key: key);
+  const TaskNotificationWidget({super.key});
 
   @override
   State<TaskNotificationWidget> createState() => _TaskNotificationWidgetState();
@@ -69,7 +69,7 @@ class _TaskNotificationWidgetState extends State<TaskNotificationWidget> {
 
 class Task extends StatelessWidget {
   final TaskNotification taskNotification;
-  const Task({Key? key, required this.taskNotification,})  : super(key: key);
+  const Task({super.key, required this.taskNotification,});
 
   @override
   Widget build(BuildContext context) {

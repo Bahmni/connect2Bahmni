@@ -7,7 +7,7 @@ import '../services/bahmni_appointments.dart';
 class PatientAppointmentList extends StatefulWidget {
   final String patientUuid;
 
-  const PatientAppointmentList({Key? key, required this.patientUuid}) : super(key: key);
+  const PatientAppointmentList({super.key, required this.patientUuid});
 
   @override
   State<PatientAppointmentList> createState() => _PatientAppointmentListState();

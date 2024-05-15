@@ -3,7 +3,7 @@ import '../domain/models/omrs_order.dart';
 
 class InvestigationDetails extends StatefulWidget {
   final OmrsOrder investigation;
-  const InvestigationDetails({Key? key, required this.investigation}):super(key:key);
+  const InvestigationDetails({super.key, required this.investigation});
 
   @override
   State<InvestigationDetails> createState() => _InvestigationDetailsState();

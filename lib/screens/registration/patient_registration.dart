@@ -25,7 +25,7 @@ const String lblPrevious = 'Previous';
 const errInvalidProfile = 'Please provide required information';
 
 class PatientRegistration extends StatefulWidget {
-  const PatientRegistration({Key? key}) : super(key: key);
+  const PatientRegistration({super.key});
 
   @override
   State<PatientRegistration> createState() => _PatientRegistration();

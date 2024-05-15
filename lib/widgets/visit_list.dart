@@ -6,7 +6,7 @@ import '../services/visits.dart';
 class PatientVisitList extends StatefulWidget {
   final String patientUuid;
 
-  const PatientVisitList({Key? key, required this.patientUuid}) : super(key: key);
+  const PatientVisitList({super.key, required this.patientUuid});
 
   @override
   State<PatientVisitList> createState() => _PatientVisitListState();

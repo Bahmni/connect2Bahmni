@@ -7,7 +7,7 @@ import '../services/order_service.dart';
 class LabResultsView extends StatefulWidget {
   final String patientUuid;
 
-  const LabResultsView({Key? key, required this.patientUuid}) : super(key: key);
+  const LabResultsView({super.key, required this.patientUuid});
 
   @override
   State<LabResultsView> createState() => _LabResultsViewState();

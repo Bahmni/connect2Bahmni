@@ -32,7 +32,7 @@ import '../widgets/select_obs_form.dart';
 
 
 class PatientDashboard extends StatefulWidget {
-  const PatientDashboard({Key? key}) : super(key: key);
+  const PatientDashboard({super.key});
 
   @override
   State<PatientDashboard> createState() => _PatientDashboardWidgetState();
@@ -64,7 +64,7 @@ typedef OnSaveConsultation = void Function();
 class _DashboardWidget extends StatefulWidget {
   final PatientModel patient;
   final OnSaveConsultation? onConsultationSave;
-  const _DashboardWidget({Key? key, required this.patient, this.onConsultationSave}) : super(key: key);
+  const _DashboardWidget({required this.patient, this.onConsultationSave});
   @override
   State<_DashboardWidget> createState() => _DashboardWidgetState();
 }
@@ -265,7 +265,7 @@ class _DashboardWidgetState extends State<_DashboardWidget> {
 
 class ConsultationActions extends StatelessWidget {
   final PatientModel patient;
-  const ConsultationActions({Key? key, required this.patient}) : super(key: key);
+  const ConsultationActions({super.key, required this.patient});
   final FloatingActionButtonLocation fabLocation = FloatingActionButtonLocation.endDocked;
   final NotchedShape shape = const CircularNotchedRectangle();
 

@@ -6,7 +6,7 @@ import '../utils/app_failures.dart';
 import '../services/concept_dictionary.dart';
 
 class InvestigationSearch extends StatefulWidget {
-  const InvestigationSearch({Key? key}) : super(key: key);
+  const InvestigationSearch({super.key});
 
   @override
   State<InvestigationSearch> createState() => _InvestigationSearchWidgetState();

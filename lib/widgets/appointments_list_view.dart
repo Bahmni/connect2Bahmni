@@ -5,7 +5,7 @@ import '../domain/models/bahmni_appointment.dart';
 
 class AppointmentsListView extends StatefulWidget {
   final String? practitionerUuid;
-  const AppointmentsListView({Key? key, this.practitionerUuid}) : super(key: key);
+  const AppointmentsListView({super.key, this.practitionerUuid});
 
   @override
   State<AppointmentsListView> createState() => _AppointmentsListViewState();

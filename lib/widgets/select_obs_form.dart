@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 import '../providers/meta_provider.dart';
 
 class SelectObsFormWidget extends StatefulWidget {
-  const SelectObsFormWidget({Key? key}) : super(key: key);
+  const SelectObsFormWidget({super.key});
 
   @override
   State<SelectObsFormWidget> createState() => _SelectObsFormWidgetState();

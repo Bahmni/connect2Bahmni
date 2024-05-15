@@ -12,7 +12,7 @@ import '../widgets/patient_list.dart';
 
 class PatientSearch extends StatefulWidget {
   final PatientSearchType searchType;
-  const PatientSearch({Key? key, this.searchType = PatientSearchType.all}) : super(key: key);
+  const PatientSearch({super.key, this.searchType = PatientSearchType.all});
 
   @override
   State<PatientSearch> createState() => _PatientsSearchWidgetState();

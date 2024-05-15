@@ -9,7 +9,7 @@ import '../services/concept_dictionary.dart';
 class ConceptSearch extends StatefulWidget {
   final OnSelectConcept? onSelect;
   final String? searchType;
-  const ConceptSearch({Key? key, this.searchType, this.onSelect}) : super(key: key);
+  const ConceptSearch({super.key, this.searchType, this.onSelect});
 
   @override
   State<ConceptSearch> createState() => _ConceptSearchWidgetState();

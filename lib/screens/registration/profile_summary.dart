@@ -13,7 +13,7 @@ class ProfileSummary extends StatefulWidget {
   final List<ProfileIdentifier>? identifiers;
   final ProfileBasics? basicDetails;
   final ProfileAddress? address;
-  const ProfileSummary({Key? key, this.uuid, this.attributes, this.identifiers, this.basicDetails, this.address}) : super(key: key);
+  const ProfileSummary({super.key, this.uuid, this.attributes, this.identifiers, this.basicDetails, this.address});
 
   @override
   State<ProfileSummary> createState() => _ProfileSummaryState();

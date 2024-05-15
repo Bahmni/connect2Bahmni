@@ -51,7 +51,7 @@ class DropDownSearchFormField<T> extends FormField<T> {
     super.key,
     super.onSaved,
     super.validator,
-    T? initialValue,
+    super.initialValue,
     AutovalidateMode? autoValidateMode,
     required List<T> items,
     required String label,
@@ -62,7 +62,6 @@ class DropDownSearchFormField<T> extends FormField<T> {
     DropdownSearchCompareFn<T>? compareFn,
     bool enabled = true,
   }) : super(
-      initialValue: initialValue,
       autovalidateMode: autoValidateMode ?? AutovalidateMode.disabled,
       builder: (FormFieldState<T> state) {
         return DropdownSearch<T>(
@@ -99,16 +98,12 @@ class CheckboxFormField extends FormField<bool> {
   CheckboxFormField({
     super.key,
     Widget? title,
-    FormFieldSetter<bool>? onSaved,
-    FormFieldValidator<bool>? validator,
-    bool enabled = true,
-    bool initialValue = false,
+    super.onSaved,
+    super.validator,
+    super.enabled,
+    bool super.initialValue = false,
     bool autoValidate = false})
   : super(
-      onSaved: onSaved,
-      validator: validator,
-      initialValue: initialValue,
-      enabled: enabled,
       builder: (FormFieldState<bool> state) {
         return CheckboxListTile(
           dense: state.hasError,

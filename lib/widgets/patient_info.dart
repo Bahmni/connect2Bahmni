@@ -4,10 +4,10 @@ import '../utils/app_type_def.dart';
 
 class PatientInfo extends StatelessWidget {
   const PatientInfo({
-    Key? key,
+    super.key,
     required this.patient,
     this.onSelect
-  }) : super(key: key);
+  });
 
   final PatientModel patient;
   final OnSelectPatient? onSelect;

@@ -10,7 +10,7 @@ class AgeDisplayWidget extends StatefulWidget {
   final Function()? onCancel;
   final Function(DateTime value)? onSet;
 
-  const AgeDisplayWidget({Key? key, this.editMode, this.initialValue, this.onSet, this.onCancel}) : super(key: key);
+  const AgeDisplayWidget({super.key, this.editMode, this.initialValue, this.onSet, this.onCancel});
 
   @override
   State<AgeDisplayWidget> createState() => _AgeDisplayWidgetState();
