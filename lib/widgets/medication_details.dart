@@ -620,7 +620,7 @@ class _MedicationDetailsState extends State<MedicationDetails> {
                     _effectiveStartDate = pickedDate;
                     _dateController.text = formattedDate;
                   }
-                }
+                                }
               ),
             ),
           ],

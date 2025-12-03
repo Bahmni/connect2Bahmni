@@ -273,7 +273,7 @@ class _BasicProfileState extends State<BasicProfile> {
                     _birthDate = date;
                   });
                 }
-              },
+                            },
               onSaved: _updateDob,
           ),
         ),

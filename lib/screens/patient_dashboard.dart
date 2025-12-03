@@ -347,38 +347,34 @@ class ConsultationActions extends StatelessWidget {
 
     OmrsConcept? concept = await Navigator.push(context,
         MaterialPageRoute(builder: (context) => const InvestigationSearch()));
-    if (concept != null) {
-      if (context.mounted) {
-        var newInvestigation = OmrsOrder(concept: concept);
-        OmrsOrder? details = await Navigator.push(context,
-            MaterialPageRoute(
-              builder: (context) => InvestigationDetails(investigation :newInvestigation),
-            ));
-        if (details != null) {
-          board.addInvestigation(details);
-        }
+    if (context.mounted) {
+      var newInvestigation = OmrsOrder(concept: concept);
+      OmrsOrder? details = await Navigator.push(context,
+          MaterialPageRoute(
+            builder: (context) => InvestigationDetails(investigation :newInvestigation),
+          ));
+      if (details != null) {
+        board.addInvestigation(details);
       }
     }
-  }
+    }
   addMedicationToConsultation(BuildContext context) async {
     var board = _activeBoardToUpdate(context);
     if (board == null) return;
 
     DrugConcept? concept = await Navigator.push(context,
         MaterialPageRoute(builder: (context) => const MedicationSearch()));
-    if (concept != null) {
-      if (context.mounted) {
-        var drugOrder = BahmniDrugOrder(drug: DrugInfo(uuid: concept.uuid, name: concept.name));
-        BahmniDrugOrder? details = await Navigator.push(context,
-            MaterialPageRoute(
-              builder: (context) => MedicationDetails(medOrder: drugOrder),
-            ));
-        if (details != null) {
-          board.addMedicationRequest(details);
-        }
+    if (concept != null && context.mounted) {
+      var drugOrder = BahmniDrugOrder(drug: DrugInfo(uuid: concept.uuid, name: concept.name));
+      BahmniDrugOrder? details = await Navigator.push(context,
+          MaterialPageRoute(
+            builder: (context) => MedicationDetails(medOrder: drugOrder),
+          ));
+      if (details != null) {
+        board.addMedicationRequest(details);
       }
     }
-  }
+    }
 
     Future<void> _addConditionToConsultation(BuildContext context) async {
     var board = _activeBoardToUpdate(context);
@@ -388,18 +384,16 @@ class ConsultationActions extends StatelessWidget {
       MaterialPageRoute(builder: (context) => const ConceptSearch(searchType: 'Condition')),
     );
 
-    if (concept != null) {
-      if (context.mounted) {
-        var newCondition = ConditionModel(code: concept);
-        ConditionModel? condition = await Navigator.push(context,
-          MaterialPageRoute(builder: (context) => ConditionWidget(condition: newCondition)),
-        );
-        if (condition != null) {
-          board.addCondition(condition);
-        }
+    if (context.mounted) {
+      var newCondition = ConditionModel(code: concept);
+      ConditionModel? condition = await Navigator.push(context,
+        MaterialPageRoute(builder: (context) => ConditionWidget(condition: newCondition)),
+      );
+      if (condition != null) {
+        board.addCondition(condition);
       }
     }
-  }
+    }
 
   Future<void> _addConsultationNotes(BuildContext ctx) async {
     var board = _activeBoardToUpdate(ctx);
@@ -423,6 +417,3 @@ class ConsultationActions extends StatelessWidget {
     return board;
   }
 }
-
-
-

@@ -49,7 +49,7 @@ dependencies:
   json_annotation: ^4.8.1
   provider: ^6.0.5
   shared_preferences: ^2.1.1
-  speech_to_text: ^6.1.1
+  speech_to_text: ^7.0.0
   uuid: ^4.2.2
   file: ^7.0.0
   dropdown_search: ^5.0.6

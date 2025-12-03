@@ -23,9 +23,7 @@ class PatientModel {
       List<String>? names = _patient.name?.first.given;
       if (names != null) {
         fullName = names.join(' ');
-      }
-      String? lastName = _patient.name?.first.family;
-      if (lastName != null) {
+        String? lastName = _patient.name?.first.family;
         fullName = '$fullName $lastName';
       }
     }
@@ -36,11 +34,9 @@ class PatientModel {
     String result = _patient.gender?.value ?? '';
     String strAge = '';
     DateTime? dob = _patient.birthDate?.valueDateTime;
-    if (dob != null) {
-      PersonAge age = calculateAge(dob);
-      strAge = age.year != 0 ? '${age.year}y ${age.month}m' : '${age.month}m ${age.days}d';
-    }
-    return '${_genderMap[result] ?? ''}, $strAge' ;
+    PersonAge age = dob != null ? calculateAge(dob) : PersonAge(0, 0);
+    strAge = age.year != 0 ? '${age.year}y ${age.month}m' : '${age.month}m ${age.days}d';
+      return '${_genderMap[result] ?? ''}, $strAge' ;
   }
 
   String get location {
