@@ -38,7 +38,7 @@ bool ellipsize(List<TextSpan> input, [String ellipse = '…']) {
 
   TextSpan last = input.last;
   String? text = last.text;
-  if (text.isEmpty || text == ellipse) {
+  if (text == null || text.isEmpty || text == ellipse) {
     input.removeLast();
     if (text == ellipse) {
       ellipsize(input, ellipse);
