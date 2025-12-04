@@ -207,6 +207,7 @@ class _DashboardWidgetState extends State<_DashboardWidget> {
               content: Text('Consultation is already finalized.')));
         } else {
           await board.save().then((value) {
+            if (!mounted) return;
             var message = value
                 ? 'Consultation Saved'
                 : 'Could not save consultation';
@@ -215,6 +216,7 @@ class _DashboardWidgetState extends State<_DashboardWidget> {
               widget.onConsultationSave!();
             }
           }).onError((error, stackTrace) {
+            if (!mounted) return;
             if (error is String) {
               ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error)));
             } else if (error is Failure) {

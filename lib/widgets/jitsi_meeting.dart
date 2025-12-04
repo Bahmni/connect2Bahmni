@@ -185,7 +185,7 @@ class _LaunchMeetingState extends State<LaunchMeeting> {
               },
               style: ButtonStyle(
                   backgroundColor:
-                  MaterialStateColor.resolveWith((states) => Colors.blue)),
+                  WidgetStateColor.resolveWith((states) => Colors.blue)),
               child: const Text(
                 "Join Meeting",
                 style: TextStyle(color: Colors.white),

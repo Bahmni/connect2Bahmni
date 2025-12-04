@@ -35,19 +35,19 @@ class _SelectObsFormWidgetState extends State<SelectObsFormWidget> {
     return AlertDialog(
       scrollable: true,
       title: const Text(lblSelectTemplate),
-      content: Column(
-        children: forms.map((f) => ListTile(
-            title: Text(f.name),
-            leading: Radio<FormResource>(
+      content: RadioGroup<FormResource>(
+        groupValue: _selectedForm,
+        onChanged: (FormResource? value) {
+          setState(() {
+            _selectedForm = value;
+          });
+        },
+        child: Column(
+          children: forms.map((f) => RadioListTile<FormResource>(
+              title: Text(f.name),
               value: f,
-              groupValue: _selectedForm,
-              onChanged: (FormResource? value) {
-                setState(() {
-                  _selectedForm = value;
-                });
-              },
-            )
-        )).toList(),
+          )).toList(),
+        ),
       ),
       actions: <Widget>[
         TextButton(

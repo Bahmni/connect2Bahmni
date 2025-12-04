@@ -125,7 +125,7 @@ class _ConsultationContextState extends State<ConsultationContext> {
       ValueListenableBuilder<bool>(
         builder: (BuildContext context, bool allowChange, Widget? child) {
           return DropdownButtonFormField<OmrsVisitType>(
-              value: _selectedVisitType,
+              initialValue: _selectedVisitType,
               isExpanded: true,
               onChanged: allowChange ? (newVal)  {
                 setState(() {
@@ -148,7 +148,7 @@ class _ConsultationContextState extends State<ConsultationContext> {
       const SizedBox(height: 10.0),
       const Text(lblEncounterType),
       DropdownButtonFormField<OmrsEncounterType>(
-          value: _selectedEncType,
+          initialValue: _selectedEncType,
           isExpanded: true,
           onChanged: (newVal)  {
             setState(() {

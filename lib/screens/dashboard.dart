@@ -748,6 +748,7 @@ class _DashboardWidgetState extends State<DashboardWidget> {
     return Patients().withUuid(uuid)
         .then((value) => value != null ? PatientModel(value.toFhir()) : null)
         .onError((error, stackTrace) {
+            if (!mounted) return null;
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text(error is Failure ? error.message : error.toString())),
             );

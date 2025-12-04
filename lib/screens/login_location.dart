@@ -76,7 +76,7 @@ class _LoginLocationState extends State<LoginLocation> {
                             ),
                             validator: (value) => value == null ? "Select a location" : null,
                             icon: const Icon(Icons.location_on_outlined),
-                            value: selectedValue,
+                            initialValue: selectedValue,
                             onChanged: (newVal)  {
                               selectedValue = newVal;
                             },
@@ -95,9 +95,11 @@ class _LoginLocationState extends State<LoginLocation> {
                             onPressed: () {
                               if (_formKey.currentState!.validate()) {
                                 Provider.of<AuthProvider>(context, listen: false).updateSessionLocation(OmrsLocation( uuid: selectedValue!, name: '')).then((value) {
+                                  if (!mounted) return;
                                   Navigator.pushReplacementNamed(context, AppRoutes.dashboard);
                                 },
                                     onError: (e) {
+                                      if (!mounted) return;
                                       ScaffoldMessenger.of(context).showSnackBar(
                                         SnackBar(content: Text('Login failed. error $e')),
                                       );

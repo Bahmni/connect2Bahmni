@@ -119,6 +119,7 @@ class _AppointmentsDayViewState extends State<AppointmentsDayView> {
             if (value == 'Charts') {
               final navigator = Navigator.of(context);
               var patientModel = await _patientUuidFromEvent(event);
+              if (!mounted) return;
               navigator.pushNamed(AppRoutes.patients, arguments: patientModel);
               //Navigator.pushNamed(context, AppRoutes.patients, arguments: patientModel);
             }
