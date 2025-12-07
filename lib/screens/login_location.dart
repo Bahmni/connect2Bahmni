@@ -76,7 +76,7 @@ class _LoginLocationState extends State<LoginLocation> {
                             ),
                             validator: (value) => value == null ? "Select a location" : null,
                             icon: const Icon(Icons.location_on_outlined),
-                            initialValue: selectedValue,
+                            value: selectedValue,
                             onChanged: (newVal)  {
                               selectedValue = newVal;
                             },
