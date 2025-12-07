@@ -47,6 +47,18 @@ jobs:
           echo app.patientAttributes=phoneNumber*,email       
           echo abdm.identifiers=ABHA Number,ABHA Address
       - run: flutter pub get
+      - name: Patch jitsi_meet_wrapper plugin for AGP 8.6.0
+        run: |
+          JITSI_BUILD_FILE="$PUB_CACHE/hosted/pub.dev/jitsi_meet_wrapper-0.2.0+1/android/build.gradle"
+          if [ -f "$JITSI_BUILD_FILE" ]; then
+            echo "Patching jitsi_meet_wrapper build.gradle..."
+            sed -i "s/classpath 'com.android.tools.build:gradle:4.1.0'/classpath 'com.android.tools.build:gradle:8.6.0'/g" "$JITSI_BUILD_FILE"
+            sed -i "s/ext.kotlin_version = '1.7.10'/ext.kotlin_version = '2.1.0'/g" "$JITSI_BUILD_FILE"
+            echo "Patched successfully"
+            cat "$JITSI_BUILD_FILE" | grep -A2 "buildscript"
+          else
+            echo "Warning: jitsi_meet_wrapper build.gradle not found"
+          fi
       - run: flutter analyze
       - run: flutter build apk --debug
       - name: archive debug results
