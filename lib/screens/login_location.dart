@@ -92,18 +92,21 @@ class _LoginLocationState extends State<LoginLocation> {
                               borderRadius: BorderRadius.circular(50)),
                           child: TextButton(
                             autofocus: false,
-                            onPressed: () {
+                            onPressed: () async {
                               if (_formKey.currentState!.validate()) {
-                                Provider.of<AuthProvider>(context, listen: false).updateSessionLocation(OmrsLocation( uuid: selectedValue!, name: '')).then((value) {
+                                final navigator = Navigator.of(context);
+                                final scaffoldMessenger = ScaffoldMessenger.of(context);
+                                try {
+                                  await Provider.of<AuthProvider>(context, listen: false)
+                                      .updateSessionLocation(OmrsLocation(uuid: selectedValue!, name: ''));
                                   if (!mounted) return;
-                                  Navigator.pushReplacementNamed(context, AppRoutes.dashboard);
-                                },
-                                    onError: (e) {
-                                      if (!mounted) return;
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        SnackBar(content: Text('Login failed. error $e')),
-                                      );
-                                    });
+                                  navigator.pushReplacementNamed(AppRoutes.dashboard);
+                                } catch (e) {
+                                  if (!mounted) return;
+                                  scaffoldMessenger.showSnackBar(
+                                    SnackBar(content: Text('Login failed. error $e')),
+                                  );
+                                }
                               }
                             },
                             child: const Text(lblProceed,

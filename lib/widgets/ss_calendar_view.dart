@@ -112,17 +112,16 @@ class _AppointmentsDayViewState extends State<AppointmentsDayView> {
       heightPerMinute: heightPerMinute,
       scrollOffset: heightPerMinute*60*currentHour,
       eventTileBuilder: _defaultEventTileBuilder,
-      onEventTap: (List<CalendarEventData<Object?>> events, DateTime date) {
-        if (events.isNotEmpty) {
+        onEventTap: (List<CalendarEventData<Object?>> events, DateTime date) async {
+          if (events.isNotEmpty) {
           var event = events.single.event as BahmniAppointment;
-          _showEventInfoDialog(context, event).then((value) async {
-            if (value == 'Charts') {
-              final navigator = Navigator.of(context);
-              var patientModel = await _patientUuidFromEvent(event);
-              if (!mounted) return;
-              navigator.pushNamed(AppRoutes.patients, arguments: patientModel);
-              //Navigator.pushNamed(context, AppRoutes.patients, arguments: patientModel);
-            }
+          final navigator = Navigator.of(context);
+          final value = await _showEventInfoDialog(context, event);
+          if (value == 'Charts' && mounted) {
+            var patientModel = await _patientUuidFromEvent(event);
+            if (!mounted) return;
+            navigator.pushNamed(AppRoutes.patients, arguments: patientModel);
+          }
             if (value == 'Join') {
               //joinJitsiMeeting(event, _user!);
               joinJitsiWrapperMeeting(event, _user!);
@@ -131,9 +130,8 @@ class _AppointmentsDayViewState extends State<AppointmentsDayView> {
               //   MaterialPageRoute(builder: (context) => LaunchMeeting(event: _event)),
               // );
             }
-          });
-        }
-      },
+          }
+        },
 
     );
   }

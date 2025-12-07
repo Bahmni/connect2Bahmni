@@ -202,34 +202,36 @@ class _DashboardWidgetState extends State<_DashboardWidget> {
       ),
       onPressed: () async {
         var board = Provider.of<ConsultationBoard>(context, listen: false);
+        final scaffoldMessenger = ScaffoldMessenger.of(context);
         if (board.currentConsultation?.status == ConsultationStatus.finalized) {
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          scaffoldMessenger.showSnackBar(const SnackBar(
               content: Text('Consultation is already finalized.')));
         } else {
-          await board.save().then((value) {
+          try {
+            final value = await board.save();
             if (!mounted) return;
             var message = value
                 ? 'Consultation Saved'
                 : 'Could not save consultation';
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+            scaffoldMessenger.showSnackBar(SnackBar(content: Text(message)));
             if (value && (widget.onConsultationSave != null)) {
               widget.onConsultationSave!();
             }
-          }).onError((error, stackTrace) {
+          } catch (error) {
             if (!mounted) return;
             if (error is String) {
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error)));
+              scaffoldMessenger.showSnackBar(SnackBar(content: Text(error)));
             } else if (error is Failure) {
-              ScaffoldMessenger.of(context).showSnackBar(
+              scaffoldMessenger.showSnackBar(
                   SnackBar(content: Text(error.message)));
             } else if (error is List<Failure>) {
-              ScaffoldMessenger.of(context).showSnackBar(
+              scaffoldMessenger.showSnackBar(
                   SnackBar(content: Text(error[0].message)));
             } else {
-              ScaffoldMessenger.of(context).showSnackBar(
+              scaffoldMessenger.showSnackBar(
                   SnackBar(content: Text('Could not save consultation')));
             }
-          });
+          }
         }
       },
     );
@@ -327,19 +329,18 @@ class ConsultationActions extends StatelessWidget {
       onPressed: () async {
         var board = _activeBoardToUpdate(context);
         if (board == null) return;
-        showDialog(
+        final form = await showDialog(
           context: context,
           builder: (BuildContext context) => SelectObsFormWidget(),
-        ).then((form) async {
-          if (form != null) {
-            final obsList = await Navigator.push(context,
-              MaterialPageRoute(builder: (context) => ObservationForm(patient: patient, formToDisplay: form)),
-            );
-            if (obsList != null) {
-              board.addFormObsList(form, obsList);
-            }
+        );
+        if (form != null && context.mounted) {
+          final obsList = await Navigator.push(context,
+            MaterialPageRoute(builder: (context) => ObservationForm(patient: patient, formToDisplay: form)),
+          );
+          if (obsList != null) {
+            board.addFormObsList(form, obsList);
           }
-        });
+        }
       },
     );
   }
