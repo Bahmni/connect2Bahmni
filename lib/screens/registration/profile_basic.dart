@@ -119,7 +119,7 @@ class _BasicProfileState extends State<BasicProfile> {
                   });
                 },
                 activeTrackColor: Colors.lightBlueAccent,
-                thumbColor: MaterialStateProperty.all(Colors.blueGrey),
+                thumbColor: WidgetStateProperty.all(Colors.blueGrey),
               ),
             ],
           ),

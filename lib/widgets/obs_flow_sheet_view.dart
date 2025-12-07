@@ -72,7 +72,7 @@ class _ObsFlowSheetViewState extends State<ObsFlowSheetView> {
                 columns: headers,
                 headingRowColor: WidgetStateProperty.resolveWith<Color?>(
                         (Set<WidgetState> states) {
-                      return Theme.of(context).colorScheme.surfaceTint.withOpacity(0.3);
+                      return Theme.of(context).colorScheme.surfaceTint.withValues(alpha: 0.3);
                     }),
                 rows: List<DataRow>.generate(
                     obsFlowSheet.conceptsData!.length,
@@ -81,11 +81,11 @@ class _ObsFlowSheetViewState extends State<ObsFlowSheetView> {
                             (Set<WidgetState> states) {
                           // All rows will have the same selected color.
                           if (states.contains(WidgetState.selected)) {
-                            return Theme.of(context).colorScheme.primary.withOpacity(0.08);
+                            return Theme.of(context).colorScheme.primary.withValues(alpha: 0.08);
                           }
                           // Even rows will have a grey color.
                           if (index.isEven) {
-                            return Colors.grey.withOpacity(0.3);
+                            return Colors.grey.withValues(alpha: 0.3);
                           }
                           return null; // Use default value for other states and odd rows.
                         }),
