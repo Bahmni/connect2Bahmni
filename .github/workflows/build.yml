@@ -52,12 +52,23 @@ jobs:
           JITSI_BUILD_FILE="$PUB_CACHE/hosted/pub.dev/jitsi_meet_wrapper-0.2.0+1/android/build.gradle"
           if [ -f "$JITSI_BUILD_FILE" ]; then
             echo "Patching jitsi_meet_wrapper build.gradle..."
+            # Update AGP version
             sed -i "s/classpath 'com.android.tools.build:gradle:4.1.0'/classpath 'com.android.tools.build:gradle:8.6.0'/g" "$JITSI_BUILD_FILE"
+            # Update Kotlin version
             sed -i "s/ext.kotlin_version = '1.7.10'/ext.kotlin_version = '2.1.0'/g" "$JITSI_BUILD_FILE"
+            # Ensure namespace is in android block (should already be there, but verify)
+            if ! grep -q "namespace 'dev.saibotma.jitsi_meet_wrapper'" "$JITSI_BUILD_FILE"; then
+              echo "Adding namespace to android block..."
+              sed -i "/^android {/a\\    namespace 'dev.saibotma.jitsi_meet_wrapper'" "$JITSI_BUILD_FILE"
+            fi
             echo "Patched successfully"
-            cat "$JITSI_BUILD_FILE" | grep -A2 "buildscript"
+            echo "=== Buildscript section ==="
+            cat "$JITSI_BUILD_FILE" | grep -A5 "buildscript"
+            echo "=== Android section ==="
+            cat "$JITSI_BUILD_FILE" | grep -A3 "^android {"
           else
-            echo "Warning: jitsi_meet_wrapper build.gradle not found"
+            echo "Warning: jitsi_meet_wrapper build.gradle not found at $JITSI_BUILD_FILE"
+            ls -la "$PUB_CACHE/hosted/pub.dev/" | grep jitsi || echo "No jitsi plugin found"
           fi
       - run: flutter analyze
       - run: flutter build apk --debug
