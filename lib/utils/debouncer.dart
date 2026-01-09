@@ -7,7 +7,7 @@ class Debouncer {
   Timer? _timer;
   bool forceStopped = false;
 
-  run(VoidCallback action) {
+  void run(VoidCallback action) {
     _timer?.cancel();
     if (forceStopped) return;
     _timer = Timer(const Duration(milliseconds: Duration.millisecondsPerSecond), action);
@@ -17,7 +17,7 @@ class Debouncer {
     _timer?.cancel();
   }
 
-  dispose() {
+  void dispose() {
     _timer?.cancel();
   }
 }

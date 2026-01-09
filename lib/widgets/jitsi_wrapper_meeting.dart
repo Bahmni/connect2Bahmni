@@ -4,7 +4,7 @@ import '../domain/models/bahmni_appointment.dart';
 import '../domain/models/user.dart';
 
 
-joinJitsiWrapperMeeting(BahmniAppointment appointment, User user) async {
+Future<void> joinJitsiWrapperMeeting(BahmniAppointment appointment, User user) async {
   //TODO Load from config or read from appointment
   var options = JitsiMeetingOptions(roomNameOrUrl: 'bahmni-connect-room');
   await JitsiMeetWrapper.joinMeeting(options: options);

@@ -200,25 +200,25 @@ class _LaunchMeetingState extends State<LaunchMeeting> {
     );
   }
 
-  _onAudioOnlyChanged(bool? value) {
+  void _onAudioOnlyChanged(bool? value) {
     setState(() {
       isAudioOnly = value;
     });
   }
 
-  _onAudioMutedChanged(bool? value) {
+  void _onAudioMutedChanged(bool? value) {
     setState(() {
       isAudioMuted = value;
     });
   }
 
-  _onVideoMutedChanged(bool? value) {
+  void _onVideoMutedChanged(bool? value) {
     setState(() {
       isVideoMuted = value;
     });
   }
 
-  _joinMeeting() async {
+  Future<void> _joinMeeting() async {
     String? serverUrl = serverText.text.trim().isEmpty ? null : serverText.text;
 
     // Enable or disable any feature flag here
@@ -274,7 +274,7 @@ class _LaunchMeetingState extends State<LaunchMeeting> {
   // }
 }
 
-joinJitsiMeeting(BahmniAppointment appointment, User user) async {
+Future<void> joinJitsiMeeting(BahmniAppointment appointment, User user) async {
   //TODO Load from config or read from appointment
   String? serverUrl;
 

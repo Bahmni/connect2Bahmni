@@ -344,7 +344,7 @@ class ConsultationActions extends StatelessWidget {
       },
     );
   }
-   addInvestigationToConsultation(BuildContext context) async {
+   Future<void> addInvestigationToConsultation(BuildContext context) async {
     var board = _activeBoardToUpdate(context);
     if (board == null) return;
 
@@ -361,7 +361,7 @@ class ConsultationActions extends StatelessWidget {
       }
     }
     }
-  addMedicationToConsultation(BuildContext context) async {
+  Future<void> addMedicationToConsultation(BuildContext context) async {
     var board = _activeBoardToUpdate(context);
     if (board == null) return;
 
