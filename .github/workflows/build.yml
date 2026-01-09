@@ -47,7 +47,7 @@ jobs:
           echo app.patientAttributes=phoneNumber*,email       
           echo abdm.identifiers=ABHA Number,ABHA Address
       - run: flutter pub get
-      - name: Patch jitsi_meet_wrapper plugin for AGP 8.6.0
+      - name: Patch plugin dependencies for AGP compatibility
         run: |
           JITSI_BUILD_FILE="$PUB_CACHE/hosted/pub.dev/jitsi_meet_wrapper-0.2.0+1/android/build.gradle"
           if [ -f "$JITSI_BUILD_FILE" ]; then
