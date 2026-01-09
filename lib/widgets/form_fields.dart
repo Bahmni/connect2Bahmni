@@ -65,23 +65,27 @@ class DropDownSearchFormField<T> extends FormField<T> {
       autovalidateMode: autoValidateMode ?? AutovalidateMode.disabled,
       builder: (FormFieldState<T> state) {
         return DropdownSearch<T>(
-          popupProps: PopupProps.menu(showSelectedItems: true, showSearchBox: true,),
-          filterFn: (item, filter) => filterFn != null ? filterFn(item, filter) : item.toString().toLowerCase().contains(filter.toLowerCase()),
-          items: items,
-          itemAsString: itemAsString,
-          clearButtonProps: ClearButtonProps(
-            color: Colors.red,
-            isVisible: true,
-            icon: Icon(Icons.clear, size: 12)
+          popupProps: PopupProps.menu(
+            showSelectedItems: true, 
+            showSearchBox: true,
           ),
+          items: (filter, infiniteScrollProps) async => items,
+          itemAsString: itemAsString,
           enabled: enabled,
           compareFn: compareFn,
-          dropdownDecoratorProps: DropDownDecoratorProps(
-            dropdownSearchDecoration: InputDecoration(
+          suffixProps: DropdownSuffixProps(
+            clearButtonProps: ClearButtonProps(
+              isVisible: true,
+              icon: Icon(Icons.clear, size: 12, color: Colors.red),
+            ),
+          ),
+          decoratorProps: DropDownDecoratorProps(
+            decoration: InputDecoration(
               hintText: label,
               errorStyle: TextStyle(color: Colors.red),
-              errorText: state.hasError? state.errorText : null,
-            ),),
+              errorText: state.hasError ? state.errorText : null,
+            ),
+          ),
           onChanged: (value) {
             state.didChange(value);
             if (onChanged != null) {
@@ -95,21 +99,24 @@ class DropDownSearchFormField<T> extends FormField<T> {
 }
 
 class CheckboxFormField extends FormField<bool> {
+  final bool isEnabled;
+  
   CheckboxFormField({
     super.key,
     Widget? title,
     super.onSaved,
     super.validator,
-    super.enabled,
+    this.isEnabled = true,
     bool super.initialValue = false,
     bool autoValidate = false})
   : super(
+      enabled: isEnabled,
       builder: (FormFieldState<bool> state) {
         return CheckboxListTile(
           dense: state.hasError,
           title: title,
           value: state.value,
-          enabled: enabled,
+          enabled: state.widget.enabled,
           onChanged: state.didChange,
           subtitle: state.hasError ? Builder(
             builder: (BuildContext context) => Text(

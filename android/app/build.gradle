@@ -24,7 +24,7 @@ if (flutterVersionName == null) {
 }
 
 android {
-    namespace "org.bahmni.connect2"
+    namespace "org.bahmni.connect2bahmni"
     compileSdkVersion flutter.compileSdkVersion
     ndkVersion "27.0.12077973"
 
