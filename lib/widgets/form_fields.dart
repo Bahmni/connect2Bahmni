@@ -68,9 +68,16 @@ class DropDownSearchFormField<T> extends FormField<T> {
           popupProps: PopupProps.menu(
             showSelectedItems: true, 
             showSearchBox: true,
+            itemBuilder: (context, item, isDisabled, isSelected) {
+              return ListTile(
+                title: Text(itemAsString?.call(item) ?? item.toString()),
+                selected: isSelected,
+              );
+            },
           ),
           items: (filter, infiniteScrollProps) async => items,
           itemAsString: itemAsString,
+          filterFn: filterFn,
           enabled: enabled,
           compareFn: compareFn,
           suffixProps: DropdownSuffixProps(

@@ -45,7 +45,7 @@ dependencies:
   google_fonts: ^7.0.0
   http: ^1.0.0
   intl: ^0.20.2
-  jitsi_meet_wrapper: ^0.2.0+1
+  jitsi_meet_flutter_sdk: ^11.6.0
   json_annotation: ^4.8.1
   provider: ^6.0.5
   shared_preferences: ^2.1.1

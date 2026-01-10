@@ -12,7 +12,7 @@ import '../screens/models/patient_model.dart';
 import '../services/patients.dart';
 import '../utils/app_routes.dart';
 import '../utils/date_time.dart';
-import 'jitsi_wrapper_meeting.dart';
+import 'jitsi_video_call.dart';
 
 CalendarControllerProvider calendarProvider(BuildContext context, AsyncSnapshot<List<BahmniAppointment>> snapshot) {
   return CalendarControllerProvider<BahmniAppointment>(
@@ -123,12 +123,7 @@ class _AppointmentsDayViewState extends State<AppointmentsDayView> {
             navigator.pushNamed(AppRoutes.patients, arguments: patientModel);
           }
             if (value == 'Join') {
-              //joinJitsiMeeting(event, _user!);
-              joinJitsiWrapperMeeting(event, _user!);
-              // Navigator.push(
-              //   context,
-              //   MaterialPageRoute(builder: (context) => LaunchMeeting(event: _event)),
-              // );
+              startJitsiVideoCall(event, _user!);
             }
           }
         },
@@ -225,3 +220,4 @@ Widget _defaultEventTileBuilder(
 String truncateWithEllipsis(int cutoff, String myString) {
   return (myString.length <= cutoff) ? myString : '${myString.substring(0, cutoff)}...';
 }
+
