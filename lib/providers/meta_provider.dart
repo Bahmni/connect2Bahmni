@@ -142,19 +142,18 @@ class MetaProvider with ChangeNotifier {
     var consultConceptUuid = Environment().consultationNoteConcept!;
     return Future.wait(
       [
-        ConceptDictionary().fetchDiagnosisCertainty(),
-        ConceptDictionary().fetchDiagnosisOrder(),
-        Encounters().visitTypes(),
-        Encounters().encTypes(),
-        Patients().identifierTypes(),
-        Patients().attributeTypes(),
-        EmrApiService().orderTypes(),
-        ConceptDictionary().fetchConceptByUuid(consultConceptUuid),
-        BahmniForms().published(),
-        ConceptDictionary().dosageInstruction(),
+        ConceptDictionary().fetchDiagnosisCertainty().catchError((_) => null),
+        ConceptDictionary().fetchDiagnosisOrder().catchError((_) => null),
+        Encounters().visitTypes().catchError((_) => null),
+        Encounters().encTypes().catchError((_) => null),
+        Patients().identifierTypes().catchError((_) => null),
+        Patients().attributeTypes().catchError((_) => null),
+        EmrApiService().orderTypes().catchError((_) => null),
+        ConceptDictionary().fetchConceptByUuid(consultConceptUuid).catchError((_) => null),
+        BahmniForms().published().catchError((_) => null),
+        ConceptDictionary().dosageInstruction().catchError((_) => null),
       ]
     ).then((List<Object?> values) {
-      debugPrint('initMetaData: metadata loaded');
       _conditionCertainty = values[0] as OmrsConcept?;
       _diagnosisOrder = values[1] as OmrsConcept?;
       _visitTypes = values[2] as List<OmrsVisitType>?;
