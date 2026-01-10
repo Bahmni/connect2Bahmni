@@ -144,14 +144,14 @@ class MetaProvider with ChangeNotifier {
       [
         ConceptDictionary().fetchDiagnosisCertainty().catchError((_) => null),
         ConceptDictionary().fetchDiagnosisOrder().catchError((_) => null),
-        Encounters().visitTypes().catchError((_) => null),
-        Encounters().encTypes().catchError((_) => null),
-        Patients().identifierTypes().catchError((_) => null),
-        Patients().attributeTypes().catchError((_) => null),
-        EmrApiService().orderTypes().catchError((_) => null),
+        Encounters().visitTypes().catchError((_) => <OmrsVisitType>[]),
+        Encounters().encTypes().catchError((_) => <OmrsEncounterType>[]),
+        Patients().identifierTypes().catchError((_) => <OmrsIdentifierType>[]),
+        Patients().attributeTypes().catchError((_) => <OmrsPersonAttributeType>[]),
+        EmrApiService().orderTypes().catchError((_) => <OmrsOrderType>[]),
         ConceptDictionary().fetchConceptByUuid(consultConceptUuid).catchError((_) => null),
-        BahmniForms().published().catchError((_) => null),
-        ConceptDictionary().dosageInstruction().catchError((_) => null),
+        BahmniForms().published().catchError((_) => <FormResource>[]),
+        ConceptDictionary().dosageInstruction().catchError((_) => DoseAttributes()),
       ]
     ).then((List<Object?> values) {
       _conditionCertainty = values[0] as OmrsConcept?;
