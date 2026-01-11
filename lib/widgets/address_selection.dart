@@ -254,13 +254,6 @@ class _AddressScreenState extends State<AddressScreen> {
          address.countyDistrict = _districtController.text.trim();
          address.subDistrict = _subDistrictController.text.trim();
          address.cityVillage = _villageController.text.trim();
-       } else {
-         widget.controller?.setData(
-             ProfileAddress(
-               stateProvince: _stateController.text.trim(),
-               cityVillage: _villageController.text.trim(),
-               subDistrict: _subDistrictController.text.trim(),
-               countyDistrict: _districtController.text.trim()));
        }
     }
   }

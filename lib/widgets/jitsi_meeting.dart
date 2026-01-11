@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:jitsi_meet_wrapper/jitsi_meet_wrapper.dart';
+import 'package:jitsi_meet_flutter_sdk/jitsi_meet_flutter_sdk.dart';
 
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
@@ -185,7 +185,7 @@ class _LaunchMeetingState extends State<LaunchMeeting> {
               },
               style: ButtonStyle(
                   backgroundColor:
-                  MaterialStateColor.resolveWith((states) => Colors.blue)),
+                  WidgetStateColor.resolveWith((states) => Colors.blue)),
               child: const Text(
                 "Join Meeting",
                 style: TextStyle(color: Colors.white),
@@ -200,61 +200,60 @@ class _LaunchMeetingState extends State<LaunchMeeting> {
     );
   }
 
-  _onAudioOnlyChanged(bool? value) {
+  void _onAudioOnlyChanged(bool? value) {
     setState(() {
       isAudioOnly = value;
     });
   }
 
-  _onAudioMutedChanged(bool? value) {
+  void _onAudioMutedChanged(bool? value) {
     setState(() {
       isAudioMuted = value;
     });
   }
 
-  _onVideoMutedChanged(bool? value) {
+  void _onVideoMutedChanged(bool? value) {
     setState(() {
       isVideoMuted = value;
     });
   }
 
-  _joinMeeting() async {
+  Future<void> _joinMeeting() async {
     String? serverUrl = serverText.text.trim().isEmpty ? null : serverText.text;
 
-    // Enable or disable any feature flag here
-    // If feature flag are not provided, default values will be used
-    // Full list of feature flags (and defaults) available in the README
-    Map<String, Object> featureFlags = {};
-
-    var options = JitsiMeetingOptions(
-        roomNameOrUrl: roomIdentifier.text,
-        serverUrl: serverUrl,
-        subject: titleText.text,
-        userDisplayName: nameText.text,
-        userEmail: emailText.text,
-        isAudioMuted: isAudioMuted,
-        isAudioOnly: isAudioOnly,
-        isVideoMuted: isVideoMuted,
-        featureFlags: featureFlags
+    var options = JitsiMeetConferenceOptions(
+      room: roomIdentifier.text,
+      serverURL: serverUrl,
+      userInfo: JitsiMeetUserInfo(
+        displayName: nameText.text,
+        email: emailText.text,
+      ),
+      configOverrides: {
+        "subject": titleText.text,
+        "startWithAudioMuted": isAudioMuted ?? false,
+        "startWithVideoMuted": isVideoMuted ?? false,
+      },
+      featureFlags: {
+        "audio-only.enabled": isAudioOnly ?? false,
+      },
     );
 
-    //debugPrint("JitsiMeetingOptions: $options");
-    await JitsiMeetWrapper.joinMeeting(
-      options: options,
-      listener: JitsiMeetingListener(
-          onConferenceWillJoin: (message) {
-            debugPrint("${options.roomNameOrUrl} will join with message: $message");
-          },
-          onConferenceJoined: (message) {
-            debugPrint("${options.roomNameOrUrl} joined with message: $message");
-          },
-          onConferenceTerminated: (message, error) {
-            debugPrint("${options.roomNameOrUrl} terminated with message: $message");
-          },
-          onClosed: () => {
-            debugPrint("${options.roomNameOrUrl} closed")
-          }),
+    //debugPrint("JitsiMeetConferenceOptions: $options");
+    var jitsiMeet = JitsiMeet();
+    
+    var listener = JitsiMeetEventListener(
+      conferenceWillJoin: (url) {
+        debugPrint("${options.room} will join with url: $url");
+      },
+      conferenceJoined: (url) {
+        debugPrint("${options.room} joined with url: $url");
+      },
+      conferenceTerminated: (url, error) {
+        debugPrint("${options.room} terminated with url: $url, error: $error");
+      },
     );
+    
+    await jitsiMeet.join(options, listener);
   }
 
   // void _onConferenceWillJoin(message) {
@@ -274,40 +273,40 @@ class _LaunchMeetingState extends State<LaunchMeeting> {
   // }
 }
 
-joinJitsiMeeting(BahmniAppointment appointment, User user) async {
+Future<void> joinJitsiMeeting(BahmniAppointment appointment, User user) async {
   //TODO Load from config or read from appointment
   String? serverUrl;
 
-  // Enable or disable any feature flag here
-  // If feature flag are not provided, default values will be used
-  // Full list of feature flags (and defaults) available in the README
-  Map<String, Object> featureFlags = {};
-  // Define meetings options here
-  var options = JitsiMeetingOptions(
-      roomNameOrUrl: appointment.uuid!,
-      serverUrl: serverUrl,
-      subject: 'Consultation',
-      userDisplayName: user.person.display,
-      userEmail: '',
-      isAudioMuted: false,
-      isAudioOnly: false,
-      isVideoMuted: false,
-      featureFlags: featureFlags
+  var options = JitsiMeetConferenceOptions(
+    room: appointment.uuid!,
+    serverURL: serverUrl,
+    userInfo: JitsiMeetUserInfo(
+      displayName: user.person.display,
+      email: '',
+    ),
+    configOverrides: {
+      "subject": 'Consultation',
+      "startWithAudioMuted": false,
+      "startWithVideoMuted": false,
+    },
   );
-  debugPrint('server url  ${options.serverUrl}');
-
-  debugPrint("JitsiMeetingOptions: $options");
-  await JitsiMeetWrapper.joinMeeting(
-    options: options,
-    listener: JitsiMeetingListener(
-        onConferenceWillJoin: (message) {
-          debugPrint("${options.roomNameOrUrl} will join with message: $message");
-        },
-        onConferenceJoined: (message) {
-          debugPrint("${options.roomNameOrUrl} joined with message: $message");
-        },
-        onConferenceTerminated: (message, error) {
-          debugPrint("${options.roomNameOrUrl} terminated with message: $message");
-        }),
+  
+  debugPrint('server url: ${options.serverURL}');
+  debugPrint("JitsiMeetConferenceOptions room: ${options.room}");
+  
+  var jitsiMeet = JitsiMeet();
+  
+  var listener = JitsiMeetEventListener(
+    conferenceWillJoin: (url) {
+      debugPrint("${options.room} will join with url: $url");
+    },
+    conferenceJoined: (url) {
+      debugPrint("${options.room} joined with url: $url");
+    },
+    conferenceTerminated: (url, error) {
+      debugPrint("${options.room} terminated with url: $url, error: $error");
+    },
   );
+  
+  await jitsiMeet.join(options, listener);
 }

@@ -220,7 +220,7 @@ class _ObservationFormState extends State<ObservationForm> {
           title: Text('${field.label} ${field.required ? '*' : ''}'),
           validator: (value) => field.required ? 'Required' : null,
           onSaved: (value) => field.value = value,
-          enabled: isEditing,
+          isEnabled: isEditing,
         );
   }
 

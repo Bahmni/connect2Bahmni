@@ -65,42 +65,66 @@ class MetaProvider with ChangeNotifier {
     ConceptDictionary().fetchDiagnosisCertainty().then((value) {
       _conditionCertainty = value;
       notifyListeners();
-    }).onError((error, stackTrace) => _logError(error));
+    }).onError((error, stackTrace) {
+      _logError(error);
+      return null;
+    });
     ConceptDictionary().fetchDiagnosisOrder().then((value) {
       _diagnosisOrder = value;
       notifyListeners();
-    }).onError((error, stackTrace) => _logError(error));
+    }).onError((error, stackTrace) {
+      _logError(error);
+      return null;
+    });
     Encounters().visitTypes().then((value) {
       _visitTypes = value;
       notifyListeners();
-    }).catchError((e) => _logError(e));
+    }).catchError((e) {
+      _logError(e);
+      return null;
+    });
 
     Encounters().encTypes().then((value) {
       _encTypes = value;
       notifyListeners();
-    }).catchError((e) => _logError(e));
+    }).catchError((e) {
+      _logError(e);
+      return null;
+    });
 
     Patients().identifierTypes().then((value) {
       _patientIdentifierTypes = value;
       notifyListeners();
-    }).catchError((e) => _logError(e));
+    }).catchError((e) {
+      _logError(e);
+      return null;
+    });
 
     Patients().attributeTypes().then((value) {
       _personAttrTypes = value;
       notifyListeners();
-    }).catchError((e) => _logError(e));
+    }).catchError((e) {
+      _logError(e);
+      return null;
+    });
 
     var consultConceptUuid = Environment().consultationNoteConcept!;
     if (consultConceptUuid.isNotEmpty) {
       ConceptDictionary().fetchConceptByUuid(consultConceptUuid).then((value) {
         _consultNoteConcept = value;
         notifyListeners();
-      }).catchError((e) => _logError(e));
+      }).catchError((e) {
+        _logError(e);
+        return null;
+      });
     }
     BahmniForms().published().then((value) {
       _publishedForms = value;
       notifyListeners();
-    }).catchError((e) => _logError(e));
+    }).catchError((e) {
+      _logError(e);
+      return null;
+    });
     EmrApiService().orderTypes().then((value) {
       _orderTypes = value;
       notifyListeners();
@@ -108,26 +132,28 @@ class MetaProvider with ChangeNotifier {
     ConceptDictionary().dosageInstruction().then((value) {
       _dosageInstructions = value;
       notifyListeners();
-    }).onError((error, stackTrace) => _logError(error));
+    }).onError((error, stackTrace) {
+      _logError(error);
+      return null;
+    });
   }
 
   Future<bool> initMetaData() {
     var consultConceptUuid = Environment().consultationNoteConcept!;
     return Future.wait(
       [
-        ConceptDictionary().fetchDiagnosisCertainty(),
-        ConceptDictionary().fetchDiagnosisOrder(),
-        Encounters().visitTypes(),
-        Encounters().encTypes(),
-        Patients().identifierTypes(),
-        Patients().attributeTypes(),
-        EmrApiService().orderTypes(),
-        ConceptDictionary().fetchConceptByUuid(consultConceptUuid),
-        BahmniForms().published(),
-        ConceptDictionary().dosageInstruction(),
+        ConceptDictionary().fetchDiagnosisCertainty().catchError((_) => null),
+        ConceptDictionary().fetchDiagnosisOrder().catchError((_) => null),
+        Encounters().visitTypes().catchError((_) => <OmrsVisitType>[]),
+        Encounters().encTypes().catchError((_) => <OmrsEncounterType>[]),
+        Patients().identifierTypes().catchError((_) => <OmrsIdentifierType>[]),
+        Patients().attributeTypes().catchError((_) => <OmrsPersonAttributeType>[]),
+        EmrApiService().orderTypes().catchError((_) => <OmrsOrderType>[]),
+        ConceptDictionary().fetchConceptByUuid(consultConceptUuid).catchError((_) => null),
+        BahmniForms().published().catchError((_) => <FormResource>[]),
+        ConceptDictionary().dosageInstruction().catchError((_) => DoseAttributes()),
       ]
     ).then((List<Object?> values) {
-      debugPrint('initMetaData: metadata loaded');
       _conditionCertainty = values[0] as OmrsConcept?;
       _diagnosisOrder = values[1] as OmrsConcept?;
       _visitTypes = values[2] as List<OmrsVisitType>?;
@@ -146,8 +172,8 @@ class MetaProvider with ChangeNotifier {
     });
   }
 
-  _logError(e) {
-    debugPrint(e);
+  void _logError(dynamic e) {
+    debugPrint(e.toString());
   }
 }
 

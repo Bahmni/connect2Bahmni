@@ -36,7 +36,7 @@ class OmrsPatient {
     return dt != null ? toFhirDate(dt) : null;
   }
 
-  _address() {
+  List<fhir.Address>? _address() {
      var prefAdrr = person?.address;
      return prefAdrr != null ? [prefAdrr] : null;
   }

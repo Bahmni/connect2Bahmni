@@ -26,7 +26,7 @@ class ProfileModel extends ChangeNotifier {
 
   bool get isNewPatient => uuid == null;
 
-  updateBasicDetails(ProfileBasics basics) {
+  void updateBasicDetails(ProfileBasics basics) {
     basicDetails = ProfileBasics(
       firstName: basics.firstName,
       lastName: basics.lastName,

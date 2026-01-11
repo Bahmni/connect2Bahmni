@@ -63,7 +63,7 @@ class Providers {
     }
   }
 
-  Practitioner fromOmrsProvider(providerJson) {
+  Practitioner fromOmrsProvider(Map<String, dynamic> providerJson) {
     return Practitioner(fhirId: providerJson['uuid'],
         identifier: [Identifier(system: FhirUri(AppUrls.omrs.provider), value: providerJson['identifier'])],
     );

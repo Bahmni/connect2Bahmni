@@ -54,6 +54,7 @@ class _PatientsSearchWidgetState extends State<PatientSearch> {
       _initialPatientList = patients;
       patientListNotifier.value = patients;
     }).onError((error, stackTrace) {
+      if (!mounted) return;
       String errorMsg = error is Failure ? error.message : '';
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error. $errorMsg')),
@@ -183,6 +184,7 @@ class _PatientsSearchWidgetState extends State<PatientSearch> {
             }
           },
           onError: (err) {
+            if (!mounted) return;
             String errorMsg = err is Failure ? err.message : '';
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text('Search failed. $errorMsg')),
@@ -283,7 +285,3 @@ enum PatientSearchType {
   final String display;
   const PatientSearchType(this.display);
 }
-
-
-
-

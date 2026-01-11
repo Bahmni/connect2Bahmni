@@ -98,6 +98,7 @@ class _ConceptSearchWidgetState extends State<ConceptSearch> {
             });
           },
           onError: (err) {
+            if (!mounted) return;
             String errorMsg = err is Failure ? err.message : '';
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text('Search failed. $errorMsg')),
@@ -299,6 +300,3 @@ class _ConceptSearchWidgetState extends State<ConceptSearch> {
 }
 
 typedef OnSelectConcept = void Function(OmrsConcept selectedConcept);
-
-
-

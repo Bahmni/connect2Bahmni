@@ -412,10 +412,11 @@ class _PatientRegistration extends State<PatientRegistration> {
       return false;
     }
     if (profile.isNewPatient) {
-      return Registrations().createPatient(profile)
-          .then((value) => profile.updateFrom(value))
+        return Registrations().createPatient(profile)
+            .then((value) => profile.updateFrom(value))
           .then((value) => true)
           .onError((error, stackTrace) {
+              if (!mounted) return false;
               String errorMsg = error is Failure ? error.message : '';
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(content: Text('Could not save patient. $errorMsg')),
@@ -432,5 +433,3 @@ class _PatientRegistration extends State<PatientRegistration> {
     return true;
   }
 }
-
-

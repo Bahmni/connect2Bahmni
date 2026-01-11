@@ -233,7 +233,7 @@ class _MedicationDetailsState extends State<MedicationDetails> {
       return Container(
         alignment: Alignment.topRight,
         child: DropdownButtonFormField(
-          value: _selectedUnitType,
+          initialValue: _selectedUnitType,
           alignment: Alignment.topLeft,
           onChanged: (value) {
             _selectedUnitType = value!;
@@ -258,7 +258,7 @@ class _MedicationDetailsState extends State<MedicationDetails> {
               ),
               Expanded(
                   child: DropdownButtonFormField(
-                    value: _selectedRouteType,
+                    initialValue: _selectedRouteType,
                     alignment: Alignment.topLeft,
                     onChanged: (value) {
                       _selectedRouteType = value!;
@@ -287,7 +287,7 @@ class _MedicationDetailsState extends State<MedicationDetails> {
                   ),
                   Expanded(
                       child: DropdownButtonFormField(
-                        value: _selectedFrequencyType,
+                        initialValue: _selectedFrequencyType,
                         alignment: Alignment.topLeft,
                         onChanged: (value) {
                           setState(() {
@@ -309,7 +309,7 @@ class _MedicationDetailsState extends State<MedicationDetails> {
   Widget _selectDurationUnit(List<dynamic> items) {
     return SizedBox(
       child: DropdownButtonFormField(
-        value: _selectedDurationType,
+        initialValue: _selectedDurationType,
         alignment: Alignment.topLeft,
         onChanged: (value) {
           setState(() {
@@ -337,7 +337,7 @@ class _MedicationDetailsState extends State<MedicationDetails> {
               ),
               Expanded(
                 child: DropdownButtonFormField<String>(
-                  value: _selectedDosingInstructions,
+                  initialValue: _selectedDosingInstructions,
                   alignment: Alignment.topRight,
                   onChanged: (value) {
                     setState(() {
@@ -620,7 +620,7 @@ class _MedicationDetailsState extends State<MedicationDetails> {
                     _effectiveStartDate = pickedDate;
                     _dateController.text = formattedDate;
                   }
-                }
+                                }
               ),
             ),
           ],

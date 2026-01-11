@@ -58,11 +58,11 @@ class _MedicationSearchWidgetState extends State<MedicationSearch> {
                       padding: const EdgeInsetsDirectional.fromSTEB(12, 0, 12, 0),
                       child: SearchBar(
                           hintText: lblSearchForMedications,
-                          hintStyle:  MaterialStateProperty.resolveWith((states) {
+                          hintStyle:  WidgetStateProperty.resolveWith((states) {
                             return Theme.of(context).textTheme.bodyLarge?.merge(
                                 TextStyle(fontFamily: 'Lexend Deca', color: Color(0xFF95A1AC), fontSize: 15, fontWeight: FontWeight.normal));
                           }),
-                          backgroundColor: MaterialStateColor.resolveWith((states) => Colors.white),
+                          backgroundColor: WidgetStateColor.resolveWith((states) => Colors.white),
                           controller: searchController,
                           leading: IconButton(icon: Icon(Icons.search), color: Color(0xFF95A1AC), onPressed: () => _searchForMedication())
                       ),
@@ -120,6 +120,7 @@ class _MedicationSearchWidgetState extends State<MedicationSearch> {
           });
         }
       }).onError((error, stackTrace) {
+        if (!mounted) return;
         String errorMsg = error is Failure ? error.message : errMedicationSearch;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Search failed. $errorMsg')),
@@ -128,4 +129,3 @@ class _MedicationSearchWidgetState extends State<MedicationSearch> {
     });
   }
 }
-

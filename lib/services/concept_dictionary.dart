@@ -116,8 +116,10 @@ class ConceptDictionary {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     if (prefs.containsKey(cacheKey)) {
       String? cachedData = prefs.getString(cacheKey);
-      Map<String,dynamic>? resultList = jsonDecode(cachedData!) as Map<String,dynamic>;
-      return DoseAttributes(details: resultList);
+      if (cachedData != null) {
+        Map<String,dynamic>? resultList = jsonDecode(cachedData) as Map<String,dynamic>;
+        return DoseAttributes(details: resultList);
+      }
     }
     String url = AppUrls.omrs.dosageInstructions;
     var response = await http.get(

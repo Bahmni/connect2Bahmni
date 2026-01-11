@@ -119,7 +119,7 @@ class _BasicProfileState extends State<BasicProfile> {
                   });
                 },
                 activeTrackColor: Colors.lightBlueAccent,
-                activeColor: Colors.blueGrey,
+                thumbColor: WidgetStateProperty.all(Colors.blueGrey),
               ),
             ],
           ),
@@ -273,7 +273,7 @@ class _BasicProfileState extends State<BasicProfile> {
                     _birthDate = date;
                   });
                 }
-              },
+                            },
               onSaved: _updateDob,
           ),
         ),

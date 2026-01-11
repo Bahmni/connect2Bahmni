@@ -61,9 +61,11 @@ class _ProfileAttributesState extends State<ProfileAttributes> {
     });
     for (var attrType in attributeTypes) {
       List<ProfileAttribute>? attributes = widget.attributes ?? widget.controller?.getData();
-      attributes?.where((attr) => attr.typeUuid == attrType.uuid).forEach((attr) {
-        attributeValues[attrType.uuid!] = attr.value;
-      });
+      if (attributes != null) {
+        attributes.where((attr) => attr.typeUuid == attrType.uuid).forEach((attr) {
+          attributeValues[attrType.uuid!] = attr.value;
+        });
+      }
     }
   }
 

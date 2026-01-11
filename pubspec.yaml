@@ -39,24 +39,24 @@ dependencies:
   english_words: ^4.0.0
   fhir: ^0.12.0
   flutter_week_view: ^1.3.0
-  flutter_dotenv: ^5.1.0
-  flutter_slidable: ^3.0.0
+  flutter_dotenv: ^6.0.0
+  flutter_slidable: ^4.0.3
   flutter_spinkit: ^5.2.0
-  google_fonts: ^6.2.0
+  google_fonts: ^7.0.0
   http: ^1.0.0
-  intl: ^0.19.0
-  jitsi_meet_wrapper: ^0.2.0+1
+  intl: ^0.20.2
+  jitsi_meet_flutter_sdk: ^11.6.0
   json_annotation: ^4.8.1
   provider: ^6.0.5
   shared_preferences: ^2.1.1
-  speech_to_text: ^6.1.1
+  speech_to_text: ^7.0.0
   uuid: ^4.2.2
   file: ^7.0.0
-  dropdown_search: ^5.0.6
+  dropdown_search: ^6.0.2
   logging: ^1.2.0
   flutter_speed_dial: ^7.0.0
   flutter_typeahead: ^5.2.0
-  camera: ^0.10.5+2
+  camera: ^0.11.3
   path_provider: ^2.0.15
   path: ^1.8.3
 
@@ -71,7 +71,7 @@ dev_dependencies:
   # activated in the `analysis_options.yaml` file located at the root of your
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
-  flutter_lints: ^4.0.0
+  flutter_lints: ^6.0.0
 
   build_runner: ^2.4.6
   json_serializable: ^6.7.0

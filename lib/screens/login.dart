@@ -63,6 +63,7 @@ class _LoginState extends State<Login> {
       _formKey.currentState!.save();
       _authProvider!.authenticate(_username as String, _password as String)
           .then((response) {
+        if (!mounted) return;
         if (response.status) {
           var session = response.session!;
           Provider.of<UserProvider>(context, listen: false).setUser(session.user);

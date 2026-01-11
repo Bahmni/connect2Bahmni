@@ -66,7 +66,7 @@ class _ConsultPadWidgetState extends State<ConsultPadWidget> {
 
   Widget _showConsultation(BuildContext context, ConsultationModel? consultation) {
     return Container(
-        color: Theme.of(context).colorScheme.background,
+        color: Theme.of(context).colorScheme.surface,
         child: Column(
           children: [
             _heading(context, consultation),
@@ -231,7 +231,7 @@ class _ConsultPadWidgetState extends State<ConsultPadWidget> {
         ],
       ),
       child: Container(
-          color: Theme.of(context).colorScheme.background,
+          color: Theme.of(context).colorScheme.surface,
           child: ListTile(
             leading: const Icon(
               Icons.medical_services_outlined,
@@ -305,7 +305,7 @@ class _ConsultPadWidgetState extends State<ConsultPadWidget> {
           ],
         ),
         child: Container(
-          color: Theme.of(context).colorScheme.background,
+          color: Theme.of(context).colorScheme.surface,
           child: ListTile(
             leading: const Icon(Icons.medication_outlined, size: 24),
             //title: Text('$drugName'),
@@ -350,7 +350,7 @@ class _ConsultPadWidgetState extends State<ConsultPadWidget> {
         ],
       ),
       child: Container(
-        color: Theme.of(context).colorScheme.background,
+        color: Theme.of(context).colorScheme.surface,
         child: ListTile(
           leading: const Icon(
             Icons.category,
@@ -489,7 +489,7 @@ class _ConsultPadWidgetState extends State<ConsultPadWidget> {
           ],
         ),
         child: Container(
-          color: Theme.of(context).colorScheme.background,
+          color: Theme.of(context).colorScheme.surface,
           child: ListTile(
             leading: const Icon(
               Icons.description_outlined,
@@ -596,7 +596,7 @@ class _ConsultationNote extends StatelessWidget {
         ],
       ),
       child: Container(
-        color: Theme.of(context).colorScheme.background,
+        color: Theme.of(context).colorScheme.surface,
         child: const ListTile(
           title: Text('Consultation Notes'),
           tileColor: Colors.red,
